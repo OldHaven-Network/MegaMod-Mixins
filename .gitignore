@@ -11,7 +11,6 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
@@ -31,5 +30,4 @@ MegaMod-Mixins.iws
 .idea/
 build/
 .gradle/
-gradle/
 run/
