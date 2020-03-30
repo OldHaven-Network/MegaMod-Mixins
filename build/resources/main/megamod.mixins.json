@@ -1,0 +1,40 @@
+{
+  "required": true,
+  "package": "net.oldhaven.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+    "MixinGameSettings",
+    "MixinMinecraft",
+    "MixinPacket",
+    "MixinThreadDownloadResources",
+    "MixinTileEntitySignRenderer",
+    "MixinThreadCheckHasPaid",
+    "MixinTexturePackList",
+    "MixinNetworkManager",
+    "blocks.MixinRenderBlocks",
+    "gui.MixinGuiButton",
+    "gui.MixinGuiControls",
+    "gui.MixinGuiChat",
+    "gui.MixinGuiConnecting",
+    "gui.MixinGuiEditSign",
+    "gui.MixinGuiIngame",
+    "gui.MixinGuiIngameMenu",
+    "gui.MixinGuiMainMenu",
+    "gui.MixinGuiMultiplayer",
+    "gui.MixinGuiOptions",
+    "entity.MixinEntity",
+    "entity.MixinImageBufferDownload",
+    "entity.MixinEntityLiving",
+    "entity.MixinEntityOtherPlayerMP",
+    "entity.MixinEntityPlayerSP",
+    "entity.MixinEntityRenderer",
+    "world.MixinNetClientHandler",
+    "world.MixinWorldInfo",
+    "world.MixinWorldProvider"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
