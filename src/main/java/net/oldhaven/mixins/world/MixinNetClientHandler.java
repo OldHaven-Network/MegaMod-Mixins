@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.NetworkManager;
 import net.minecraft.src.Packet18Animation;
+import net.minecraft.src.Packet3Chat;
 import net.oldhaven.customs.CustomGameSettings;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.packets.CustomPackets;
@@ -22,6 +23,11 @@ public class MixinNetClientHandler {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
         CustomPackets.receiveNetworkClient(this.netManager);
+    }
+
+    @Inject(method = "handleChat", at = @At("RETURN"))
+    public void handleChat(Packet3Chat var1, CallbackInfo ci) {
+        System.out.println(var1.message);
     }
 
     @Inject(method = "handleArmAnimation", at=@At("HEAD"), cancellable = true)

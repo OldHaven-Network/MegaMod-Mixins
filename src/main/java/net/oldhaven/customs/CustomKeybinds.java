@@ -40,6 +40,24 @@ public class CustomKeybinds {
         keyIntegers = new HashMap<>();
     }
 
+    public static Map<String, Integer> defaultKeybinds = new HashMap<String, Integer>() {
+        {
+            put("Forward", Keyboard.KEY_W);
+            put("Left", Keyboard.KEY_A);
+            put("Right", Keyboard.KEY_D);
+            put("Back", Keyboard.KEY_S);
+            put("Jump", Keyboard.KEY_SPACE);
+            put("Sneak", Keyboard.KEY_LSHIFT);
+            put("Drop", Keyboard.KEY_Q);
+            put("Inventory", Keyboard.KEY_E);
+            put("Chat", Keyboard.KEY_T);
+            put("Toggle Fog", Keyboard.KEY_F);
+            put("PlayerList", Keyboard.KEY_TAB);
+            put("Fly", Keyboard.KEY_R);
+            put("Sprint", Keyboard.KEY_LCONTROL);
+        }
+    };
+
     public Map<String, SavedKey> getSavedKeys() {
         return savedKeysMap;
     }
@@ -72,6 +90,10 @@ public class CustomKeybinds {
     private void onKey_Fly(boolean b) {
         boolean flying = MegaMod.getInstance().isFlying;
         MegaMod.getInstance().isFlying = !flying;
+    }
+
+    private void onKey_PlayerList(boolean b) {
+        MegaMod.getInstance().playerList = b;
     }
 
     public void onKey(String name, boolean b) {
@@ -108,6 +130,11 @@ public class CustomKeybinds {
 
     public void keyCheck() {
         CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+        if(gs.getOptionI("Disable PlayerList") != 1)
+            keyActions.put("PlayerList", this::onKey_PlayerList);
+        else
+            keyActions.remove("PlayerList");
+        savedKeysMap.put("PlayerList", new SavedKey(1, Keyboard.KEY_TAB, "PlayerList"));
         if(gs.getOptionI("Disable Fly") != 1)
             keyActions.put("Fly", this::onKey_Fly);
         else

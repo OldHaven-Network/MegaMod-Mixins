@@ -25,29 +25,37 @@ public class GuiGuiSettings extends GuiScreen
         guiGameSettings = gamesettings;
     }
 
+    private CustomGuiButton.GuiTextField colorField;
     public void initGui()
     {
         StringTranslate stringtranslate = StringTranslate.getInstance();
         int i = 0;
-        CustomEnumOptions aenumoptions[] = videoOptions;
-        int j = aenumoptions.length;
+        CustomEnumOptions[] enumOptions = videoOptions;
+        int j = enumOptions.length;
         for(int k = 0; k < j; k++)
         {
             CustomEnumOptions enumoptions = videoOptions[k];
             String option = enumoptions.getEnumString();
-            if(!enumoptions.getEnumFloat())
-            {
+            if(enumoptions.getEnumBoolean()) {
                 controlList.add(new CustomGuiButton.GuiSmallButton(enumoptions.returnEnumOrdinal(), (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), enumoptions, option));
-            } else {
+            } else if(enumoptions.getEnumFloat()) {
                 Float value = MegaMod.getInstance().getCustomGameSettings().getOptionF(enumoptions.getEnumString());
                 controlList.add(new CustomGuiButton.GuiSlider(
                         enumoptions.returnEnumOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
                         enumoptions, option, value == null ? 0F : value));
+            } else {
+                String value = MegaMod.getInstance().getCustomGameSettings().getOptionS(enumoptions.getEnumString());
+                controlList.add(colorField=new CustomGuiButton.GuiTextField(this,
+                        fontRenderer, enumoptions.returnEnumOrdinal(),
+                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                        enumoptions, value));
             }
             i++;
         }
 
+        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+        colorField.enabled = ((int) (gs.getOptionF("Button Outline") * 11.0F)) == 11;
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
     }
 
@@ -55,13 +63,12 @@ public class GuiGuiSettings extends GuiScreen
     {
         if(!guibutton.enabled)
             return;
-        if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton))
-        {
-            MegaMod.getInstance().getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
-            guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
-        }
-        if(guibutton.id == 200)
-        {
+        if(guibutton.id < 100) {
+             if(guibutton instanceof GuiSmallButton) {
+                MegaMod.getInstance().getCustomGameSettings().setOptionBtn(((GuiSmallButton) guibutton).returnEnumOptions().name());
+                guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
+            }
+        } else if (guibutton.id == 200) {
             mc.gameSettings.saveOptions();
             mc.displayGuiScreen(parentGuiScreen);
         }
@@ -69,9 +76,6 @@ public class GuiGuiSettings extends GuiScreen
 
     public void drawScreen(int i, int j, float f)
     {
-        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-        Integer show = gs.getOptionI("Enable Button Outline");
-        ((GuiButton) controlList.get(1)).enabled = (show == 1);
         drawDefaultBackground();
         drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         super.drawScreen(i, j, f);
@@ -85,8 +89,9 @@ public class GuiGuiSettings extends GuiScreen
     static 
     {
         videoOptions = (new CustomEnumOptions[] {
-                CustomEnumOptions.ENABLE_BTN_OUTLINE, CustomEnumOptions.BTN_OUTLINE_COLOR, CustomEnumOptions.SHOW_SPEED, CustomEnumOptions.SHOW_MOTION,
-                CustomEnumOptions.SHOW_TOOLTIP, CustomEnumOptions.DEFAULT_MM_BACKGROUND, CustomEnumOptions.SHOW_QUIT_BUTTON
+                CustomEnumOptions.BTN_OUTLINE_COLOR, CustomEnumOptions.BTN_ADVANCED_COLOR, CustomEnumOptions.SHOW_SPEED,
+                CustomEnumOptions.SHOW_MOTION, CustomEnumOptions.SHOW_TOOLTIP, CustomEnumOptions.DEFAULT_MM_BACKGROUND,
+                CustomEnumOptions.SHOW_QUIT_BUTTON
         });
     }
 }

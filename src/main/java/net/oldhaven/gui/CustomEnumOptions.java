@@ -25,24 +25,29 @@ public enum CustomEnumOptions {
     SHOW_MOTION("Show Motion In-Game", false, true, 0),
     SHOW_SPEED("Show Speed In-Game", false, true, 0),
     BTN_OUTLINE_COLOR("Button Outline", true, false, "OFF", 11.0F, "", 0.0F, 0.0F,
-            new String[]{
-                    "OFF", "White", "Blue", "Purple", "Red", "Aqua", "Green", "Yellow", "Orange", "Light Grey", "Grey", "Black"
-            }),
-    ENABLE_BTN_OUTLINE("Enable Button Outline", false, true, 0),
+        new String[]{
+                "White", "Blue", "Purple", "Red", "Aqua", "Green", "Yellow", "Orange", "Light Grey", "Grey", "Black", "ADVANCED"
+        }),
+    BTN_ADVANCED_COLOR("Button ADV Color", false, false, "(NOTWORKING)", 2, 8),
 
+    Disable_PlayerList("Disable PlayerList", false, true, 0),
     DISABLE_SPRINT("Disable Sprint", false, true, 0),
     DISABLE_FLY("Disable Fly", false, true, 0);
 
     private final boolean enumFloat;
     private final boolean enumBoolean;
     private final String enumString;
+    private int defaultValueInt = -83;
     private float defaultValue = -1.0158F;
+    private String defaultValueString = "";
     private String startString = "OFF";
     private float start = 0.0F;
     private float times = 100.0F;
     private String slideEnd = "%";
     private float add = 0.0F;
     private String[] values = null;
+    private int minString = 0;
+    private int maxString = 20;
 
     public static CustomEnumOptions getEnumOptions(int var0) {
         CustomEnumOptions[] var1 = values();
@@ -63,16 +68,23 @@ public enum CustomEnumOptions {
         this.enumFloat = floa;
         this.enumBoolean = bool;
     }
-    private CustomEnumOptions(String name, boolean floa, boolean bool, float defaultValue) {
-        this.enumString = name;
-        this.enumFloat = floa;
-        this.enumBoolean = bool;
-        this.defaultValue = defaultValue;
+    private CustomEnumOptions(String name, boolean floa, boolean bool, int valueInt) {
+        this(name, floa, bool);
+        this.defaultValue = valueInt;
+    }
+    private CustomEnumOptions(String name, boolean floa, boolean bool, float valueFloat) {
+        this(name, floa, bool);
+        this.defaultValue = valueFloat;
+    }
+    private CustomEnumOptions(String name, boolean floa, boolean bool, String valueString, int min, int max) {
+        this(name, floa, bool);
+        this.defaultValueString = valueString;
+        this.defaultValue = 0.0F;
+        this.minString = min;
+        this.maxString = max;
     }
     private CustomEnumOptions(String name, boolean floa, boolean bool, String startString, Float times, String end, Float add, float defaultValue) {
-        this.enumString = name;
-        this.enumFloat = floa;
-        this.enumBoolean = bool;
+        this(name, floa, bool);
         this.startString = startString;
         if(times != null)
             this.times = times;
@@ -83,18 +95,17 @@ public enum CustomEnumOptions {
         this.defaultValue = defaultValue;
     }
     private CustomEnumOptions(String name, boolean floa, boolean bool, String startString, Float times, String end, Float add, float defaultValue, String[] values) {
-        this.enumString = name;
-        this.enumFloat = floa;
-        this.enumBoolean = bool;
-        this.startString = startString;
-        if(times != null)
-            this.times = times;
-        if(end != null)
-            this.slideEnd = end;
-        if(add != null)
-            this.add = add;
-        this.defaultValue = defaultValue;
+        this(name, floa, bool, startString, times, end, add, defaultValue);
         this.values = values;
+    }
+
+
+    public int getMaxString() {
+        return maxString;
+    }
+
+    public int getMinString() {
+        return minString;
     }
 
     public String[] getValues() {
@@ -130,6 +141,10 @@ public enum CustomEnumOptions {
     }
 
     public float getAdd() { return add; }
+
+    public String getDefaultValueString() {
+        return defaultValueString;
+    }
 
     public float getDefaultValue() {
         return defaultValue;

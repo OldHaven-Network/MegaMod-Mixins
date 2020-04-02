@@ -23,6 +23,12 @@ public class CustomGameSettings {
         map.remove(name);
         map.put(name, obj);
     }
+    public String getOptionS(String name) {
+        Object obj = getOption(name);
+        if(obj != null)
+            return String.valueOf(obj);
+        return null;
+    }
     public Float getOptionF(String name) {
         Object obj = getOption(name);
         if(obj != null)
@@ -32,7 +38,7 @@ public class CustomGameSettings {
     public Integer getOptionI(String name) {
         Object obj = getOption(name);
         if(obj != null)
-            return Integer.valueOf(String.valueOf(obj));
+            return Integer.parseInt(String.valueOf(obj));
         return null;
     }
     public Object getOption(String name) {
@@ -55,8 +61,6 @@ public class CustomGameSettings {
         }
     }
     public void readSettings() {
-        if(!optionsFile.exists())
-            return;
         try {
             BufferedReader reader = new BufferedReader(new FileReader(optionsFile));
             for (String s = ""; (s = reader.readLine()) != null; ) {
@@ -72,12 +76,14 @@ public class CustomGameSettings {
         for(int i=0;i < CustomEnumOptions.values().length;i++) {
             CustomEnumOptions enu = CustomEnumOptions.values()[i];
             String name = enu.getEnumString();
-            float def = enu.getDefaultValue();
-            if(def != -1.0158F && !map.containsKey(name)) {
+            float f = enu.getDefaultValue();
+            if(f != -1.0158F && !map.containsKey(name)) {
                 if(enu.getEnumBoolean() && !enu.getEnumFloat())
-                    map.put(name, (int)def);
+                    map.put(name, (int)f);
+                else if(enu.getEnumFloat() && !enu.getEnumBoolean())
+                    map.put(name, f);
                 else
-                    map.put(name, def);
+                    map.put(name, enu.getDefaultValueString());
                 save = true;
             }
         }
