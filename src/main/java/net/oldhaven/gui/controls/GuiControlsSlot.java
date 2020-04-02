@@ -45,7 +45,7 @@ public class GuiControlsSlot extends GuiSlot {
             defaultButtons.addLast(new ButtonInfo(button, defaultStrings.get(o)));
             o++;
         }
-        newButtonsAt = o+1;
+        newButtonsAt = o;
         keybinds.keyCheck();
         for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keybinds.getSavedKeys().entrySet()) {
             if(!keybinds.isKeyDisabled(entry.getKey())) {
@@ -83,6 +83,13 @@ public class GuiControlsSlot extends GuiSlot {
         button.xPosition = i1+150;
         button.yPosition = i2;
         button.drawButton(mc, i1+150, i2);
-        parGui.drawString(mc.fontRenderer, buttons.get(i).string, i1, i2, -1);
+        String str = buttons.get(i).string;
+        parGui.drawString(mc.fontRenderer, str, i1, i2, -1);
+        if(CustomKeybinds.defaultKeybinds.containsKey(str)) {
+            String key = Keyboard.getKeyName(CustomKeybinds.defaultKeybinds.get(str));
+            parGui.drawString(mc.fontRenderer, "Default Key " + key, i1, i2+12, 0x525252);
+        } else {
+            parGui.drawString(mc.fontRenderer, "Default Key UNKNOWN", i1, i2+12, 0x525252);
+        }
     }
 }

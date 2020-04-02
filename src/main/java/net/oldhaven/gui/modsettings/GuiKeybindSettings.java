@@ -72,8 +72,6 @@ public class GuiKeybindSettings extends GuiScreen
     public void drawScreen(int i, int j, float f)
     {
         CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-        Integer show = gs.getOptionI("Enable Button Outline");
-        ((GuiButton) controlList.get(1)).enabled = (show == 1);
         drawDefaultBackground();
         drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         super.drawScreen(i, j, f);
@@ -88,7 +86,7 @@ public class GuiKeybindSettings extends GuiScreen
     {
         videoOptions = (new CustomEnumOptions[] {
                 CustomEnumOptions.DISABLE_SPRINT, CustomEnumOptions.DISABLE_FLY, CustomEnumOptions.HOLD_SPRINT,
-                CustomEnumOptions.DOUBLEJUMPTOFLY
+                CustomEnumOptions.DOUBLEJUMPTOFLY, CustomEnumOptions.Disable_PlayerList
         });
     }
 }

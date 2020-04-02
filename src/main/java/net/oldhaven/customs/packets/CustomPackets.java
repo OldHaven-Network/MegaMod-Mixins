@@ -60,13 +60,7 @@ public class CustomPackets {
             System.out.println("CONFIRMED CUSTOM PACKET CHECK OF "+seed+" ON "+pName+"!");
             System.out.println("YOUR CLIENT WILL NOW USE PACKETS FROM/TO THE SERVER");
             System.out.println(" ");
-            /*System.out.println("IF YOU SEE THIS MESSAGE, DO NOT GIVE OUT YOUR ID:");
-            System.out.println("Your ID is used to send/recieve packs from the server");
-            System.out.println("Your ID is consistant, so going to another server with");
-            System.out.println("  custom packet support will also work the same");
-            System.out.println(" ");*/
             ((EntityClientPlayerMP)thePlayer).sendQueue.addToSendQueue(new Packet195Custom(thePlayer.username, "CONFIRM"));
-            //Minecraft.getInstance().thePlayer.sendChatMessage("CSTMPCKT;C0nF1Rm");
             canUsePackets = true;
             return true;
         } else
@@ -75,8 +69,8 @@ public class CustomPackets {
     }
 
 
-    public static void setUsePackets(boolean canUsePackets) {
-        CustomPackets.canUsePackets = canUsePackets;
+    public static void setUsePackets(boolean canUse) {
+        canUsePackets = canUse;
     }
     public static boolean canUsePackets() {
         return canUsePackets;

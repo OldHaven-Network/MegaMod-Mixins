@@ -11,6 +11,7 @@ package net.oldhaven.gui.modsettings;
 
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.CustomGameSettings;
 import net.oldhaven.gui.CustomEnumOptions;
 import net.oldhaven.gui.CustomGuiButton;
 
@@ -46,15 +47,20 @@ public class GuiModSettings extends GuiScreen
         {
             CustomEnumOptions enumoptions = videoOptions[k];
             String option = enumoptions.getEnumString();
-            if(!enumoptions.getEnumFloat())
-            {
+            if(enumoptions.getEnumBoolean()) {
                 controlList.add(new CustomGuiButton.GuiSmallButton(enumoptions.returnEnumOrdinal(), (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), enumoptions, option));
-            } else {
-                Float value = megaMod.getCustomGameSettings().getOptionF(enumoptions.getEnumString());
+            } else if(enumoptions.getEnumFloat()) {
+                Float value = MegaMod.getInstance().getCustomGameSettings().getOptionF(enumoptions.getEnumString());
                 controlList.add(new CustomGuiButton.GuiSlider(
-                                enumoptions.returnEnumOrdinal(),
-                                (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                                enumoptions, option, value == null ? 0F : value));
+                        enumoptions.returnEnumOrdinal(),
+                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                        enumoptions, option, value == null ? 0F : value));
+            } else {
+                String value = MegaMod.getInstance().getCustomGameSettings().getOptionS(enumoptions.getEnumString());
+                controlList.add(new CustomGuiButton.GuiTextField(this,
+                        fontRenderer, enumoptions.returnEnumOrdinal(),
+                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                        enumoptions, value));
             }
             i++;
         }
@@ -64,6 +70,7 @@ public class GuiModSettings extends GuiScreen
 
     protected void actionPerformed(GuiButton guibutton)
     {
+        super.actionPerformed(guibutton);
         if(!guibutton.enabled)
             return;
         if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton))

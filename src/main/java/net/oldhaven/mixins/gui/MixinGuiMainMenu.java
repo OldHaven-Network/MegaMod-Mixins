@@ -3,14 +3,13 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.packets.CustomPackets;
 import net.oldhaven.gui.changelog.GuiChangelog;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiMainMenu.class)
@@ -26,9 +25,12 @@ public class MixinGuiMainMenu extends GuiScreen {
     private void initGui(CallbackInfo ci) {
         controlList.add(new GuiButton(26, width-37, 3, 35, 20, "MM-CL"));
         field_35358_g = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
+        CustomPackets.setUsePackets(false);
+        MegaMod.getInstance().clearJoinedNames();
         MegaMod.getInstance().setConnectedServer(null);
         MegaMod.getInstance().modLoaderTest();
     }
+
 
     @Inject(method = "updateScreen", at = @At("RETURN"))
     public void updateScreen(CallbackInfo ci) {
@@ -176,13 +178,23 @@ public class MixinGuiMainMenu extends GuiScreen {
         tessellator.draw();
     }
 
-    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", shift = At.Shift.BEFORE))
+    @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", shift = At.Shift.AFTER))
     private void drawScreen(int i, int j, float f, CallbackInfo ci) {
         if(MegaMod.requiresUpdate != null) {
             this.drawString(fontRenderer, "UPDATE FROM " + MegaMod.version + " TO " + MegaMod.requiresUpdate, 2, height - 10, 0xff7575);
             this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 20, 0xFFFFFF);
         } else
             this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 10, 0xFFFFFF);
+    }
+
+    @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", ordinal = 0))
+    public void drawMCString(GuiMainMenu mainMenu, FontRenderer fontRenderer, String s, int i, int i1, int i2) {
+        int o = MegaMod.getInstance().getCustomGameSettings().getOptionI("Default Main Menu BG");
+        if(o != 1) {
+            mainMenu.drawString(fontRenderer, "Minecraft Beta 1.7.3", i, i1, 0xffffff);
+        } else {
+            mainMenu.drawString(fontRenderer, "Minecraft Beta 1.7.3", i, i1, i2);
+        }
     }
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawDefaultBackground()V"))

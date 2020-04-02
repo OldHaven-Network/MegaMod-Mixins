@@ -3,6 +3,8 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.CustomGameSettings;
+import net.oldhaven.customs.packets.CustomPackets;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Map;
 
 @Mixin(GuiIngame.class)
@@ -54,7 +57,8 @@ public class MixinGuiIngame extends Gui {
             ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
             int k = scaledresolution.getScaledWidth();
             int l = scaledresolution.getScaledHeight();
-            Integer tooltip = megaMod.getCustomGameSettings().getOptionI("Show Tooltip");
+            CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+            Integer tooltip = gs.getOptionI("Show Tooltip");
             if(tooltip != null && tooltip == 1) {
                 ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
                 if (stack != null) {
@@ -74,8 +78,8 @@ public class MixinGuiIngame extends Gui {
                 } else if (!lastItem.equals(""))
                     lastItem = "";
             }
-            int showSpeed = MegaMod.getInstance().getCustomGameSettings().getOptionI("Show Speed In-Game");
-            int showMotion = MegaMod.getInstance().getCustomGameSettings().getOptionI("Show Motion In-Game");
+            int showSpeed = gs.getOptionI("Show Speed In-Game");
+            int showMotion = gs.getOptionI("Show Motion In-Game");
             if(showSpeed == 1) {
                 double speed = MegaMod.getPlayerInstance().getPlayerSpeed();
                 MegaMod.getInstance().replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
@@ -94,10 +98,32 @@ public class MixinGuiIngame extends Gui {
                     down+=12;
                 }
             }
-            if(MegaMod.getInstance().getCustomGameSettings().getOptionI("Enable WAILA") == 1) {
+            if(gs.getOptionI("Enable WAILA") == 1) {
                 guiWAILA(scaledresolution);
             }
+            if(gs.getOptionI("Disable PlayerList") != 1 && MegaMod.getInstance().playerList) {
+                guiPlayerList(scaledresolution);
+            }
         }
+    }
+
+    private void guiPlayerList(ScaledResolution sc) {
+        int width = sc.getScaledWidth();
+        int centerW = sc.getScaledWidth()/2;
+        if(CustomPackets.canUsePackets()) {
+            List<String> names = MegaMod.getInstance().getJoinedNames();
+            int height = sc.getScaledHeight()/2 - (12 * names.size());
+            int graidentOH = height - 12;
+            int gradientH = height + (12 * names.size()) + 12;
+            drawGradientRect(width / 2 - 45, graidentOH,  width / 2 + 45, gradientH, 0xc0101010, 0xd0101010);
+            this.drawCenteredString(mc.fontRenderer, "PLAYERLIST", centerW, graidentOH, 0x4fedff);
+            for(String name : names) {
+                this.drawCenteredString(mc.fontRenderer, name, centerW, height, 0xffffff);
+                height += 12;
+            }
+        } /*else {
+            // later
+        }*/
     }
 
     private void guiWAILA(ScaledResolution sc) {

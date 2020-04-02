@@ -16,7 +16,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class MegaMod {
-    public static boolean debug = true;
+
+    public static boolean debug = false;
     private static MegaMod instance;
     public MegaMod() {
         instance = this;
@@ -27,6 +28,7 @@ public class MegaMod {
         customGameSettings = new CustomGameSettings();
         customKeybinds = new CustomKeybinds();
         player = new Player();
+        joinedNames = new ArrayList<>();
     }
 
     public void modLoaderTest() {
@@ -98,8 +100,23 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.3.1";
+    public static String version = "0.4.0";
     public static String requiresUpdate = null;
+
+    public boolean playerList;
+    private List<String> joinedNames;
+    public void addPlayerJoin(String name) {
+        joinedNames.add(name);
+    }
+    public void removePlayerJoin(String name) {
+        joinedNames.remove(name);
+    }
+    public List<String> getJoinedNames() {
+        return joinedNames;
+    }
+    public void clearJoinedNames() {
+        joinedNames.clear();
+    }
 
     public static boolean isConnected() {
         return SkinFix.connected;

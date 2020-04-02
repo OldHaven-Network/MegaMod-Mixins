@@ -45,9 +45,9 @@ public class ChangeLog {
                     if (sub.contains(".")) {
                         String ver = sub.replaceAll("[A-z ]", "");
                         if (ver.equals(sub)) {
-                            if(!hasCheckedVersion && MegaMod.version.equals(sub)) {
+                            if(!hasCheckedVersion && !MegaMod.version.equals(sub)) {
                                 MegaMod.requiresUpdate = sub;
-                            } else
+                            }
                             hasCheckedVersion = true;
                             textFields.addLast(new TextField(str, green));
                             continue;

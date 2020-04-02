@@ -40,6 +40,7 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
         List<GuiButton> self = new ArrayList<>();
         for(GuiButton button : (List<GuiButton>) this.controlList) {
             if(button.id == 200) {
+                button.yPosition = height - 26;
                 self.add(button);
             } else
                 keepers.add(button);
@@ -71,11 +72,14 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
             clickedButton.displayString = Keyboard.getKeyName(var2);
             this.clickedButton = null;
             this.clickedButtonIsNew = null;
+            this.lastButton = null;
         } else {
             super.keyTyped(var1, var2);
         }
     }
 
+
+    private GuiButton lastButton;
     /**
      * @author ashleez_
      * @reason New controls screen
@@ -85,6 +89,14 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
         if (var1.id == 200) {
             this.mc.displayGuiScreen(this.parentScreen);
         } else {
+            if(lastButton != null) {
+                if(lastButton.id == var1.id)
+                    return;
+                int lI = lastButton.displayString.indexOf("<", 3)-1;
+                if(lI != -2)
+                    lastButton.displayString = lastButton.displayString.substring(2, lI);
+            }
+            this.lastButton = var1;
             this.clickedButton = var1;
             /*if(!this.clickedButtonIsNew) {
                 var1.displayString = "> " + this.options.getOptionDisplayString(var1.id) + " <";

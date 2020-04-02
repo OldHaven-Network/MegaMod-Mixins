@@ -14,6 +14,7 @@
     "MixinTexturePackList",
     "MixinNetworkManager",
     "blocks.MixinRenderBlocks",
+    "gui.MixinGuiScreen",
     "gui.MixinGuiButton",
     "gui.MixinGuiControls",
     "gui.MixinGuiChat",
