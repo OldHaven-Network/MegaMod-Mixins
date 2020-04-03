@@ -104,8 +104,8 @@ public class MixinGuiMultiplayer extends GuiScreen {
      * @param var2
      */
     @Overwrite
-    protected void keyTyped(char var1, int var2) {
-        
+    public void keyTyped(char var1, int var2) {
+
     }
 
     /**
