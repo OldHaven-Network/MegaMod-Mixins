@@ -5,6 +5,7 @@ import net.oldhaven.gui.CustomEnumOptions;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class CustomGameSettings {
     public File optionsFile;
@@ -87,6 +88,17 @@ public class CustomGameSettings {
                 save = true;
             }
         }
+        /* 0.4.0 fixes */
+        if(getOptionS("Button ADV Color").equalsIgnoreCase("(NOTWORKING)")) {
+            setOption("Button ADV Color", "0xffffff");
+            save = true;
+        }
+        if(getOptionI("Enable WAILA") != null) {
+            setOption("Toggle WAILA", getOptionI("Enable WAILA"));
+            removeOption("Enable WAILA");
+            save = true;
+        }
+        /* end 0.4.0 fixes */
         if(save)
             this.saveSettings();
     }

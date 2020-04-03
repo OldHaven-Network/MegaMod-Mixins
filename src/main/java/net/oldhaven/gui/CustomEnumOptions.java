@@ -20,7 +20,7 @@ public enum CustomEnumOptions {
     CHAT_BACKGROUND_OPACITY("Chat BG Opacity", true, false, 0.0F),
 
     DEFAULT_MM_BACKGROUND("Default Main Menu BG", false, true, 0),
-    ENABLE_WAILA("Enable WAILA", false, true, 1),
+    TOGGLE_WAILA("Toggle WAILA", false, true, 1),
     SHOW_QUIT_BUTTON("Show Main Menu Quit Btn", false, true, 1),
     SHOW_MOTION("Show Motion In-Game", false, true, 0),
     SHOW_SPEED("Show Speed In-Game", false, true, 0),
@@ -28,7 +28,7 @@ public enum CustomEnumOptions {
         new String[]{
                 "White", "Blue", "Purple", "Red", "Aqua", "Green", "Yellow", "Orange", "Light Grey", "Grey", "Black", "ADVANCED"
         }),
-    BTN_ADVANCED_COLOR("Button ADV Color", false, false, "(NOTWORKING)", 2, 8),
+    BTN_ADVANCED_COLOR("Button ADV Color", false, false, "0xffffff", 2, 8),
 
     Disable_PlayerList("Disable PlayerList", false, true, 0),
     DISABLE_SPRINT("Disable Sprint", false, true, 0),

@@ -29,6 +29,11 @@ public class MixinGuiChat extends GuiScreen {
         MegaMod.getInstance().chatCursorLoc = 0;
     }
 
+    @Inject(method = "onGuiClosed", at = @At("RETURN"))
+    private void onGuiClosed(CallbackInfo ci) {
+        MegaMod.getInstance().chatCursorLoc = 0;
+    }
+
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped(char c, int i, CallbackInfo ci) {
         MegaMod megaMod = MegaMod.getInstance();
