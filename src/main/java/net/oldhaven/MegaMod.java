@@ -100,7 +100,7 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.4.0";
+    public static String version = "0.4.1";
     public static String requiresUpdate = null;
 
     public boolean playerList;
