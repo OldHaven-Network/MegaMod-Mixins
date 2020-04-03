@@ -98,7 +98,7 @@ public class MixinGuiIngame extends Gui {
                     down+=12;
                 }
             }
-            if(gs.getOptionI("Enable WAILA") == 1) {
+            if(gs.getOptionI("Toggle WAILA") == 1) {
                 guiWAILA(scaledresolution);
             }
             if(gs.getOptionI("Disable PlayerList") != 1 && MegaMod.getInstance().playerList) {

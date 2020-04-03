@@ -99,6 +99,17 @@ public class MixinGuiMultiplayer extends GuiScreen {
 
     /**
      * @author ashleez_
+     * @reason New MP Gui, Crashes game otherwise
+     * @param var1
+     * @param var2
+     */
+    @Overwrite
+    protected void keyTyped(char var1, int var2) {
+        
+    }
+
+    /**
+     * @author ashleez_
      * @reason New Multilayer GUI
      */
     @Overwrite
