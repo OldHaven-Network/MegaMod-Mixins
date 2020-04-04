@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiMainMenu extends GuiScreen {
     @Shadow private String splashText;
 
+    private GuiButton MM_CL;
+    private boolean aetherEnabled = false;
+
     @Inject(method = "initGui", at = @At("HEAD"))
     private void initGuiFirst(CallbackInfo ci) {
         mc.hideQuitButton = MegaMod.getInstance().getCustomGameSettings().getOptionI("Show Main Menu Quit Btn") != 1;
@@ -23,12 +26,25 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("RETURN"))
     private void initGui(CallbackInfo ci) {
-        controlList.add(new GuiButton(26, width-37, 3, 35, 20, "MM-CL"));
         field_35358_g = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
         CustomPackets.setUsePackets(false);
+        MegaMod.getInstance().hasLoggedIn = false;
         MegaMod.getInstance().clearJoinedNames();
         MegaMod.getInstance().setConnectedServer(null);
         MegaMod.getInstance().modLoaderTest();
+        MegaMod.getInstance().getServerPacketInformation().reset();
+        for(Object o : controlList) {
+            GuiButton guiButton = (GuiButton) o;
+            //System.out.println(guiButton.displayString + ", x" + guiButton.xPosition + " y" + guiButton.yPosition);
+            if (guiButton.displayString.equals("W") || guiButton.displayString.equals("T")) {
+                aetherEnabled = true;
+                break;
+            }
+        }
+        int w = width-(35+2);
+        if(aetherEnabled)
+            w = 403 - 24 - (35+2);
+        controlList.add(MM_CL=new GuiButton(26, w, 4, 35, 20, "MM-CL"));
     }
 
 
@@ -178,8 +194,18 @@ public class MixinGuiMainMenu extends GuiScreen {
         tessellator.draw();
     }
 
+    private boolean isMouseOver(int i, int j, int xPosition, int yPosition, int width, int height) {
+        return i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height;
+    }
+
     @Inject(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", shift = At.Shift.AFTER))
     private void drawScreen(int i, int j, float f, CallbackInfo ci) {
+        if(isMouseOver(i, j, MM_CL.xPosition, MM_CL.yPosition, 35, 20)) {
+            if(aetherEnabled)
+                this.drawCenteredString(this.fontRenderer, "MegaMod ChangeLog", MM_CL.xPosition + (35/2), MM_CL.yPosition + 22+2, 0xffffff);
+            else
+                this.drawCenteredString(this.fontRenderer, "MegaMod ChangeLog", MM_CL.xPosition-15, MM_CL.yPosition + 22+2, 0xffffff);
+        }
         if(MegaMod.requiresUpdate != null) {
             this.drawString(fontRenderer, "UPDATE FROM " + MegaMod.version + " TO " + MegaMod.requiresUpdate, 2, height - 10, 0xff7575);
             this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 20, 0xFFFFFF);

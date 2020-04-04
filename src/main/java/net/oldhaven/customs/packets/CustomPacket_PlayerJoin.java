@@ -8,4 +8,9 @@ public class CustomPacket_PlayerJoin extends CustomPacket {
         System.out.println("Player Join: " + args[0]);
         MegaMod.getInstance().addPlayerJoin(args[0]);
     }
+
+    @Override
+    public CustomPacketType getType() {
+        return CustomPacketType.Server;
+    }
 }

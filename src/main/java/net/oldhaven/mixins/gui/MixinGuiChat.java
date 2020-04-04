@@ -76,6 +76,13 @@ public class MixinGuiChat extends GuiScreen {
         currentUp = 0;
     }
 
+
+    private int substringTest(String msg, int cursorLoc) {
+        if(cursorLoc > msg.length())
+            cursorLoc = msg.length();
+        return cursorLoc;
+    }
+
     @Redirect(
             method = "keyTyped",
             at = @At(value = "FIELD", target = "Lnet/minecraft/src/GuiChat;message:Ljava/lang/String;", opcode = Opcodes.PUTFIELD),
@@ -106,6 +113,7 @@ public class MixinGuiChat extends GuiScreen {
         this.drawRect(2, this.height - 14, this.width - 2, this.height - 2, -2147483648);
         MegaMod megaMod = MegaMod.getInstance();
         int cursor = megaMod.chatCursorLoc;
+        MegaMod.getInstance().chatCursorLoc = substringTest(this.message, cursor);
         String msg = this.message;
         msg = msg.substring(0, cursor) + ((updateCounter / 6) % 2 != 0 ? "" : "|") + msg.substring(cursor);
         this.drawString(this.fontRenderer, "> " + msg, 4, this.height - 12, 14737632);

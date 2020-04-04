@@ -20,4 +20,9 @@ public class CustomPacket_Disconnect extends CustomPacket {
                 builder.toString()
         }));
     }
+
+    @Override
+    public CustomPacketType getType() {
+        return CustomPacketType.Server;
+    }
 }

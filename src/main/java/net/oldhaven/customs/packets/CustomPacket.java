@@ -18,4 +18,6 @@ public abstract class CustomPacket {
         EntityPlayerSP thePlayer = MegaMod.getMinecraftInstance().thePlayer;
         ((EntityClientPlayerMP)thePlayer).sendQueue.addToSendQueue(new Packet195Custom(thePlayer.username, packet+";"+utf));
     }
+
+    public abstract CustomPacketType getType();
 }

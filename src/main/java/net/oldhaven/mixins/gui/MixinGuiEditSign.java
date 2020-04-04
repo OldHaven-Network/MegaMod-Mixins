@@ -24,6 +24,11 @@ public class MixinGuiEditSign extends GuiScreen {
         MegaMod.getInstance().signCursorLoc = 0;
     }
 
+    @Inject(method = "onGuiClosed", at = @At("RETURN"))
+    private void onGuiClosed(CallbackInfo ci) {
+        MegaMod.getInstance().signCursorLoc = 0;
+    }
+
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped1(char c, int i, CallbackInfo ci) {
         int signCursorLoc = MegaMod.getInstance().signCursorLoc;
@@ -45,8 +50,16 @@ public class MixinGuiEditSign extends GuiScreen {
         MegaMod.getInstance().signCursorLoc = signCursorLoc;
     }
 
+    private int substringTest(String msg, int cursorLoc) {
+        if(cursorLoc > msg.length())
+            cursorLoc = msg.length();
+        return cursorLoc;
+    }
+
     @Inject(method = "drawScreen", at = @At("HEAD"))
     private void drawScreen(CallbackInfo ci) {
+        int cursorLoc = MegaMod.getInstance().chatCursorLoc;
+        MegaMod.getInstance().chatCursorLoc = substringTest(this.entitySign.signText[this.editLine], cursorLoc);
         this.drawCenteredString(this.fontRenderer, "Cursor: " + MegaMod.getInstance().signCursorLoc, this.width / 2, 18, 0xffffff);
         this.drawCenteredString(this.fontRenderer, "Length: " + entitySign.signText[editLine].length(), this.width / 2, 28, 0xffffff);
     }

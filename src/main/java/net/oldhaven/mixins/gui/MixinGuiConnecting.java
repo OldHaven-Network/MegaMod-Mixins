@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiConnecting {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void GuiConnecting(Minecraft minecraft, String s, int i, CallbackInfo ci) {
+        System.out.println("set connected server " + (s + ":"+ i));
         MegaMod.getInstance().setConnectedServer(s + ":" + i);
     }
 }

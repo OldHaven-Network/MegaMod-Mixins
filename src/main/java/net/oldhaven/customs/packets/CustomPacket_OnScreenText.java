@@ -18,4 +18,9 @@ public class CustomPacket_OnScreenText extends CustomPacket {
         int l = scaledresolution.getScaledHeight();
         mc.fontRenderer.drawString(s, 1, k/2, 0xFFFFFF);
     }
+
+    @Override
+    public CustomPacketType getType() {
+        return CustomPacketType.Client;
+    }
 }
