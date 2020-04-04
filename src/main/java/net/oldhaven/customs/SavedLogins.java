@@ -22,7 +22,7 @@ public class SavedLogins {
                 for(Map.Entry<String, String> userEntry : usernames.entrySet()) {
                     list.append(userEntry.getKey()).append(" ").append(userEntry.getValue());
                     if(i+1 < usernames.size())
-                        list.append(":");
+                        list.append(":<>:");
                     i++;
                 }
                 printwriter.println(entry.getKey() + "|" + list.toString());
@@ -46,7 +46,7 @@ public class SavedLogins {
                         savedLoginMap.remove(server);
                     } else
                         savedLogin = new SavedLogin();
-                    String[] logins = serverSplit[1].split(":");
+                    String[] logins = serverSplit[1].split(":<>:");
                     for(String login : logins) {
                         String[] split = login.split(" ");
                         savedLogin.add(split[0], split[1]);
@@ -79,7 +79,6 @@ public class SavedLogins {
         }
         public void add(String username, String login) {
             this.usernames.put(username, login);
-            saveLogins();
         }
         public void remove(String username) {
             this.usernames.remove(username);

@@ -221,7 +221,6 @@ public class CustomGuiButton extends GuiButton {
             float times = this.idFloat.getTimes();
             String startString = this.idFloat.getStartString();
             int i = (int)((this.sliderValue * times) + add);
-            System.out.println(i);
             if(this.idFloat.getValues() != null) {
                 this.displayString = this.sliderValue == 0.0 ? option + ": "+ startString : option + ": " + this.idFloat.getValues()[i] + end;
             } else

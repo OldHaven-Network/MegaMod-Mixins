@@ -4,9 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.CustomGameSettings;
+import net.oldhaven.customs.SavedLogins;
 import net.oldhaven.customs.packets.CustomPackets;
+import org.checkerframework.common.util.report.qual.ReportReadWrite;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -105,6 +108,29 @@ public class MixinGuiIngame extends Gui {
                 guiPlayerList(scaledresolution);
             }
         }
+    }
+
+    @Redirect(method = "renderGameOverlay", at = @At(value = "FIELD", target = "Lnet/minecraft/src/ChatLine;message:Ljava/lang/String;", opcode = 180))
+    private String getMessage(ChatLine chatLine) {
+        MegaMod megaMod = MegaMod.getInstance();
+        boolean b =
+                chatLine.message.equals("§cPlease identify yourself with /login <password>") ||
+                chatLine.message.equals("§cPlease login with \"/login password\"");
+        if(!megaMod.hasLoggedIn && b) {
+            /* holy this was long */
+            SavedLogins savedLoginsClass = megaMod.getAutoLogins();
+            SavedLogins.SavedLogin logins = savedLoginsClass.getSavedLoginsByIP(megaMod.getConnectedServer());
+            if(logins != null) {
+                String login = logins.getName(mc.thePlayer.username);
+                if(login != null) {
+                    mc.thePlayer.sendChatMessage("/login " + login);
+                    megaMod.hasLoggedIn = true;
+                } else
+                    megaMod.hasLoggedIn = true; /* ignore */
+            } else
+                megaMod.hasLoggedIn = true; /* ignore */
+        }
+        return chatLine.message;
     }
 
     private void guiPlayerList(ScaledResolution sc) {

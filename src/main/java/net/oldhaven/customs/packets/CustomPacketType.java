@@ -1,13 +1,46 @@
 package net.oldhaven.customs.packets;
 
 public enum CustomPacketType {
-    GUI, Message, Unknown;
-    CustomPacketType() {};
-    public static CustomPacketType compare(int i) {
-        switch (i) {
-            case 0: return CustomPacketType.GUI;
-            case 1: return CustomPacketType.Message;
-            default: return CustomPacketType.Unknown;
+    GUI("Packet used to create custom GUI", 0),
+    Message("Packet used to communicate with chat", 1),
+    Server("Packet used to communicate with server-stuff", 2),
+    Client("Packet used to communicate with client-stuff", 3),
+    Unknown("Unknown packet type", -1);
+
+    private String desc;
+    private int number;
+    CustomPacketType(String desc, int num) {
+        this.desc = desc;
+        this.number = num;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public int getTypeInt() {
+        switch(this.name()) {
+            case "GUI": return 0;
+            case "Message": return 1;
+            case "Server": return 2;
+            case "Client": return 3;
+            default: return -1;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "CustomPacketType{" +
+                "desc='" + desc + '\'' +
+                ", number=" + number +
+                '}';
+    }
+
+    public static CustomPacketType compare(int num) {
+        for(int i=0;i < CustomPacketType.values().length;i++) {
+            if(CustomPacketType.values()[i].number == num)
+                return CustomPacketType.values()[i];
+        }
+        return CustomPacketType.Unknown;
     }
 }

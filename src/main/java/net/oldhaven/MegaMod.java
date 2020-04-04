@@ -237,6 +237,7 @@ public class MegaMod {
     }
 
     private String connectedServer;
+    public boolean hasLoggedIn = false;
     public void setConnectedServer(String s) {
         connectedServer = s;
     }

@@ -6,13 +6,14 @@
 package net.oldhaven.gui.changelog;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.GuiButton;
-import net.minecraft.src.GuiScreen;
-import net.minecraft.src.StringTranslate;
+import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 // Referenced classes of package net.minecraft.src:
 //            GuiScreen, StringTranslate, GuiSmallButton, TexturePackList, 
@@ -30,6 +31,8 @@ public class GuiChangelog extends GuiScreen
     GuiButton done;
     public void initGui()
     {
+        this.controlList.add(new GuiButton(4, 2, 2, 48, 20,"GitHub"));
+        this.controlList.add(new GuiButton(5, 2+48+2, 2, 48, 20,"Discord"));
         this.controlList.add(done=new GuiButton(6, this.width / 2 - 100, this.height - 38, "Done"));
         mc.texturePackList.updateAvaliableTexturePacks();
         fileLocation = (new File(Minecraft.getMinecraftDir(), "texturepacks")).getAbsolutePath();
@@ -41,7 +44,19 @@ public class GuiChangelog extends GuiScreen
     {
         if(!guibutton.enabled)
             return;
-        else if(guibutton.id == 6) {
+        if(guibutton.id == 4 || guibutton.id == 5) {
+            boolean b = Desktop.isDesktopSupported();
+            if(b) {
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.browse(guibutton.id == 4 ?
+                            new URL("https://github.com/OldHaven-Network/MegaMod-Mixins").toURI() :
+                            new URL("https://discord.gg/DhxegRJ").toURI());
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if(guibutton.id == 6) {
             mc.displayGuiScreen(guiScreen);
         } else
             slotGui.actionPerformed(guibutton);

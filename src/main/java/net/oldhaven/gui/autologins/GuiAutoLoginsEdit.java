@@ -18,7 +18,6 @@ import org.lwjgl.input.Keyboard;
 
 public class GuiAutoLoginsEdit extends GuiScreen
 {
-    private MegaMod megaMod;
     private boolean editing = false;
     private String editingForIP = "";
     private String editingName = "";
@@ -27,12 +26,11 @@ public class GuiAutoLoginsEdit extends GuiScreen
         parentScreen = guiscreen;
     }
     public GuiAutoLoginsEdit(GuiScreen guiScreen, String ip, String username) {
-        this.megaMod = MegaMod.getInstance();
         parentScreen = guiScreen;
         this.editing = true;
         this.editingForIP = ip;
         this.editingName = username;
-        this.editingPass = megaMod.getAutoLogins().getSavedLoginsByIP(ip).getName(username);
+        this.editingPass = MegaMod.getInstance().getAutoLogins().getSavedLoginsByIP(ip).getName(username);
     }
 
     public void updateScreen()
@@ -82,6 +80,7 @@ public class GuiAutoLoginsEdit extends GuiScreen
         if(guibutton.id == 1)
             mc.displayGuiScreen(parentScreen);
         else if(guibutton.id == 0) {
+            MegaMod megaMod = MegaMod.getInstance();
             if(editing)
                 megaMod.getAutoLogins().getSavedLoginsByIP(editingForIP).remove(editingName);
             megaMod.getAutoLogins().saveLogin(username.getText(), password.getText());
@@ -111,8 +110,9 @@ public class GuiAutoLoginsEdit extends GuiScreen
     public void drawScreen(int i, int j, float f)
     {
         drawDefaultBackground();
+        String server = MegaMod.getInstance().getConnectedServer();
         drawCenteredString(fontRenderer, editing ? "Edit Login Info" : "Adding Auto-Login", width / 2, 16, 0xffffff);
-        drawCenteredString(fontRenderer, "For IP " + (editing ? editingForIP : megaMod.getConnectedServer()), width / 2, 34, 0xffffff);
+        drawCenteredString(fontRenderer, "For IP " + (editing ? editingForIP : server), width / 2, 34, 0xffffff);
         drawString(fontRenderer, "Username", width / 2 - 100, (height / 4 - (10+60+20)) + 60 + 36, 0xa0a0a0);
         String name = username.getText();
         if(name.length() > 0)

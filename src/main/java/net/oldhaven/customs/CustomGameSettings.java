@@ -66,7 +66,6 @@ public class CustomGameSettings {
             BufferedReader reader = new BufferedReader(new FileReader(optionsFile));
             for (String s = ""; (s = reader.readLine()) != null; ) {
                 String[] as = s.split(":");
-                System.out.println(as[1].getClass().getName());
                 map.put(as[0], as[1]);
             }
             reader.close();

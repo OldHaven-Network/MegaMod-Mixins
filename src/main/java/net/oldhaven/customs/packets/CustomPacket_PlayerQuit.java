@@ -7,4 +7,9 @@ public class CustomPacket_PlayerQuit extends CustomPacket {
         System.out.println("Player Quit: " + args[0]);
         MegaMod.getInstance().removePlayerJoin(args[0]);
     }
+
+    @Override
+    public CustomPacketType getType() {
+        return CustomPacketType.Server;
+    }
 }
