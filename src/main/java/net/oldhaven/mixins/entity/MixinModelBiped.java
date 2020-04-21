@@ -18,25 +18,55 @@ public class MixinModelBiped extends ModelBase {
     @Shadow public ModelRenderer bipedLeftArm;
     @Shadow public ModelRenderer bipedRightArm;
     @Shadow public ModelRenderer bipedBody;
+    @Shadow public ModelRenderer bipedHead;
+    @Shadow public ModelRenderer bipedHeadwear;
+    @Shadow public ModelRenderer bipedCloak;
     public CustomModelRenderer bipedLeftArmwear;
     public CustomModelRenderer bipedRightArmwear;
     public CustomModelRenderer bipedLeftLegwear;
     public CustomModelRenderer bipedRightLegwear;
     public CustomModelRenderer bipedBodyWear;
     @Inject(method = "<init>(FF)V", at = @At("RETURN"))
-    private void init(float scale, float f2, CallbackInfo ci) {
-        this.bipedLeftArm = new ModelRenderer(32, 48);
-        this.bipedLeftArm.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale);
+    private void init(float scale, float f, CallbackInfo ci) {
+        this.bipedCloak = new CustomModelRenderer(0, 0);
+        ((CustomModelRenderer)this.bipedCloak).addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, scale, 64, 64);
+
+        this.bipedHead = new CustomModelRenderer(0, 0);
+        ((CustomModelRenderer)this.bipedHead).addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, scale, 64, 64);
+        this.bipedHead.setRotationPoint(0.0F, 0.0F + f, 0.0F);
+        this.bipedHeadwear = new CustomModelRenderer(32, 0);
+        ((CustomModelRenderer)this.bipedHeadwear).addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, scale + 0.5F, 64, 64);
+        this.bipedHeadwear.setRotationPoint(0.0F, 0.0F + f, 0.0F);
+
+        this.bipedBody = new CustomModelRenderer(16, 16);
+        ((CustomModelRenderer)this.bipedBody).addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4, scale, 64, 64);
+        this.bipedBody.setRotationPoint(0.0F, 0.0F + f, 0.0F);
+        this.bipedRightArm = new CustomModelRenderer(40, 16);
+        ((CustomModelRenderer)this.bipedRightArm).addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, scale, 64, 64);
+        this.bipedRightArm.setRotationPoint(-5.0F, 2.0F + f, 0.0F);
+        this.bipedLeftArm = new CustomModelRenderer(40, 16);
+        this.bipedLeftArm.mirror = true;
+        ((CustomModelRenderer)this.bipedLeftArm).addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale, 64, 64);
+        this.bipedLeftArm.setRotationPoint(5.0F, 2.0F + f, 0.0F);
+        this.bipedRightLeg = new CustomModelRenderer(0, 16);
+        ((CustomModelRenderer)this.bipedRightLeg).addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
+        this.bipedRightLeg.setRotationPoint(-2.0F, 12.0F + f, 0.0F);
+        this.bipedLeftLeg = new CustomModelRenderer(0, 16);
+        this.bipedLeftLeg.mirror = true;
+        ((CustomModelRenderer)this.bipedLeftLeg).addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
+        this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + f, 0.0F);
+        this.bipedLeftArm = new CustomModelRenderer(32, 48);
+        ((CustomModelRenderer)this.bipedLeftArm).addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale, 64, 64);
         this.bipedLeftArm.setRotationPoint(5.0F, 2.0F, 0.0F);
-        this.bipedRightArm = new ModelRenderer(40, 16);
-        this.bipedRightArm.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, scale);
+        this.bipedRightArm = new CustomModelRenderer(40, 16);
+        ((CustomModelRenderer)this.bipedRightArm).addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4, scale, 64, 64);
         this.bipedRightArm.setRotationPoint(-5.0F, 2.5F, 0.0F);
-        this.bipedLeftLeg = new ModelRenderer(16, 48);
-        this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale);
+        this.bipedLeftLeg = new CustomModelRenderer(16, 48);
+        ((CustomModelRenderer)this.bipedLeftLeg).addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
         this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
-        this.bipedRightLeg = new ModelRenderer(0, 16);
-        this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale);
-        this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F + f2, 0.0F);
+        this.bipedRightLeg = new CustomModelRenderer(0, 16);
+        ((CustomModelRenderer)this.bipedRightLeg).addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
+        this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F + f, 0.0F);
 
         this.bipedLeftArmwear = new CustomModelRenderer(48, 48);
         this.bipedLeftArmwear.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4, scale + 0.25F, 64, 64);
@@ -62,6 +92,7 @@ public class MixinModelBiped extends ModelBase {
         /*if (entityIn.isSneaking()) {
             GlStateManager.translate(0.0F, 0.2F, 0.0F);
         }*/
+        copyModelAngles(bipedHeadwear, bipedHead);
         this.bipedLeftLegwear.render(scale);
         this.bipedRightLegwear.render(scale);
         this.bipedLeftArmwear.render(scale);

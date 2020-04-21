@@ -32,12 +32,18 @@ public class MixinGuiEditSign extends GuiScreen {
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped1(char c, int i, CallbackInfo ci) {
         int signCursorLoc = MegaMod.getInstance().signCursorLoc;
+        if(editLine > 3)
+            editLine = 3;
+        if(editLine < 0)
+            editLine = 0;
         if(i == 200) { /* UP key */
             if(editLine > 0)
                 signCursorLoc = entitySign.signText[editLine-1].length();
         } else if(i == 208 || i == 28) { /* DOWN key */
-            if(editLine < entitySign.signText.length)
+            if(editLine < entitySign.signText.length-1)
                 signCursorLoc = entitySign.signText[editLine+1].length();
+            else
+                signCursorLoc = 0;
         } else if(i == 203 && signCursorLoc > 0) { /* LEFT key */
             signCursorLoc -= 1;
         } else if(i == 205 && signCursorLoc < entitySign.signText[editLine].length()) { /* RIGHT key */

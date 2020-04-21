@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 public class MegaMod {
-
+    public static int thirdPersonView = 0;
     public static boolean debug = false;
     private static MegaMod instance;
     public MegaMod() {
@@ -29,6 +29,7 @@ public class MegaMod {
         customKeybinds = new CustomKeybinds();
         player = new Player();
         joinedNames = new ArrayList<>();
+        BeginThread();
     }
 
     public void modLoaderTest() {
@@ -57,7 +58,7 @@ public class MegaMod {
     public static boolean modLoaderEnabled = false;
 
     public static float[] getRainbowColor() {
-        return null;
+        return mmThread.lastRainbow;
     }
     private static class MMThread extends TimerTask {
         MMThread() {
@@ -87,7 +88,7 @@ public class MegaMod {
             if (colorNext >= colors.size())
                 colorNext = 0;
             Color color = colors.get(colorNext);
-            lastRainbow = new float[]{color.getRed()/255, color.getGreen()/255, color.getBlue()/255, 1.0F};
+            lastRainbow = new float[]{color.getRed()/255F, color.getGreen()/255F, color.getBlue()/255F, 1.0F};
             return lastRainbow;
         }
     }
@@ -100,7 +101,7 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.4.2";
+    public static String version = "0.5.0";
     public static String requiresUpdate = null;
 
     public boolean playerList;
@@ -124,6 +125,8 @@ public class MegaMod {
 
     public static class Player {
         Player() {}
+        private double exp;
+        private int level;
         public EntityPlayerSP getPlayer() {
             return getMinecraftInstance().thePlayer;
         }
@@ -142,6 +145,12 @@ public class MegaMod {
             EntityPlayerSP p = getPlayer();
             return (p.motionX * p.motionX + p.motionZ * p.motionZ);
         }
+        public double getExp() {
+            return exp;
+        }
+        public int getLevel() {
+            return level;
+        }
     }
     private static Player player;
     public static Player getPlayerInstance() {
@@ -152,6 +161,7 @@ public class MegaMod {
     public int chatCursorLoc = 0;
     public int chatScrollUp = 0;
 
+    public boolean isZooming = false;
     public boolean isSprinting = false;
     public boolean isFlying = false;
     public boolean flyStill = false;

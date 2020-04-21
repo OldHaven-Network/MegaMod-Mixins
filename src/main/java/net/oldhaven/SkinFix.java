@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,10 +30,10 @@ public class SkinFix {
 
     }
 
-    public static Boolean checkIfSkinIsAlex(String name) {
+    public static Boolean isSkinAlex(String name) {
         String s = getUuidStringFromName(name).replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
         int hash_code = s.hashCode();
-        return !((hash_code % 2) == 1);
+        return (hash_code & 1) == 1;
     }
 
     private static Map<String, String> savedUrl = new HashMap<>();

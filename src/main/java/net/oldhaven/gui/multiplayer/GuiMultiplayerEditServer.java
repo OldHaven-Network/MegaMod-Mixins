@@ -18,12 +18,10 @@ import org.lwjgl.input.Keyboard;
 
 public class GuiMultiplayerEditServer extends GuiScreen
 {
-    private MegaMod megaMod;
     private ServerInfo editing;
     public GuiMultiplayerEditServer(GuiScreen guiscreen)
     {
         parentScreen = guiscreen;
-        megaMod = MegaMod.getInstance();
         this.editing = null;
     }
     public GuiMultiplayerEditServer(GuiScreen guiScreen, ServerInfo serverInfo) {
@@ -78,7 +76,7 @@ public class GuiMultiplayerEditServer extends GuiScreen
         if(guibutton.id == 1)
             mc.displayGuiScreen(parentScreen);
         else if(guibutton.id == 0) {
-            megaMod.getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
+            MegaMod.getInstance().getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
             mc.gameSettings.saveOptions();
             mc.displayGuiScreen(parentScreen);
         }

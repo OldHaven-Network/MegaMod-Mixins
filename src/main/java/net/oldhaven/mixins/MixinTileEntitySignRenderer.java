@@ -15,6 +15,10 @@ public class MixinTileEntitySignRenderer {
     private String redirect2(StringBuilder builder, TileEntitySign var1, double var2, double var4, double var6, float var8) {
         String text = var1.signText[var1.lineBeingEdited];
         int cursor = MegaMod.getInstance().signCursorLoc;
+        if(cursor > text.length()) {
+            MegaMod.getInstance().signCursorLoc = text.length();
+            return text;
+        }
         return text.substring(0, cursor) + "|" + text.substring(cursor);
     }
 }

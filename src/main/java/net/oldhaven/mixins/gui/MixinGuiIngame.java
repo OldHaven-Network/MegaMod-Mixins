@@ -5,11 +5,9 @@ import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.CustomGameSettings;
 import net.oldhaven.customs.SavedLogins;
+import net.oldhaven.customs.packets.CustomPacket_MobHealth;
 import net.oldhaven.customs.packets.CustomPackets;
-import org.checkerframework.common.util.report.qual.ReportReadWrite;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -19,6 +17,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Mixin(GuiIngame.class)
 public class MixinGuiIngame extends Gui {
@@ -27,6 +26,8 @@ public class MixinGuiIngame extends Gui {
     private int itemFade = 0;
     @Shadow private Minecraft mc;
     @Shadow private static RenderItem itemRenderer;
+
+    @Shadow private List chatMessageList;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
@@ -101,21 +102,38 @@ public class MixinGuiIngame extends Gui {
                     down+=12;
                 }
             }
-            if(gs.getOptionI("Toggle WAILA") == 1) {
+            //if(gs.getOptionI("Toggle XP-Bar") == 1)
+                //guiEXPBar(scaledresolution);
+            if(gs.getOptionI("Toggle WAILA") == 1)
                 guiWAILA(scaledresolution);
-            }
-            if(gs.getOptionI("Disable PlayerList") != 1 && MegaMod.getInstance().playerList) {
+            if(gs.getOptionI("Disable PlayerList") != 1 && MegaMod.getInstance().playerList)
                 guiPlayerList(scaledresolution);
-            }
         }
     }
 
+    private boolean getListFromChat = false;
     @Redirect(method = "renderGameOverlay", at = @At(value = "FIELD", target = "Lnet/minecraft/src/ChatLine;message:Ljava/lang/String;", opcode = 180))
     private String getMessage(ChatLine chatLine) {
         MegaMod megaMod = MegaMod.getInstance();
+        String msg = chatLine.message;
+        if(getListFromChat) {
+            if(msg.startsWith("§9There are §c2")) {
+                String rep = msg.replace("§9There are §c", "");
+                rep = rep.replaceAll("§9", "");
+                playersOnline = Integer.parseInt(rep.split(" ")[0]);
+                rep = rep.replace(playersOnline + " out of a maximum §c", "");
+                maxPlayers = Integer.parseInt(rep.split(" ")[0]);
+                chatMessageList.remove(chatLine);
+            }
+            for(int i=0;i < chatMessageList.size();i++) {
+
+            }
+            getListFromChat = false;
+            return msg;
+        }
         boolean b =
-                chatLine.message.equals("§cPlease identify yourself with /login <password>") ||
-                chatLine.message.equals("§cPlease login with \"/login password\"");
+                msg.equals("§cPlease identify yourself with /login <password>") ||
+                msg.equals("§cPlease login with \"/login password\"");
         if(!megaMod.hasLoggedIn && b) {
             /* holy this was long */
             SavedLogins savedLoginsClass = megaMod.getAutoLogins();
@@ -133,6 +151,16 @@ public class MixinGuiIngame extends Gui {
         return chatLine.message;
     }
 
+    @ModifyConstant(method = "renderGameOverlay", constant = @Constant(intValue = 32))
+    private int modify32(int test) {
+        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+        if(gs.getOptionI("Toggle XP-Bar") == 1)
+            return 32+6;
+        return 32;
+    }
+
+    private int playersOnline = 0;
+    private int maxPlayers = 100;
     private void guiPlayerList(ScaledResolution sc) {
         int width = sc.getScaledWidth();
         int centerW = sc.getScaledWidth()/2;
@@ -147,9 +175,29 @@ public class MixinGuiIngame extends Gui {
                 this.drawCenteredString(mc.fontRenderer, name, centerW, height, 0xffffff);
                 height += 12;
             }
-        } /*else {
-            // later
-        }*/
+            playersOnline = names.size();
+            this.drawCenteredString(mc.fontRenderer, playersOnline + " players online", centerW, height, 0x4fedff);
+        } else {
+            this.drawCenteredString(mc.fontRenderer, playersOnline+"/"+maxPlayers, centerW, width/2, 0x4fedff);
+        }
+    }
+
+    private void guiEXPBar(ScaledResolution sc) {
+        int width = sc.getScaledWidth();
+        int height = sc.getScaledHeight();
+        GL11.glEnable(GL11.GL_BLEND);
+        GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        int o = mc.renderEngine.getTexture("/gui/alphabg.png");
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.renderEngine.bindTexture(o);
+
+        int i = 10;
+        int h = height-29;
+        drawTexturedModalRect(width/2-(182/2), h, 0, 26, 1, 5);
+        drawTexturedModalRect(width/2-(182/2)+1+i, h, 1, 26, 179-i, 5);
+        drawTexturedModalRect(width/2-(182/2)+180, h, 180, 26, 1, 5);
+        GL11.glBlendFunc(770, 771);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     private void guiWAILA(ScaledResolution sc) {
@@ -177,9 +225,15 @@ public class MixinGuiIngame extends Gui {
             } else
                 name = getEntityName(entityLiving);
 
+
             drawCenteredString(mc.fontRenderer, name, width / 2, 6, 0xffffff);
             GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mc.renderEngine.getTexture("/gui/icons.png"));
             int health = entityLiving.health;
+
+            String connectedServer = MegaMod.getInstance().getConnectedServer();
+            if(connectedServer != null && CustomPacket_MobHealth.mobIds.containsKey(entity.entityId))
+                health = CustomPacket_MobHealth.mobIds.get(entity.entityId);
+
             for (int i = 0; i < 10; i++) {
                 int i6 = (width / 2 - 42) + i * 8;
                 drawMissingHealth(i6, 15, entity.heartsLife);
@@ -194,10 +248,12 @@ public class MixinGuiIngame extends Gui {
             }
         } else if(blockId != 0) {
             Block block = Block.blocksList[blockId];
-            drawCenteredString(mc.fontRenderer, getBlockName(block.translateBlockName()), width / 2 + 5, 6, 0xffffff);
-            drawCenteredString(mc.fontRenderer, "H: " + block.getHardness(), width / 2 + 5, 16, 0xffffff);
-            itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(block), width/2-40, 8);
-            RenderHelper.disableStandardItemLighting();
+            if(block != null) {
+                drawCenteredString(mc.fontRenderer, getBlockName(block.translateBlockName()), width / 2 + 5, 6, 0xffffff);
+                drawCenteredString(mc.fontRenderer, "H: " + block.getHardness(), width / 2 + 5, 16, 0xffffff);
+                itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(block), width / 2 - 40, 8);
+                RenderHelper.disableStandardItemLighting();
+            }
         }
     }
 

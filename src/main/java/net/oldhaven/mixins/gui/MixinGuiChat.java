@@ -61,11 +61,10 @@ public class MixinGuiChat extends GuiScreen {
                 cursorLoc = message.length();
             }
         }
-        if(i == 199) { /* HOME key */
+        if(i == 199 || i == 28) /* HOME key, ENTER key */
             cursorLoc = 0;
-        } else if(i == 207) { /* END key */
+        else if(i == 207) /* END key */
             cursorLoc = message.length();
-        }
         megaMod.chatCursorLoc = cursorLoc;
     }
 
@@ -75,7 +74,6 @@ public class MixinGuiChat extends GuiScreen {
         enteredChats.addFirst(s1);
         currentUp = 0;
     }
-
 
     private int substringTest(String msg, int cursorLoc) {
         if(cursorLoc > msg.length())

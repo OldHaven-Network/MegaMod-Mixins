@@ -89,6 +89,7 @@ public class GuiGuiSettings extends GuiScreen
     static 
     {
         videoOptions = (new CustomEnumOptions[] {
+                CustomEnumOptions.ThirdPerson_Distance,
                 CustomEnumOptions.BTN_OUTLINE_COLOR, CustomEnumOptions.BTN_ADVANCED_COLOR, CustomEnumOptions.SHOW_SPEED,
                 CustomEnumOptions.SHOW_MOTION, CustomEnumOptions.SHOW_TOOLTIP, CustomEnumOptions.DEFAULT_MM_BACKGROUND,
                 CustomEnumOptions.SHOW_QUIT_BUTTON, CustomEnumOptions.TOGGLE_WAILA

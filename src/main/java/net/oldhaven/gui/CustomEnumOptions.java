@@ -21,6 +21,7 @@ public enum CustomEnumOptions {
 
     DEFAULT_MM_BACKGROUND("Default Main Menu BG", false, true, 0),
     TOGGLE_WAILA("Toggle WAILA", false, true, 1),
+    TOGGLE_XP_BAR("Toggle XP-Bar", false, true, 1),
     SHOW_QUIT_BUTTON("Show Main Menu Quit Btn", false, true, 1),
     SHOW_MOTION("Show Motion In-Game", false, true, 0),
     SHOW_SPEED("Show Speed In-Game", false, true, 0),
@@ -30,9 +31,11 @@ public enum CustomEnumOptions {
         }),
     BTN_ADVANCED_COLOR("Button ADV Color", false, false, "0xffffff", 2, 8),
 
+    ThirdPerson_Distance("ThirdPerson Distance", true, false, "FAR", 29.0F, "", 1.0F, 1.0F),
     Disable_PlayerList("Disable PlayerList", false, true, 0),
     DISABLE_SPRINT("Disable Sprint", false, true, 0),
-    DISABLE_FLY("Disable Fly", false, true, 0);
+    DISABLE_FLY("Disable Fly", false, true, 0),
+    DISABLE_ZOOM("Disable Zoom", false, true, 0);
 
     private final boolean enumFloat;
     private final boolean enumBoolean;

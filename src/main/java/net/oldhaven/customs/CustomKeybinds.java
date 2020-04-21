@@ -55,6 +55,7 @@ public class CustomKeybinds {
             put("PlayerList", Keyboard.KEY_TAB);
             put("Fly", Keyboard.KEY_R);
             put("Sprint", Keyboard.KEY_LCONTROL);
+            put("Zoom", Keyboard.KEY_C);
         }
     };
 
@@ -90,6 +91,9 @@ public class CustomKeybinds {
     private void onKey_Fly(boolean b) {
         boolean flying = MegaMod.getInstance().isFlying;
         MegaMod.getInstance().isFlying = !flying;
+    }
+    private void onKey_Zoom(boolean b) {
+        MegaMod.getInstance().isZooming = b;
     }
 
     private void onKey_PlayerList(boolean b) {
@@ -144,7 +148,12 @@ public class CustomKeybinds {
             keyActions.put("Sprint", this::onKey_Sprint);
         else
             keyActions.remove("Sprint");
+        if(gs.getOptionI("Disable Zoom") != 1)
+            keyActions.put("Zoom", this::onKey_Zoom);
+        else
+            keyActions.remove("Zoom");
         savedKeysMap.put("Sprint", new SavedKey(1, Keyboard.KEY_LCONTROL, "Sprint"));
+        savedKeysMap.put("Zoom", new SavedKey(1, Keyboard.KEY_C, "Zoom"));
         keyActions.put("Jump", this::onKey_Jump);
     }
     public void saveIntegers() {
