@@ -48,6 +48,9 @@ public class CustomModelAlexArms {
                 this.rotationPointX -= 1F;
                 if(this.outer)
                     this.rotationPointX += 1F;
+            } else {
+                if(this.outer)
+                    this.rotationPointX -= 1F;
             }
             this.rotationPointY = 2.0F+f;
             doRotations(alexArms);

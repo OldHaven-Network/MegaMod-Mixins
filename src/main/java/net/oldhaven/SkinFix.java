@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,9 +32,10 @@ public class SkinFix {
     }
 
     public static Boolean isSkinAlex(String name) {
-        String s = getUuidStringFromName(name).replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
-        int hash_code = s.hashCode();
-        return (hash_code & 1) == 1;
+        if(getUuidStringFromName(name) == null)
+            return false;
+        UUID uuid = UUID.fromString(getUuidStringFromName(name).replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
+        return (uuid.hashCode() & 1) != 0;
     }
 
     private static Map<String, String> savedUrl = new HashMap<>();
@@ -109,7 +111,6 @@ public class SkinFix {
             if (uuid != null) {
                 uuids.put(playerName, uuid);
             }
-
             return uuid;
         }
     }

@@ -96,6 +96,7 @@ public class MixinGuiChat extends GuiScreen {
     private int substringTest(String msg, int cursorLoc) {
         if(cursorLoc > msg.length())
             cursorLoc = msg.length();
+        MegaMod.getInstance().chatCursorLoc = cursorLoc;
         return cursorLoc;
     }
 
@@ -130,8 +131,8 @@ public class MixinGuiChat extends GuiScreen {
     public void drawScreen(int var1, int var2, float var3) {
         this.drawRect(2, this.height - 14, this.width - 2, this.height - 2, -2147483648);
         MegaMod megaMod = MegaMod.getInstance();
+        MegaMod.getInstance().chatCursorLoc = substringTest(this.message, megaMod.chatCursorLoc);
         int cursor = megaMod.chatCursorLoc;
-        MegaMod.getInstance().chatCursorLoc = substringTest(this.message, cursor);
         String msg = this.message;
         msg = msg.substring(0, cursor) + ((updateCounter / 6) % 2 != 0 ? "" : "|") + msg.substring(cursor);
         this.drawString(this.fontRenderer, "> " + msg, 4, this.height - 12, 14737632);

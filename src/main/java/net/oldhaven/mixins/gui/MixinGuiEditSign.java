@@ -64,8 +64,7 @@ public class MixinGuiEditSign extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At("HEAD"))
     private void drawScreen(CallbackInfo ci) {
-        int cursorLoc = MegaMod.getInstance().chatCursorLoc;
-        MegaMod.getInstance().chatCursorLoc = substringTest(this.entitySign.signText[this.editLine], cursorLoc);
+        MegaMod.getInstance().chatCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().chatCursorLoc);
         this.drawCenteredString(this.fontRenderer, "Cursor: " + MegaMod.getInstance().signCursorLoc, this.width / 2, 18, 0xffffff);
         this.drawCenteredString(this.fontRenderer, "Length: " + entitySign.signText[editLine].length(), this.width / 2, 28, 0xffffff);
     }

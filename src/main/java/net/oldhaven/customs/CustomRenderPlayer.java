@@ -168,9 +168,8 @@ public class CustomRenderPlayer extends RenderPlayer {
             GL11.glPushMatrix();
             this.modelBipedMain.bipedRightArm.postRender(0.0625F);
             GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
-            if (var1.fishEntity != null) {
+            if (var1.fishEntity != null)
                 var21 = new ItemStack(Item.stick);
-            }
 
             if (var21.itemID < 256 && RenderBlocks.renderItemIn3d(Block.blocksList[var21.itemID].getRenderType())) {
                 var5 = 0.5F;
@@ -198,11 +197,9 @@ public class CustomRenderPlayer extends RenderPlayer {
                 GL11.glRotatef(-90.0F, 1.0F, 0.0F, 0.0F);
                 GL11.glRotatef(20.0F, 0.0F, 0.0F, 1.0F);
             }
-
             this.renderManager.itemRenderer.renderItem(var1, var21);
             GL11.glPopMatrix();
         }
-
     }
 
     protected void func_186_b(EntityPlayer var1, float var2) {
@@ -214,5 +211,8 @@ public class CustomRenderPlayer extends RenderPlayer {
         this.modelBipedMain.onGround = 0.0F;
         this.modelBipedMain.setRotationAngles(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
         this.modelBipedMain.bipedRightArm.render(0.0625F);
+        this.modelBipedMain.copyModelAngles(this.modelBipedMain.bipedRightArm, this.modelBipedMain.bipedRightArmwear);
+        this.modelBipedMain.bipedRightArmwear.rotationPointX += 1F;
+        //this.modelBipedMain.bipedRightArmwear.render(0.0625F);
     }
 }

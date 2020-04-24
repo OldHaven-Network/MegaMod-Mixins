@@ -5,13 +5,11 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.Vec3D;
 import net.oldhaven.customs.*;
-import net.oldhaven.modloader.IBaseMod;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Color;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -101,7 +99,7 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.5.0";
+    public static String version = "0.5.1";
     public static String requiresUpdate = null;
 
     public boolean playerList;
