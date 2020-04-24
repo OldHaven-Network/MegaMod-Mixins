@@ -71,6 +71,11 @@ public class MixinMinecraft {
 		MegaMod.thirdPersonView = 0;
 	}
 
+	@Redirect(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isMultiplayerWorld()Z"))
+	private boolean isMultiplayer(Minecraft minecraft) {
+		return true;
+	}
+
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", ordinal = 2, shift = At.Shift.BEFORE))
 	private void onKeyPress(CallbackInfo ci) {
 		if(Keyboard.getEventKey() == 63) {

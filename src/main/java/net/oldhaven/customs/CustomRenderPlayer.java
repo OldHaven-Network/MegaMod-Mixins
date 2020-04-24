@@ -2,26 +2,23 @@ package net.oldhaven.customs;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.SkinFix;
 import org.lwjgl.opengl.GL11;
 
 public class CustomRenderPlayer extends RenderPlayer {
     private CustomModelBiped modelBipedMain;
-    private CustomModelBiped modelArmorChestplate;
-    private CustomModelBiped modelArmor;
+    private ModelBiped modelArmorChestplate;
+    private ModelBiped modelArmor;
     private static final String[] armorFilenamePrefix = new String[]{"cloth", "chain", "iron", "diamond", "gold"};
 
     public CustomRenderPlayer() {
         super();
         this.mainModel = new CustomModelBiped(0.0F, 0.0F);
         this.modelBipedMain = (CustomModelBiped)this.mainModel;
-        this.modelArmorChestplate = new CustomModelBiped(1.0F, 0.0F);
-        this.modelArmor = new CustomModelBiped(0.5F, 0.0F);
+        this.modelArmorChestplate = new ModelBiped(1.0F, 0.0F);
+        this.modelArmor = new ModelBiped(0.5F, 0.0F);
     }
 
     protected boolean setArmorModel(EntityPlayer var1, int var2, float var3) {
-        this.modelBipedMain.bipedLeftArm.setIsAlex(SkinFix.isSkinAlex(var1.username));
-        this.modelBipedMain.bipedRightArm.setIsAlex(SkinFix.isSkinAlex(var1.username));
         ItemStack var4 = var1.inventory.armorItemInSlot(3 - var2);
         if (var4 != null) {
             Item var5 = var4.getItem();
@@ -40,7 +37,6 @@ public class CustomRenderPlayer extends RenderPlayer {
                 return true;
             }
         }
-
         return false;
     }
 

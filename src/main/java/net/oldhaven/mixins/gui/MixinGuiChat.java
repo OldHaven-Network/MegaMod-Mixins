@@ -1,8 +1,10 @@
 package net.oldhaven.mixins.gui;
 
+import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiScreen;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.packets.CustomPacket_OnScreenText;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,6 +34,22 @@ public class MixinGuiChat extends GuiScreen {
     @Inject(method = "onGuiClosed", at = @At("RETURN"))
     private void onGuiClosed(CallbackInfo ci) {
         MegaMod.getInstance().chatCursorLoc = 0;
+    }
+
+    @Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;sendChatMessage(Ljava/lang/String;)V"))
+    private void sendMessage(EntityPlayerSP entityPlayerSP, String s) {
+        entityPlayerSP.sendChatMessage(s);
+        if(!mc.isMultiplayerWorld()) {
+            if(s.startsWith("/")) {
+                EntityPlayerSP player = mc.thePlayer;
+                String[] split = s.split(" ");
+                String cmd = split[0].substring(1).toLowerCase();
+                if(cmd.equals("setspawn")) {
+                    mc.theWorld.getWorldInfo().setSpawn(player.chunkCoordX, player.chunkCoordY, player.chunkCoordZ);
+                    new CustomPacket_OnScreenText().run(new String[]{"Successfully set spawn to your location"});
+                }
+            }
+        }
     }
 
     @Inject(method = "keyTyped", at = @At("HEAD"))
@@ -88,6 +106,8 @@ public class MixinGuiChat extends GuiScreen {
                 to = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private void redirect1(GuiChat guiChat, String value) {
         int cursorLoc = MegaMod.getInstance().chatCursorLoc;
+        if(cursorLoc-1 < 0)
+            return;
         this.message = this.message.substring(0, cursorLoc-1) + this.message.substring(cursorLoc);
         MegaMod.getInstance().chatCursorLoc = cursorLoc-1;
     }

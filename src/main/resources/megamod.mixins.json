@@ -28,6 +28,7 @@
     "gui.MixinGuiOptions",
     "entity.MixinTexturedQuad",
     "entity.MixinRenderManager",
+    "entity.MixinRenderLiving",
     "entity.MixinEntity",
     "entity.MixinImageBufferDownload",
     "entity.MixinEntityLiving",

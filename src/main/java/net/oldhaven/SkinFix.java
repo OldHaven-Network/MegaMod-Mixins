@@ -53,7 +53,7 @@ public class SkinFix {
     }
 
     private static boolean codeIs404(int code) {
-        return code == 404;
+        return code == 404 || code == 500;
     }
     private static boolean tryConnect(String urlS) {
         try {

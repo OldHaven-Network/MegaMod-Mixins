@@ -11,10 +11,14 @@ public class CustomModelAlexArms {
     private CustomModelRenderer steveArms;
     public boolean isAlex = false;
     public boolean mirror = false;
+    private boolean outer;
+    private float f;
 
-    float f = 0;
-    public CustomModelAlexArms(int i, int i2, float scale, float f) {
+    public CustomModelAlexArms(int i, int i2, float scale, float f, boolean outer) {
+        this.outer = outer;
         this.f = f;
+        if(outer)
+            scale = scale + 0.25F;
         this.alexArms = new CustomModelRenderer(i, i2);
         this.alexArms.addBox(-1.0F, -2.0F, -2.0F, 3, 12, 4, scale, 64, 64);
         this.alexArms.setRotationPoint(5.0F, 2.0F, 0.0F);
@@ -40,12 +44,19 @@ public class CustomModelAlexArms {
 
     public void render(float scale) {
         if(isAlex) {
-            if(!mirror)
+            if(!mirror) {
                 this.rotationPointX -= 1F;
+                if(this.outer)
+                    this.rotationPointX += 1F;
+            }
             this.rotationPointY = 2.0F+f;
             doRotations(alexArms);
             alexArms.render(scale);
         } else {
+            if(mirror && !this.outer)
+                this.rotationPointX += 2F;
+            //if(!mirror && this.outer)
+                //this.rotationPointX += 0.5F;
             this.rotationPointY = 2.0F+f;
             doRotations(steveArms);
             steveArms.render(scale);
