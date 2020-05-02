@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class FakeShaderThread implements Runnable {
+    public int lightingTick = 0;
     private static Map<Integer, TorchIDs> torchIDs = new HashMap<Integer, TorchIDs>() {
         {
             put(Block.torchRedstoneActive.blockID, new TorchIDs(Block.torchRedstoneActive.blockID, 1.35F));
@@ -69,15 +70,12 @@ public class FakeShaderThread implements Runnable {
         this.world = world;
     }
 
-    int lightingTick = 0;
     public void updateLightingAt(ItemStack heldItem, Vec3D pVec) {
         if(heldItem == null || !torchIDs.containsKey(heldItem.itemID)) {
             if (lastLightVec != null) {
-                lightingTick++;
                 if(lightingTick > 5) {
                     markExtLightUpdate(lastLightVec);
                     lastLightVec = null;
-                    lightingTick = 0;
                 }
             }
             return;

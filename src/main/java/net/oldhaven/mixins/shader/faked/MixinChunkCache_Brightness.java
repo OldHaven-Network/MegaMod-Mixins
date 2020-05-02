@@ -26,7 +26,8 @@ public abstract class MixinChunkCache_Brightness {
 
     @Inject(method = "getBrightness", at=@At("HEAD"), cancellable = true)
     private void returnBrightness(int x, int y, int z, int min, CallbackInfoReturnable<Float> cir) {
-        if(((int)ModOptions.SHADERS.getAsFloat()*3) <= 2) {
+        int f = (int)(ModOptions.SHADERS.getAsFloat()*3);
+        if(f == 2) {
             float density = ModOptions.SHADOW_DENSITY.getAsFloat()/2;
             long time = MegaMod.getMinecraftInstance().theWorld.getWorldTime();
             Vec3D curVec = Vec3D.createVector(x, y, z);

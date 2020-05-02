@@ -42,7 +42,7 @@ public class Shader {
     public static int baseTextureId = 0;
     public static int depthTextureId = 0;
     public static int depthTexture2Id = 0;
-    public static Minecraft x = null;
+    public static Minecraft mc = null;
     public static final int RENDER_TYPE_UNKNOWN = 0;
     public static final int RENDER_TYPE_TERRAIN = 1;
     private static int setupProgram(String s, String s1, String s2, String s3) {
@@ -86,7 +86,7 @@ public class Shader {
         ARBShaderObjects.glUseProgramObjectARB(i);
         activeProgram = i;
         if (i != 0) {
-            if(x.thePlayer != null) {
+            if(mc.thePlayer != null) {
 
             }
             int zero = ARBShaderObjects.glGetUniformLocationARB(i, "sampler0");
@@ -104,7 +104,7 @@ public class Shader {
             ARBShaderObjects.glUniform3fARB(l1, sunPosition[0], sunPosition[1], sunPosition[2]);
             int i2 = ARBShaderObjects.glGetUniformLocationARB(i, "moonPosition");
             ARBShaderObjects.glUniform3fARB(i2, moonPosition[0], moonPosition[1], moonPosition[2]);
-            ItemStack itemstack = x.thePlayer.inventory.getCurrentItem();
+            ItemStack itemstack = mc.thePlayer.inventory.getCurrentItem();
             int j2, i3, l3, j4;
             if (itemstack != null && (j2 = itemstack.itemID) < lightSources.length && lightSources[j2] != null) {
                 i3 = ARBShaderObjects.glGetUniformLocationARB(i, "heldLight.itemId");
@@ -121,7 +121,7 @@ public class Shader {
             }
 
             i3 = ARBShaderObjects.glGetUniformLocationARB(i, "worldTime");
-            ARBShaderObjects.glUniform1iARB(i3, (int)(x.theWorld.getWorldInfo().getWorldTime() % 24000L));
+            ARBShaderObjects.glUniform1iARB(i3, (int)(mc.theWorld.getWorldInfo().getWorldTime() % 24000L));
             l3 = ARBShaderObjects.glGetUniformLocationARB(i, "aspectRatio");
             ARBShaderObjects.glUniform1fARB(l3, (float)renderWidth / (float)renderHeight);
             j4 = ARBShaderObjects.glGetUniformLocationARB(i, "displayWidth");
@@ -131,7 +131,7 @@ public class Shader {
             int l4 = ARBShaderObjects.glGetUniformLocationARB(i, "near");
             ARBShaderObjects.glUniform1fARB(l4, 0.05F);
             int i5 = ARBShaderObjects.glGetUniformLocationARB(i, "far");
-            ARBShaderObjects.glUniform1fARB(i5, (float)(256 >> x.gameSettings.renderDistance));
+            ARBShaderObjects.glUniform1fARB(i5, (float)(256 >> mc.gameSettings.renderDistance));
         }
     }
 
@@ -167,7 +167,7 @@ public class Shader {
     }
 
     public static void processScene(float f, float f1, float f2) {
-        if (!x.gameSettings.anaglyph && finalProgram != 0) {
+        if (!mc.gameSettings.anaglyph && finalProgram != 0) {
             GL11.glBindTexture(3553, baseTextureId);
             GL11.glCopyTexImage2D(3553, 0, 6408, 0, 0, renderWidth, renderHeight, 0);
             GL13.glActiveTexture(33985);
@@ -250,8 +250,8 @@ public class Shader {
     }
 
     public static void setUpBuffers() {
-        if (x != null) {
-            setUpBuffers(x);
+        if (mc != null) {
+            setUpBuffers(mc);
         }
     }
 
@@ -264,7 +264,7 @@ public class Shader {
     }
 
     public static void setUpBuffers(Minecraft minecraft) {
-        x = minecraft;
+        mc = minecraft;
         if (!E) {
             initLightSources();
             if (useMSAA) {

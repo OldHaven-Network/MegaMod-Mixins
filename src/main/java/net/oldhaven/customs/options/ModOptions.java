@@ -16,7 +16,7 @@ public enum ModOptions {
     FIELD_OF_VIEW(new ModOption("Field of View", "Mod", false), true, false, "70", 70.0F, "", 70.0F, 0.1F),
     FLY_SPEED(new ModOption("Fly Speed", "Mod", false), true, false, "OFF", 100.0F, "%", 0.0F, 0.25F),
 
-    SHADOW_DENSITY(new ModOption("Shadow Density", "Shader", false), true, false, "DEFAULT", 1.0F, "", 1.0F, 0),
+    SHADOW_DENSITY(new ModOption("Shadow Density", "Shader", false), true, false, "DEFAULT", 20.0F, "", 1.0F, 0),
     SHADERS(new ModOption("Shaders", "Shader", false), true, false, "OFF", 3.0F, "", 0.0F, 0.0F,
             new String[]{
                     "OFF", "Checkerboard", "Faked-Real", "Outline"

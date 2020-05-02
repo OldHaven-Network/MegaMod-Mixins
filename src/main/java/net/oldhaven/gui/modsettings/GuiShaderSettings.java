@@ -80,6 +80,8 @@ public class GuiShaderSettings extends ModdedSettingsGui
                     }
                 }
             }
+            if(MegaMod.getMinecraftInstance().renderGlobal != null)
+                MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
             mc.displayGuiScreen(parentGuiScreen);
         }
     }

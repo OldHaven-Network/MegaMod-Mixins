@@ -90,21 +90,22 @@ public class CustomGameSettings {
         }
     }
     public void readSettings() {
-        String version = MegaMod.version;
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(optionsFile));
-            for (String s;(s = reader.readLine()) != null;) {
-                s = s.trim();
-                if(s.startsWith("SECTION"))
-                    continue;
-                String[] as = s.split(":");
-                if(as.length > 1) {
-                    map.put(as[0], as[1]);
+        if(optionsFile.exists()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(optionsFile));
+                for (String s; (s = reader.readLine()) != null; ) {
+                    s = s.trim();
+                    if (s.startsWith("SECTION"))
+                        continue;
+                    String[] as = s.split(":");
+                    if (as.length > 1) {
+                        map.put(as[0], as[1]);
+                    }
                 }
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         boolean save = false;
         if(!map.containsKey("MM Version")) {

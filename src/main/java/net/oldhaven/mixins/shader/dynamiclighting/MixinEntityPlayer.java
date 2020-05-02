@@ -14,21 +14,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayer.class)
 public abstract class MixinEntityPlayer extends EntityLiving {
-    @Shadow public abstract ItemStack getCurrentEquippedItem();
-
     public MixinEntityPlayer(World world) {
         super(world);
     }
 
-    int i = 0;
+    @Shadow public abstract ItemStack getCurrentEquippedItem();
+
     @Inject(method = "onUpdate", at=@At("INVOKE"))
     public void onUpdate(CallbackInfo ci) {
         if(ModOptions.DYNAMIC_LIGHTING.getAsInt() == 1) {
+            int i = MegaMod.getFakeShaderThread().lightingTick;
             if(i > 5) {
                 MegaMod.getFakeShaderThread().updateLightingAt(this.getCurrentEquippedItem(), this.getPosition(1.0F));
                 i = 0;
             }
-            i++;
+            MegaMod.getFakeShaderThread().lightingTick = i+1;
         }
     }
 }

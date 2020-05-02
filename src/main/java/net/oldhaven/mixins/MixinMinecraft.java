@@ -1,10 +1,13 @@
 package net.oldhaven.mixins;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.*;
-import net.oldhaven.customs.options.CustomKeybinds;
+import net.minecraft.src.EntityPlayerSP;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.GameSettings;
+import net.minecraft.src.Session;
 import net.oldhaven.MegaMod;
 import net.oldhaven.SkinFix;
+import net.oldhaven.customs.options.CustomKeybinds;
 import net.oldhaven.customs.shaders.Shader;
 import net.oldhaven.gui.changelog.ChangeLog;
 import net.oldhaven.javascript.JSEngine;
@@ -14,7 +17,9 @@ import org.lwjgl.opengl.PixelFormat;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Map;
@@ -42,7 +47,7 @@ public class MixinMinecraft {
 			PixelFormat pixelformat = new PixelFormat();
 			pixelformat = pixelformat.withDepthBits(24);
 			Display.create(pixelformat);
-			Shader.x = theMinecraft;
+			Shader.mc = theMinecraft;
 			Shader.setUpBuffers();
 		} catch(Exception e) {
 			e.printStackTrace();
