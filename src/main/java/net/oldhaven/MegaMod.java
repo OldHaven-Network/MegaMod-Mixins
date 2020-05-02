@@ -5,6 +5,8 @@ import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.Vec3D;
 import net.oldhaven.customs.*;
+import net.oldhaven.customs.options.*;
+import net.oldhaven.customs.shaders.FakeShaderThread;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.Color;
@@ -22,14 +24,17 @@ public class MegaMod {
         onScreenTextMap = new LinkedHashMap<>();
         autoLogins = new SavedLogins(this);
         savedServers = new SavedServers(this);
+        savedShaders = new SavedShaders();
         serverPacketInformation = new ServerPacketInformation(this);
         customGameSettings = new CustomGameSettings();
         customKeybinds = new CustomKeybinds();
         player = new Player();
         joinedNames = new ArrayList<>();
-        BeginThread();
+        fakeShaderThread = new FakeShaderThread();
+        //BeginThread();
     }
 
+    public static boolean modLoaderEnabled = false;
     public void modLoaderTest() {
         if(null == null)
             return;
@@ -45,27 +50,38 @@ public class MegaMod {
         }
     }
 
-    private static MMThread mmThread;
+    //private static MMThread mmThread;
+    /**
+     * Deprecated because use is no longer needed.
+     */
+    @Deprecated
     public void BeginThread() {
-        new Thread(() -> {
+        /*new Thread(() -> {
             Timer timer = new Timer();
-            timer.scheduleAtFixedRate(mmThread=new MMThread(), 0, 50);
-        }).start();
+            timer.scheduleAtFixedRate(mmThread=new MMThread(), 0, 2000);
+        }).start();*/
     }
 
-    public static boolean modLoaderEnabled = false;
-
-    public static float[] getRainbowColor() {
+    /*public static float[] getRainbowColor() {
         return mmThread.lastRainbow;
-    }
+    }*/
     private static class MMThread extends TimerTask {
+        private int seconds = 0;
         MMThread() {
             this.lastRainbow = new float[]{1, 1, 1, 1};
         }
         @Override
         public void run() {
+            //if(seconds >= 1) {
+                //if (renderBlocks != null) {
+                    //System.out.println("compute shaders 1?");
+                    //renderBlocks.computeShaders();
+                //}
+            //    seconds = 0;
+            //}
             if(getFontRenderer() != null)
                 this.rainbowNext();
+            seconds++;
         }
         private List<Color> colors;
         private int colorNext = 0;
@@ -99,7 +115,8 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.5.1";
+    public static String version = "0.6.0";
+    public static boolean hasUpdated = false;
     public static String requiresUpdate = null;
 
     public boolean playerList;
@@ -167,7 +184,13 @@ public class MegaMod {
     public Entity pointingEntity = null;
     public int pointingBlock = 0;
 
-    public void tryFullscreen() {
+    /**
+     * @deprecated un-used, impossible.
+     * @throws NullPointerException Invalid ModOption: Borderless
+     * @see ModOptions
+     */
+    @Deprecated
+    public void tryFullscreen() throws NullPointerException {
         if(System.getProperty("org.lwjgl.opengl.Window.undecorated") == null)
             System.setProperty("org.lwjgl.opengl.Window.undecorated", "false");
         boolean b = getCustomGameSettings().getOptionI("Borderless") == 1;
@@ -175,6 +198,11 @@ public class MegaMod {
             int w = Display.getWidth();
             int h = Display.getHeight();
         }
+    }
+
+    private static FakeShaderThread fakeShaderThread;
+    public static FakeShaderThread getFakeShaderThread() {
+        return fakeShaderThread;
     }
 
     public static class OnScreenText {
@@ -211,18 +239,23 @@ public class MegaMod {
         onScreenTextMap.remove(name);
     }
 
-    private ServerPacketInformation serverPacketInformation;
-    public ServerPacketInformation getServerPacketInformation() {
+    private static ServerPacketInformation serverPacketInformation;
+    public static ServerPacketInformation getServerPacketInformation() {
         return serverPacketInformation;
     }
 
-    private CustomKeybinds customKeybinds;
-    public CustomKeybinds getCustomKeybinds() {
+    private static SavedShaders savedShaders;
+    public static SavedShaders getSavedShaders() {
+        return savedShaders;
+    }
+
+    private static CustomKeybinds customKeybinds;
+    public static CustomKeybinds getCustomKeybinds() {
         return customKeybinds;
     }
 
-    private CustomGameSettings customGameSettings;
-    public CustomGameSettings getCustomGameSettings() {
+    private static CustomGameSettings customGameSettings;
+    public static CustomGameSettings getCustomGameSettings() {
         return customGameSettings;
     }
 
@@ -234,13 +267,13 @@ public class MegaMod {
         return fontRenderer;
     }
 
-    private SavedLogins autoLogins;
-    public SavedLogins getAutoLogins() {
+    private static SavedLogins autoLogins;
+    public static SavedLogins getAutoLogins() {
         return autoLogins;
     }
 
-    private SavedServers savedServers;
-    public SavedServers getSavedServers() {
+    private static SavedServers savedServers;
+    public static SavedServers getSavedServers() {
         return savedServers;
     }
 

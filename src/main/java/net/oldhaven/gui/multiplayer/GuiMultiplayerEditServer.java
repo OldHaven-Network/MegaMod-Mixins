@@ -76,7 +76,7 @@ public class GuiMultiplayerEditServer extends GuiScreen
         if(guibutton.id == 1)
             mc.displayGuiScreen(parentScreen);
         else if(guibutton.id == 0) {
-            MegaMod.getInstance().getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
+            MegaMod.getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
             mc.gameSettings.saveOptions();
             mc.displayGuiScreen(parentScreen);
         }

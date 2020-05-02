@@ -2,15 +2,19 @@ package net.oldhaven.mixins.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.customs.CustomGameSettings;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.options.CustomGameSettings;
+import net.oldhaven.customs.options.ModOptions;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
@@ -93,9 +97,7 @@ public abstract class MixinEntityRenderer {
             return (getZoomFoV() + 70);
         }
         MegaMod.getInstance().hideOnScreenText("zoom");
-        Float f = MegaMod.getInstance().getCustomGameSettings().getOptionF("Field of View");
-        if(f == null)
-            return 70.0F;
+        float f = ModOptions.FIELD_OF_VIEW.getAsFloat();
         return ((f * 70) + 70 + sprintFoV());
     }
 
@@ -103,9 +105,7 @@ public abstract class MixinEntityRenderer {
     private float getFoVModifierWater(float var1) {
         if(MegaMod.getInstance().isZooming)
             return (getZoomFoV() + 70);
-        Float f = MegaMod.getInstance().getCustomGameSettings().getOptionF("Field of View");
-        if(f == null)
-            return 60.0F;
+        float f = ModOptions.FIELD_OF_VIEW.getAsFloat();
         return (f * 70) + 70  + sprintFoV() - 10;
     }
 
@@ -121,7 +121,7 @@ public abstract class MixinEntityRenderer {
         double var6 = var2.prevPosY + (var2.posY - var2.prevPosY) * (double)var1 - (double)var3;
         double var8 = var2.prevPosZ + (var2.posZ - var2.prevPosZ) * (double)var1;
         double var27 = (double)(this.field_22227_s + (this.field_22228_r - this.field_22227_s) * var1) /
-                ((MegaMod.getInstance().getCustomGameSettings().getOptionF("ThirdPerson Distance") * 30 + 1));
+                ((ModOptions.THIRDPERSON_DISTANCE.getAsFloat() * 30 + 1));
         float var13;
         float var28;
         var28 = var2.rotationYaw;
@@ -176,14 +176,19 @@ public abstract class MixinEntityRenderer {
         }
     }*/
 
+    @Inject(method = "renderRainSnow", at = @At("HEAD"), cancellable = true)
+    private void renderRainSnow(float v, CallbackInfo ci) {
+        int value = ModOptions.TOGGLE_RAINSNOW.getAsInt();
+        if(value != 1)
+            ci.cancel();
+    }
+
     @Inject(method = "func_4135_b", at = @At("HEAD"))
     private void renderHand(float f, int i, CallbackInfo ci) {
-        Float temp = MegaMod.getInstance().getCustomGameSettings().getOptionF("Field of View");
-        if(temp == null)
-            temp = 0.1F;
+        Float temp = ModOptions.FIELD_OF_VIEW.getAsFloat();
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+        CustomGameSettings gs = MegaMod.getCustomGameSettings();
         gs.setOption("Field of View", 0.0F);
         float zoom = MegaMod.getInstance().isZooming ? (getZoomFoV() + 70 - 10) : getFovModifierDefault(f);
         if(MegaMod.getInstance().isZooming && zoom <= 20)

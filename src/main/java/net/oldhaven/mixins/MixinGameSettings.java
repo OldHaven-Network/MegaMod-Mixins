@@ -14,13 +14,15 @@ import java.io.File;
 public class MixinGameSettings {
     @Inject(method = "<init>(Lnet/minecraft/client/Minecraft;Ljava/io/File;)V", at = @At("RETURN"))
     private void onInit(Minecraft var1, File var2, CallbackInfo ci) {
-        MegaMod.getInstance().getAutoLogins().savedLoginsFile = new File(var2, "savedLogins.txt");
-        MegaMod.getInstance().getAutoLogins().readLogins();
-        MegaMod.getInstance().getSavedServers().savedServersFile = new File(var2, "savedServers.txt");
-        MegaMod.getInstance().getSavedServers().readServers();
-        MegaMod.getInstance().getCustomGameSettings().optionsFile = new File(var2, "megamodOptions.txt");
-        MegaMod.getInstance().getCustomGameSettings().readSettings();
-        MegaMod.getInstance().getCustomKeybinds().savedKeysFile = new File(var2, "savedKeys.txt");
-        MegaMod.getInstance().getCustomKeybinds().loadKeys();
+        MegaMod.getAutoLogins().savedLoginsFile = new File(var2, "savedLogins.txt");
+        MegaMod.getAutoLogins().readLogins();
+        MegaMod.getSavedServers().savedServersFile = new File(var2, "savedServers.txt");
+        MegaMod.getSavedServers().readServers();
+        MegaMod.getCustomGameSettings().optionsFile = new File(var2, "megamodOptions.ini");
+        MegaMod.getCustomGameSettings().readSettings();
+        MegaMod.getCustomKeybinds().savedKeysFile = new File(var2, "savedKeys.txt");
+        MegaMod.getCustomKeybinds().loadKeys();
+        MegaMod.getSavedShaders().shaderFolder = new File(var2, "shaders/");
+        MegaMod.getSavedShaders().loadShaders();
     }
 }

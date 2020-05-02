@@ -31,11 +31,17 @@ public class SkinFix {
 
     }
 
+    private static Map<String, Boolean> isAlex = new HashMap<>();
     public static Boolean isSkinAlex(String name) {
-        if(getUuidStringFromName(name) == null)
+        if(isAlex.containsKey(name))
+            return isAlex.get(name);
+        if(getUuidStringFromName(name) == null) {
+            isAlex.put(name, false);
             return false;
+        }
         UUID uuid = UUID.fromString(getUuidStringFromName(name).replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
-        return (uuid.hashCode() & 1) != 0;
+        isAlex.put(name, (uuid.hashCode() & 1) != 0);
+        return isAlex.get(name);
     }
 
     private static Map<String, String> savedUrl = new HashMap<>();

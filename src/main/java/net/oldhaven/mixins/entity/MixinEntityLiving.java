@@ -2,8 +2,9 @@ package net.oldhaven.mixins.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.customs.CustomGameSettings;
+import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.options.ModOptions;
 import org.lwjgl.input.Keyboard;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -56,9 +57,9 @@ public class MixinEntityLiving extends Entity {
             this.moveEntity(x, y, z);
             return;
         }
-        CustomGameSettings cgs = MegaMod.getInstance().getCustomGameSettings();
+        CustomGameSettings cgs = MegaMod.getCustomGameSettings();
         GameSettings gs = MegaMod.getMinecraftInstance().gameSettings;
-        float gsFlySpeed = (cgs.getOptionF("Fly Speed") * 5) + 1;
+        float gsFlySpeed = (ModOptions.FLY_SPEED.getAsFloat() * 5) + 1;
         Boolean flyB = isFlying(this);
         Boolean sprintB = isSprinting(this);
         if(flyB) {
@@ -199,9 +200,9 @@ public class MixinEntityLiving extends Entity {
     @Inject(method = "isOnLadder", at = @At("HEAD"), cancellable = true)
     private void isOnLadder(CallbackInfoReturnable<Boolean> ci) {
         if(isPlayer(this)) {
-            Integer i = MegaMod.getInstance().getCustomGameSettings().getOptionI("Disable Ladders");
+            int i = ModOptions.DISABLE_LADDERS.getAsInt();
             boolean flyB = isFlying(this);
-            if (i != null && i == 1 || flyB)
+            if (i == 1 || flyB)
                 ci.setReturnValue(false);
         }
     }

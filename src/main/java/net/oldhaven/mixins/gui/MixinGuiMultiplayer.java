@@ -126,7 +126,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     public void drawScreen(int i, int j, float f)
     {
         slotGui.drawScreen(i, j, f);
-        if(MegaMod.getInstance().getSavedServers().selectedServer != -1)
+        if(MegaMod.getSavedServers().selectedServer != -1)
             btnEditServer.enabled = btnDeleteServer.enabled = btnSelectServer.enabled = true;
         StringTranslate stringtranslate = StringTranslate.getInstance();
         drawCenteredString(fontRenderer, stringtranslate.translateKey("multiplayer.title"), width / 2, 16, 0xffffff);

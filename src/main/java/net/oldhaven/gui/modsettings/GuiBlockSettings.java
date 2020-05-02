@@ -11,10 +11,8 @@ package net.oldhaven.gui.modsettings;
 
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.gui.CustomEnumOptions;
-import net.oldhaven.gui.CustomGuiButton;
 
-public class GuiBlockSettings extends GuiScreen
+public class GuiBlockSettings extends ModdedSettingsGui
 {
     private MegaMod megaMod;
     public GuiBlockSettings(GuiScreen guiscreen, GameSettings gamesettings)
@@ -27,26 +25,8 @@ public class GuiBlockSettings extends GuiScreen
 
     public void initGui()
     {
+        super.initGui(0);
         StringTranslate stringtranslate = StringTranslate.getInstance();
-        int i = 0;
-        int j = videoOptions.length;
-        for(int k = 0; k < j; k++)
-        {
-            CustomEnumOptions enumoptions = videoOptions[k];
-            String option = enumoptions.getEnumString();
-            if(!enumoptions.getEnumFloat())
-            {
-                controlList.add(new CustomGuiButton.GuiSmallButton(enumoptions.returnEnumOrdinal(), (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), enumoptions, option));
-            } else {
-                Float value = megaMod.getCustomGameSettings().getOptionF(enumoptions.getEnumString());
-                controlList.add(new CustomGuiButton.GuiSlider(
-                                enumoptions.returnEnumOrdinal(),
-                                (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                                enumoptions, option, value == null ? 0F : value));
-            }
-            i++;
-        }
-
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
     }
 
@@ -56,12 +36,12 @@ public class GuiBlockSettings extends GuiScreen
             return;
         if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton))
         {
-            megaMod.getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
+            MegaMod.getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
             guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
         }
         if(guibutton.id == 200)
         {
-            megaMod.getCustomGameSettings().saveSettings();
+            MegaMod.getCustomGameSettings().saveSettings();
             mc.displayGuiScreen(parentGuiScreen);
         }
     }
@@ -76,12 +56,9 @@ public class GuiBlockSettings extends GuiScreen
     private GuiScreen parentGuiScreen;
     protected String screenTitle;
     private GameSettings guiGameSettings;
-    private static CustomEnumOptions videoOptions[];
 
-    static 
-    {
-        videoOptions = (new CustomEnumOptions[] {
-                CustomEnumOptions.ENABLE_FANCY_TREES, CustomEnumOptions.DISABLE_LADDERS
-        });
+    @Override
+    public String getModSection() {
+        return "Blocks";
     }
 }

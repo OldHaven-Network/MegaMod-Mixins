@@ -2,9 +2,10 @@ package net.oldhaven.mixins;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.customs.CustomKeybinds;
+import net.oldhaven.customs.options.CustomKeybinds;
 import net.oldhaven.MegaMod;
 import net.oldhaven.SkinFix;
+import net.oldhaven.customs.shaders.Shader;
 import net.oldhaven.gui.changelog.ChangeLog;
 import net.oldhaven.javascript.JSEngine;
 import org.lwjgl.input.Keyboard;
@@ -24,6 +25,7 @@ public class MixinMinecraft {
 	@Shadow public GameSettings gameSettings;
 	@Shadow public Session session;
 	@Shadow public EntityPlayerSP thePlayer;
+	@Shadow private static Minecraft theMinecraft;
 	private CustomKeybinds customKeybinds;
 
 	@Inject(method = "startGame", at = @At("HEAD"))
@@ -40,6 +42,8 @@ public class MixinMinecraft {
 			PixelFormat pixelformat = new PixelFormat();
 			pixelformat = pixelformat.withDepthBits(24);
 			Display.create(pixelformat);
+			Shader.x = theMinecraft;
+			Shader.setUpBuffers();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -47,12 +51,12 @@ public class MixinMinecraft {
 
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;handleKeyPress(IZ)V", shift = At.Shift.BEFORE))
 	private void onKeyPressHold(CallbackInfo ci) {
-		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getInstance().getCustomKeybinds().getSavedKeys();
+		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getCustomKeybinds().getSavedKeys();
 		for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keys.entrySet()) {
 			if(entry.getValue().getKeyType() != 1)
 				continue;
 			boolean b = Keyboard.isKeyDown(entry.getValue().getKey());
-			MegaMod.getInstance().getCustomKeybinds().onKey(entry.getKey(), b);
+			MegaMod.getCustomKeybinds().onKey(entry.getKey(), b);
 		}
 	}
 
@@ -85,13 +89,13 @@ public class MixinMinecraft {
 			MegaMod.thirdPersonView = third;
 		}
 		if(Keyboard.getEventKey() == gameSettings.keyBindJump.keyCode)
-			MegaMod.getInstance().getCustomKeybinds().onKey("Jump", true);
-		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getInstance().getCustomKeybinds().getSavedKeys();
+			MegaMod.getCustomKeybinds().onKey("Jump", true);
+		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getCustomKeybinds().getSavedKeys();
 		for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keys.entrySet()) {
 			if(entry.getValue().getKeyType() != 0)
 				continue;
 			if(Keyboard.getEventKey() == entry.getValue().getKey()) {
-				MegaMod.getInstance().getCustomKeybinds().onKey(entry.getKey(), true);
+				MegaMod.getCustomKeybinds().onKey(entry.getKey(), true);
 			}
 		}
 	}

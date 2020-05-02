@@ -17,7 +17,6 @@ public class CustomPackets {
             put("playerquit", new CustomPacket_PlayerQuit());
             put("disconnect", new CustomPacket_Disconnect());
             put("mobhealth", new CustomPacket_MobHealth());
-            put("exp", new CustomPacket_EXP());
         }
     };
     public static boolean doPacketCheck(Packet195Custom packetCustom) {

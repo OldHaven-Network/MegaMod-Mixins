@@ -8,7 +8,7 @@ package net.oldhaven.gui.autologins;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiSlot;
 import net.minecraft.src.Tessellator;
-import net.oldhaven.customs.SavedLogins;
+import net.oldhaven.customs.options.SavedLogins;
 import net.oldhaven.MegaMod;
 
 import java.util.Map;

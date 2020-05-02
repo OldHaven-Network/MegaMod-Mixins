@@ -2,15 +2,16 @@ package net.oldhaven.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.customs.CustomGameSettings;
+import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.options.ModOptions;
 import org.lwjgl.opengl.GL11;
 
 public class CustomGuiButton extends GuiButton {
     public static class GuiSmallButton extends CustomGuiButton {
-        private final CustomEnumOptions enumOptions;
+        private final ModOptions enumOptions;
 
-        public GuiSmallButton(int var1, int var2, int var3, CustomEnumOptions var4, String var5) {
+        public GuiSmallButton(int var1, int var2, int var3, ModOptions var4, String var5) {
             super(var1, var2, var3, 150, 20, var5);
             this.enumOptions = var4;
         }
@@ -21,10 +22,10 @@ public class CustomGuiButton extends GuiButton {
         public void mouseReleased(int i, int i1) {
             super.mouseReleased(i, i1);
             if(mousePressed(null, i, i1)) {
-                String s = this.returnEnumOptions().getEnumString();
-                Object option = MegaMod.getInstance().getCustomGameSettings().getOption(s);
+                String s = this.returnEnumOptions().getName();
+                Object option = MegaMod.getCustomGameSettings().getOption(s);
                 boolean b = (option != null && String.valueOf(option).equals("1"));
-                MegaMod.getInstance().getCustomGameSettings().setOption(s, b ? 0 : 1);
+                MegaMod.getCustomGameSettings().setOption(s, b ? 0 : 1);
             }
         }
 
@@ -33,9 +34,9 @@ public class CustomGuiButton extends GuiButton {
             if (this.enabled2) {
                 String onOff = "";
                 if(returnEnumOptions() != null) {
-                    String s = this.returnEnumOptions().getEnumString();
+                    String s = this.returnEnumOptions().getName();
                     onOff = ": OFF";
-                    Object option = MegaMod.getInstance().getCustomGameSettings().getOption(s);
+                    Object option = MegaMod.getCustomGameSettings().getOption(s);
                     if(option != null && String.valueOf(option).equals("1"))
                         onOff = ": ON";
                 }
@@ -45,8 +46,8 @@ public class CustomGuiButton extends GuiButton {
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 boolean var5 = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width && j < this.yPosition + this.height;
                 int var6 = this.getHoverState(var5);
-                CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-                int value = (int)(gs.getOptionF("Button Outline") * 11.0F);
+                CustomGameSettings gs = MegaMod.getCustomGameSettings();
+                int value = (int)(ModOptions.BUTTON_OUTLINE.getAsFloat() * 11.0F);
                 if(value > 0) {
                     int color;
                     switch(value) {
@@ -80,7 +81,7 @@ public class CustomGuiButton extends GuiButton {
             }
         }
 
-        public CustomEnumOptions returnEnumOptions() {
+        public ModOptions returnEnumOptions() {
             return this.enumOptions;
         }
     }
@@ -103,9 +104,9 @@ public class CustomGuiButton extends GuiButton {
         private int width;
         private int height;
         private FontRenderer fontRenderer;
-        private final CustomEnumOptions enumOption;
+        private final ModOptions enumOption;
 
-        public GuiTextField(GuiScreen screen, FontRenderer var1, int oridnal, int x, int y, CustomEnumOptions enumOptions, String var7) {
+        public GuiTextField(GuiScreen screen, FontRenderer var1, int oridnal, int x, int y, ModOptions enumOptions, String var7) {
             super(oridnal, x, y, 150, 20, var7);
             this.enumOption = enumOptions;
             this.text = var7;
@@ -200,22 +201,22 @@ public class CustomGuiButton extends GuiButton {
     }
 
     public static class GuiSlider extends GuiButton {
-        private CustomEnumOptions idFloat = null;
+        private ModOptions idFloat = null;
         public float sliderValue = 1.0F;
         public boolean dragging = false;
-        public GuiSlider(int var1, int var2, int var3, CustomEnumOptions var4, String var5, float var6) {
+        public GuiSlider(int var1, int var2, int var3, ModOptions var4, String var5, float var6) {
             super(var1, var2, var3, 150, 20, var5);
             this.idFloat = var4;
             this.sliderValue = var6;
-            CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-            Object nullable = gs.getOption(var4.getEnumString());
+            CustomGameSettings gs = MegaMod.getCustomGameSettings();
+            Object nullable = gs.getOption(var4.getName());
             if(nullable == null)
-                gs.setOption(var4.getEnumString(), var4.getDefaultValue());
+                gs.setOption(var4.getName(), var4.getDefaultValue());
             this.doDisplayString();
         }
 
         private void doDisplayString() {
-            String option = this.idFloat.getEnumString();
+            String option = this.idFloat.getName();
             String end = this.idFloat.getSlideEnd();
             float add = this.idFloat.getAdd();
             float times = this.idFloat.getTimes();
@@ -244,7 +245,7 @@ public class CustomGuiButton extends GuiButton {
                         this.sliderValue = 1.0F;
                     }
 
-                    MegaMod.getInstance().getCustomGameSettings().setOption(this.idFloat.getEnumString(), this.sliderValue);
+                    MegaMod.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
                     this.doDisplayString();
                 }
 
@@ -265,7 +266,7 @@ public class CustomGuiButton extends GuiButton {
                     this.sliderValue = 1.0F;
                 }
 
-                MegaMod.getInstance().getCustomGameSettings().setOption(this.idFloat.getEnumString(), this.sliderValue);
+                MegaMod.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
                 this.doDisplayString();
                 this.dragging = true;
                 return true;

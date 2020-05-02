@@ -3,8 +3,8 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.CustomGameSettings;
-import net.oldhaven.customs.SavedLogins;
+import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.options.SavedLogins;
 import net.oldhaven.customs.packets.CustomPacket_MobHealth;
 import net.oldhaven.customs.packets.CustomPackets;
 import org.lwjgl.opengl.GL11;
@@ -17,7 +17,6 @@ import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 @Mixin(GuiIngame.class)
 public class MixinGuiIngame extends Gui {
@@ -26,13 +25,7 @@ public class MixinGuiIngame extends Gui {
     private int itemFade = 0;
     @Shadow private Minecraft mc;
     @Shadow private static RenderItem itemRenderer;
-
     @Shadow private List chatMessageList;
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(CallbackInfo ci) {
-        itemRenderer = new RenderItem();
-    }
 
     private void drawHealth(int x, int y, boolean half) {
         if(!half) {
@@ -57,13 +50,11 @@ public class MixinGuiIngame extends Gui {
         if(!this.mc.gameSettings.showDebugInfo) {
             if(mc.isGamePaused)
                 return;
-            MegaMod megaMod = MegaMod.getInstance();
             ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
             int k = scaledresolution.getScaledWidth();
             int l = scaledresolution.getScaledHeight();
-            CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-            Integer tooltip = gs.getOptionI("Show Tooltip");
-            if(tooltip != null && tooltip == 1) {
+            int tooltip = ModOptions.SHOW_TOOLTIP.getAsInt();
+            if(tooltip == 1) {
                 ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
                 if (stack != null) {
                     String name = stack.getItem().getStatName();
@@ -82,8 +73,8 @@ public class MixinGuiIngame extends Gui {
                 } else if (!lastItem.equals(""))
                     lastItem = "";
             }
-            int showSpeed = gs.getOptionI("Show Speed In-Game");
-            int showMotion = gs.getOptionI("Show Motion In-Game");
+            int showSpeed = ModOptions.SHOW_SPEED_IN_GAME.getAsInt();
+            int showMotion = ModOptions.SHOW_MOTION_IN_GAME.getAsInt();
             if(showSpeed == 1) {
                 double speed = MegaMod.getPlayerInstance().getPlayerSpeed();
                 MegaMod.getInstance().replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
@@ -104,9 +95,9 @@ public class MixinGuiIngame extends Gui {
             }
             //if(gs.getOptionI("Toggle XP-Bar") == 1)
                 //guiEXPBar(scaledresolution);
-            if(gs.getOptionI("Toggle WAILA") == 1)
+            if(ModOptions.TOGGLE_WAILA.getAsInt() == 1)
                 guiWAILA(scaledresolution);
-            if(gs.getOptionI("Disable PlayerList") != 1 && MegaMod.getInstance().playerList)
+            if(ModOptions.DISABLE_PLAYERLIST.getAsInt() != 1 && MegaMod.getInstance().playerList)
                 guiPlayerList(scaledresolution);
         }
     }
@@ -153,9 +144,9 @@ public class MixinGuiIngame extends Gui {
 
     @ModifyConstant(method = "renderGameOverlay", constant = @Constant(intValue = 32))
     private int modify32(int test) {
-        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-        if(gs.getOptionI("Toggle XP-Bar") == 1)
-            return 32+6;
+        //CustomGameSettings gs = MegaMod.getCustomGameSettings();
+        //if(gs.getOptionI("Toggle XP-Bar") == 1)
+        //    return 32+6;
         return 32;
     }
 

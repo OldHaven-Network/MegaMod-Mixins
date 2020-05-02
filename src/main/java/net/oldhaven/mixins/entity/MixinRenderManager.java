@@ -2,7 +2,7 @@ package net.oldhaven.mixins.entity;
 
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.RenderManager;
-import net.oldhaven.customs.CustomRenderPlayer;
+import net.oldhaven.customs.alexskins.CustomRenderPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

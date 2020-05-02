@@ -64,7 +64,7 @@ public class MixinGuiEditSign extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At("HEAD"))
     private void drawScreen(CallbackInfo ci) {
-        MegaMod.getInstance().chatCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().chatCursorLoc);
+        MegaMod.getInstance().signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
         this.drawCenteredString(this.fontRenderer, "Cursor: " + MegaMod.getInstance().signCursorLoc, this.width / 2, 18, 0xffffff);
         this.drawCenteredString(this.fontRenderer, "Length: " + entitySign.signText[editLine].length(), this.width / 2, 28, 0xffffff);
     }
@@ -75,6 +75,7 @@ public class MixinGuiEditSign extends GuiScreen {
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;length()I", ordinal = 0),
                              to = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private String redirect1(String s, int a, int b, char c, int i) {
+        MegaMod.getInstance().signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
         int cursorLoc = MegaMod.getInstance().signCursorLoc;
         String newS = this.entitySign.signText[this.editLine].substring(0, cursorLoc-1) + this.entitySign.signText[this.editLine].substring(cursorLoc);
         MegaMod.getInstance().signCursorLoc-=1;
@@ -86,6 +87,7 @@ public class MixinGuiEditSign extends GuiScreen {
             at = @At(value = "INVOKE",target = "Ljava/lang/StringBuilder;toString()Ljava/lang/String;"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private String redirect3(StringBuilder builder, char c, int i) {
+        MegaMod.getInstance().signCursorLoc= substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
         int cursorLoc = MegaMod.getInstance().signCursorLoc;
         String[] var10002 = this.entitySign.signText;
         int var10004 = this.editLine;

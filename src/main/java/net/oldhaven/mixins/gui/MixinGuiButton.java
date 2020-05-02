@@ -3,8 +3,7 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Gui;
 import net.minecraft.src.GuiButton;
-import net.oldhaven.MegaMod;
-import net.oldhaven.customs.CustomGameSettings;
+import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,8 +19,7 @@ public class MixinGuiButton extends Gui {
 
     @Inject(method = "drawButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiButton;getHoverState(Z)I", shift = At.Shift.AFTER))
     private void drawButton(Minecraft minecraft, int i, int j, CallbackInfo ci) {
-        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
-        float f =  gs.getOptionF("Button Outline");
+        float f = ModOptions.BUTTON_OUTLINE.getAsFloat();
         int value = (int)(f * 11.0F);
         if(f > 0.0F) {
             int color;
@@ -36,7 +34,7 @@ public class MixinGuiButton extends Gui {
                 case 8: color = 0x65686e;break;
                 case 9: color = 0x363636;break;
                 case 10: color = 0x000000;break;
-                case 11: color = Integer.decode(gs.getOptionS("Button ADV Color"));break;
+                case 11: color = Integer.decode(ModOptions.BUTTON_ADV_COLOR.getAsString());break;
                 default: color = 0xffffff;break;
             }
             if (i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height)

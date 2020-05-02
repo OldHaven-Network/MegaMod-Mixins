@@ -1,0 +1,35 @@
+//Water rendering mode (0: off 1: diffraction only 2:reflection and diffraction)
+water_mode 2
+
+
+//PERFORMANCE SETTINGS
+
+//Resolution of reflection rendering (1 full resolution)
+reflection_resolution 1
+
+//Reflective items, player, mob (on/off)
+reflective_items 1
+
+//Reflective clouds (on/off)
+reflective_clouds 1
+
+//Reflect player (on/off)
+reflect_player 1
+
+
+
+//RENDER SETTINGS
+// R/G/B (float)
+water_color 0.0/0.5/0.35
+
+//between 0.0 and 1.0
+water_surface_transparency 0.1
+
+//between 0.0 and 1.0
+waterfall_transparency 0.25
+
+
+
+
+//transparent block ids to be excluded from water effect (not implemented)
+exclude_list

@@ -6,21 +6,10 @@
 package net.oldhaven.gui.changelog;
 
 import net.minecraft.src.FontRenderer;
-import net.minecraft.src.GuiSlot;
 import net.minecraft.src.Tessellator;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.SavedLogins;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.LinkedList;
-import java.util.Map;
 
 // Referenced classes of package net.minecraft.src:
 //            GuiSlot, GuiAutoLogins, TexturePackList, TexturePackBase, 

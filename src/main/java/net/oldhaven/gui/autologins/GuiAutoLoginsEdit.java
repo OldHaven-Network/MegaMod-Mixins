@@ -30,7 +30,7 @@ public class GuiAutoLoginsEdit extends GuiScreen
         this.editing = true;
         this.editingForIP = ip;
         this.editingName = username;
-        this.editingPass = MegaMod.getInstance().getAutoLogins().getSavedLoginsByIP(ip).getName(username);
+        this.editingPass = MegaMod.getAutoLogins().getSavedLoginsByIP(ip).getName(username);
     }
 
     public void updateScreen()

@@ -8,7 +8,7 @@ public class CustomPacket_Option extends CustomPacket {
     @Override
     public void run(String[] args) {
         if(args.length > 1) {
-            ServerPacketInformation spi = MegaMod.getInstance().getServerPacketInformation();
+            ServerPacketInformation spi = MegaMod.getServerPacketInformation();
             boolean b = args[1].equalsIgnoreCase("true");
             if (args[0].equals("canFly"))
                 spi.setCanFly(b);

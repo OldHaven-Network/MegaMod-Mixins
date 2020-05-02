@@ -1,15 +1,18 @@
 package net.oldhaven.mixins.gui;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.packets.CustomPackets;
+import net.oldhaven.gui.GuiYesNo;
 import net.oldhaven.gui.changelog.GuiChangelog;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiMainMenu.class)
@@ -19,12 +22,25 @@ public class MixinGuiMainMenu extends GuiScreen {
     private GuiButton MM_CL;
     private boolean aetherEnabled = false;
 
-    @Inject(method = "initGui", at = @At("HEAD"))
+    @Inject(method = "initGui", at = @At("HEAD"), cancellable = true)
     private void initGuiFirst(CallbackInfo ci) {
-        mc.hideQuitButton = MegaMod.getInstance().getCustomGameSettings().getOptionI("Show Main Menu Quit Btn") != 1;
+        if(MegaMod.hasUpdated) {
+            mc.displayGuiScreen(new GuiYesNo(
+                () -> { /* yes */
+                    MegaMod.hasUpdated = false;
+                    mc.displayGuiScreen(new GuiChangelog(new GuiMainMenu()));
+                }, () -> {
+                    MegaMod.hasUpdated = false;
+                    mc.displayGuiScreen(new GuiMainMenu());
+                }, "MegaMod has updated", "Would you like to view the changelog?"
+            ));
+            ci.cancel();
+            return;
+        }
+        mc.hideQuitButton = ModOptions.SHOW_MAIN_MENU_QUIT_BUTTON.getAsInt() != 1;
     }
 
-    @Inject(method = "initGui", at = @At("RETURN"))
+    @Inject(method = "initGui", at = @At("RETURN"), cancellable = true)
     private void initGui(CallbackInfo ci) {
         field_35358_g = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
         CustomPackets.setUsePackets(false);
@@ -32,7 +48,7 @@ public class MixinGuiMainMenu extends GuiScreen {
         MegaMod.getInstance().clearJoinedNames();
         MegaMod.getInstance().setConnectedServer(null);
         MegaMod.getInstance().modLoaderTest();
-        MegaMod.getInstance().getServerPacketInformation().reset();
+        MegaMod.getServerPacketInformation().reset();
         for(Object o : controlList) {
             GuiButton guiButton = (GuiButton) o;
             //System.out.println(guiButton.displayString + ", x" + guiButton.xPosition + " y" + guiButton.yPosition);
@@ -60,8 +76,7 @@ public class MixinGuiMainMenu extends GuiScreen {
         }
     }
 
-    private void func_35355_b(int i, int j, float f)
-    {
+    private void func_35355_b(int i, int j, float f) {
         Tessellator tessellator = Tessellator.instance;
         GL11.glMatrixMode(5889 /*GL_PROJECTION*/);
         GL11.glPushMatrix();
@@ -215,7 +230,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", ordinal = 0))
     public void drawMCString(GuiMainMenu mainMenu, FontRenderer fontRenderer, String s, int i, int i1, int i2) {
-        int o = MegaMod.getInstance().getCustomGameSettings().getOptionI("Default Main Menu BG");
+        int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
         if(o != 1) {
             mainMenu.drawString(fontRenderer, "Minecraft Beta 1.7.3", i, i1, 0xffffff);
         } else {
@@ -225,7 +240,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawDefaultBackground()V"))
     public void drawDefaultBackground(GuiMainMenu mainMenu, int i, int j, float f) {
-        int o = MegaMod.getInstance().getCustomGameSettings().getOptionI("Default Main Menu BG");
+        int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
         if(o == 1) {
             this.drawDefaultBackground();
         } else {

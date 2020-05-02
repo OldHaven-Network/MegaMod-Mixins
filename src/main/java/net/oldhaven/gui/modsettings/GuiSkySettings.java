@@ -10,12 +10,10 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
-import net.oldhaven.customs.CustomGameSettings;
 import net.oldhaven.MegaMod;
-import net.oldhaven.gui.CustomEnumOptions;
-import net.oldhaven.gui.CustomGuiButton;
+import net.oldhaven.customs.options.CustomGameSettings;
 
-public class GuiSkySettings extends GuiScreen {
+public class GuiSkySettings extends ModdedSettingsGui {
     public GuiSkySettings(GuiScreen guiscreen, GameSettings gamesettings)
     {
         screenTitle = "Mod Sky Settings";
@@ -26,29 +24,9 @@ public class GuiSkySettings extends GuiScreen {
     public void initGui()
     {
         StringTranslate stringtranslate = StringTranslate.getInstance();
-        CustomGameSettings gs = MegaMod.getInstance().getCustomGameSettings();
+        CustomGameSettings gs = MegaMod.getCustomGameSettings();
         screenTitle = stringtranslate.translateKey("Sky Settings");
-        int i = 0;
-        int j = options.length;
-        for(int k = 0; k < j; k++)
-        {
-            CustomEnumOptions enumoptions = options[k];
-            String option = enumoptions.getEnumString();
-            if(!enumoptions.getEnumFloat()) {
-                controlList.add(new CustomGuiButton.GuiSmallButton(
-                        enumoptions.returnEnumOrdinal(),
-                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumoptions, option));
-            } else {
-                Float value = gs.getOptionF(enumoptions.getEnumString());
-                controlList.add(new CustomGuiButton.GuiSlider(
-                        enumoptions.returnEnumOrdinal(),
-                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumoptions, option, value == null ? 0F : value));
-            }
-            i++;
-        }
-
+        super.initGui(0);
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
     }
 
@@ -65,7 +43,7 @@ public class GuiSkySettings extends GuiScreen {
         }
         if(guibutton.id == 200)
         {
-            MegaMod.getInstance().getCustomGameSettings().saveSettings();
+            MegaMod.getCustomGameSettings().saveSettings();
             mc.displayGuiScreen(parentGuiScreen);
         }
     }
@@ -80,12 +58,9 @@ public class GuiSkySettings extends GuiScreen {
     private GuiScreen parentGuiScreen;
     protected String screenTitle;
     private GameSettings guiGameSettings;
-    private static CustomEnumOptions options[];
 
-    static 
-    {
-        options = (new CustomEnumOptions[] {
-            CustomEnumOptions.CLOUD_HEIGHT, CustomEnumOptions.RAIN_TOGGLE, CustomEnumOptions.FORCE_TIME
-        });
+    @Override
+    public String getModSection() {
+        return "Sky";
     }
 }

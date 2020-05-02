@@ -11,11 +11,9 @@ package net.oldhaven.gui.modsettings;
 
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.CustomGameSettings;
-import net.oldhaven.gui.CustomEnumOptions;
-import net.oldhaven.gui.CustomGuiButton;
+import net.oldhaven.customs.options.ModOptions;
 
-public class GuiModSettings extends GuiScreen
+public class GuiModSettings extends ModdedSettingsGui
 {
     private MegaMod megaMod;
     public GuiModSettings(GuiScreen guiscreen, GameSettings gamesettings)
@@ -26,11 +24,15 @@ public class GuiModSettings extends GuiScreen
         guiGameSettings = gamesettings;
     }
 
+    @Override
+    public String getModSection() {
+        return "Mod";
+    }
+
     public void initGui()
     {
         StringTranslate stringtranslate = StringTranslate.getInstance();
         int i = 0;
-        int j = videoOptions.length;
         controlList.add(new GuiSmallButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Sky Settings..."));
         i++;
         controlList.add(new GuiSmallButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Gui Settings..."));
@@ -39,32 +41,11 @@ public class GuiModSettings extends GuiScreen
         i++;
         controlList.add(new GuiSmallButton(204, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Block Settings..."));
         i++;
-        GuiSmallButton skinSettings;
-        controlList.add(skinSettings=new GuiSmallButton(205, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Skin Settings..."));
-        skinSettings.enabled = false;
+        controlList.add(new GuiSmallButton(205, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Shader Settings..."));
         i++;
-        for(int k = 0; k < j; k++)
-        {
-            CustomEnumOptions enumoptions = videoOptions[k];
-            String option = enumoptions.getEnumString();
-            if(enumoptions.getEnumBoolean()) {
-                controlList.add(new CustomGuiButton.GuiSmallButton(enumoptions.returnEnumOrdinal(), (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1), enumoptions, option));
-            } else if(enumoptions.getEnumFloat()) {
-                Float value = MegaMod.getInstance().getCustomGameSettings().getOptionF(enumoptions.getEnumString());
-                controlList.add(new CustomGuiButton.GuiSlider(
-                        enumoptions.returnEnumOrdinal(),
-                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumoptions, option, value == null ? 0F : value));
-            } else {
-                String value = MegaMod.getInstance().getCustomGameSettings().getOptionS(enumoptions.getEnumString());
-                controlList.add(new CustomGuiButton.GuiTextField(this,
-                        fontRenderer, enumoptions.returnEnumOrdinal(),
-                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumoptions, value));
-            }
-            i++;
-        }
-
+        controlList.add(new GuiSmallButton(206, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Skin Settings..."));
+        i++;
+        super.initGui(i);
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
     }
 
@@ -90,6 +71,10 @@ public class GuiModSettings extends GuiScreen
                     mc.displayGuiScreen(new GuiKeybindSettings(this, guiGameSettings));break;
                 case 204:
                     mc.displayGuiScreen(new GuiBlockSettings(this, guiGameSettings));break;
+                case 205:
+                    mc.displayGuiScreen(new GuiShaderSettings(this, guiGameSettings));break;
+                case 206:
+                    mc.displayGuiScreen(new GuiSkinSettings(this, guiGameSettings));break;
             }
         }
     }
@@ -104,12 +89,5 @@ public class GuiModSettings extends GuiScreen
     private GuiScreen parentGuiScreen;
     protected String screenTitle;
     private GameSettings guiGameSettings;
-    private static CustomEnumOptions videoOptions[];
-
-    static 
-    {
-        videoOptions = (new CustomEnumOptions[] {
-                CustomEnumOptions.FLY_SPEED, CustomEnumOptions.FoV
-        });
-    }
+    private static ModOptions videoOptions[];
 }

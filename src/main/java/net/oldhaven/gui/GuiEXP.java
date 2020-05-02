@@ -4,6 +4,7 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSmallButton;
 
+@Deprecated
 public class GuiEXP extends GuiScreen {
     public GuiEXP() {}
 
