@@ -25,8 +25,11 @@ public class MixinEntityPlayerSP extends EntityPlayer {
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;toString()Ljava/lang/String;"))
     private String toStr(StringBuilder builder, Minecraft var1, World var2, Session var3, int var4) {
         if(MegaMod.debug)
-            var3.username = "ashleez_";
-        return SkinFix.getSkinUrl(var3.username);
+            var3.username = "cutezyash";
+        SkinFix.UserSkin userSkin = SkinFix.getUserSkin(var3.username);
+        if(userSkin == null)
+            return null;
+        return userSkin.skinUrl;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))

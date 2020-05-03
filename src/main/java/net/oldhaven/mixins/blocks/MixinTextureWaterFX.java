@@ -2,7 +2,6 @@ package net.oldhaven.mixins.blocks;
 
 import net.minecraft.src.TextureFX;
 import net.minecraft.src.TextureWaterFX;
-import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +19,7 @@ public class MixinTextureWaterFX extends TextureFX {
 
     @Inject(method = "onTick", at = @At("HEAD"), cancellable = true)
     private void onTick(CallbackInfo ci) {
-        int f = (int)(ModOptions.WATER_COLOR.getAsFloat() * 5.0F);
+        /*int f = (int)(ModOptions.WATER_COLOR.getAsFloat() * 5.0F);
         if(f == 5) {
             ci.cancel();
             return;
@@ -42,6 +41,6 @@ public class MixinTextureWaterFX extends TextureFX {
                 imageData[i1 * 4 + 3] = (byte) l2;
             }
             ci.cancel();
-        }
+        }*/
     }
 }

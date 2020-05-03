@@ -124,7 +124,7 @@ public class MixinGuiChat extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason Show cursor in chat line
      */
     @Overwrite

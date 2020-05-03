@@ -15,6 +15,6 @@ public class MixinSession {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
         if(MegaMod.debug)
-            this.username = "ashleez_";
+            this.username = "cutezyash";
     }
 }

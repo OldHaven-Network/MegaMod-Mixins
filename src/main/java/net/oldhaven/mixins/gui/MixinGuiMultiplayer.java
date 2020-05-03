@@ -32,7 +32,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New Multilayer GUI
      */
     @Overwrite
@@ -57,7 +57,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New Multilayer GUI
      */
     @Overwrite
@@ -98,7 +98,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New MP Gui, Crashes game otherwise
      * @param var1
      * @param var2
@@ -109,7 +109,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New Multilayer GUI
      */
     @Overwrite
@@ -119,7 +119,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New Multilayer GUI
      */
     @Overwrite
@@ -134,7 +134,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     }
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New Multilayer GUI
      */
     @Overwrite

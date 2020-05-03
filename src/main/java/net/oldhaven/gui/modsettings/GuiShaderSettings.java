@@ -15,6 +15,8 @@ import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.gui.CustomGuiButton;
 import net.oldhaven.gui.GuiYesNo;
+import net.oldhaven.gui.rgb.GuiRGB;
+import net.oldhaven.gui.rgb.RGBButton;
 
 public class GuiShaderSettings extends ModdedSettingsGui
 {
@@ -42,7 +44,23 @@ public class GuiShaderSettings extends ModdedSettingsGui
 
     public void initGui()
     {
-        super.initGui(0);
+        int i = 0;
+        String waterStr = ModOptions.WATER_COLOR.getAsString();
+        int waterColor;
+        if(waterStr.isEmpty())
+            waterColor = 0xffffff;
+        else
+            waterColor  = Integer.decode(waterStr);
+        controlList.add(new RGBButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Water Color", waterColor));
+        i++;
+        String lavaStr = ModOptions.LAVA_COLOR.getAsString();
+        int lavaColor;
+        if(lavaStr.isEmpty())
+            lavaColor = 0xffffff;
+        else
+            lavaColor  = Integer.decode(lavaStr);
+        controlList.add(new RGBButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Lava Color", lavaColor));
+        super.initGui(i+1);
         StringTranslate stringtranslate = StringTranslate.getInstance();
         CustomGameSettings gs = MegaMod.getCustomGameSettings();
         //colorField.enabled = ((int) (gs.getOptionF("Button Outline") * 11.0F)) == 11;
@@ -83,6 +101,42 @@ public class GuiShaderSettings extends ModdedSettingsGui
             if(MegaMod.getMinecraftInstance().renderGlobal != null)
                 MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
             mc.displayGuiScreen(parentGuiScreen);
+        } else if(guibutton.id == 201) {
+            mc.displayGuiScreen(new GuiRGB(
+                (int hex) -> {
+                    MegaMod.getCustomGameSettings().setOption("Water Color Hex", String.valueOf(hex));
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
+                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    mc.displayGuiScreen(this);
+                }, (int hex) -> {
+                    mc.displayGuiScreen(this);
+                }, () -> {
+                    MegaMod.getCustomGameSettings().setOption("Water Color Hex", "");
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
+                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    mc.displayGuiScreen(this);
+                }
+            ));
+        } else if(guibutton.id == 202) {
+            mc.displayGuiScreen(new GuiRGB(
+                (int hex) -> {
+                    MegaMod.getCustomGameSettings().setOption("Lava Color Hex", String.valueOf(hex));
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
+                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    mc.displayGuiScreen(this);
+                }, (int hex) -> {
+                    mc.displayGuiScreen(this);
+                }, () -> {
+                    MegaMod.getCustomGameSettings().setOption("Lava Color Hex", "");
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
+                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    mc.displayGuiScreen(this);
+                }
+            ));
         }
     }
 

@@ -21,7 +21,7 @@ public class MixinImageBufferDownload implements ImageBuffer {
     private int imageHeight;
 
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @param image Image to parse
      * @return edited image
      */

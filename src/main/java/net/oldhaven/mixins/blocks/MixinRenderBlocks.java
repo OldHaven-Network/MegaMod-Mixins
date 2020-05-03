@@ -2,8 +2,6 @@ package net.oldhaven.mixins.blocks;
 
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.shaders.water.CustomLavaColor;
-import net.oldhaven.customs.shaders.water.CustomWaterColor;
 import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -107,13 +105,13 @@ public abstract class MixinRenderBlocks {
     private int redirect(Block block, IBlockAccess iBlockAccess, int i, int i1, int i2) {
         int id = iBlockAccess.getBlockId(i, i1, i2);
         if(id == Block.waterStill.blockID || id == Block.waterMoving.blockID) {
-            int f = (int) (ModOptions.WATER_COLOR.getAsFloat() * CustomWaterColor.list.size());
-            if (f != 0)
-                return CustomWaterColor.list.get(f - 1).getHex();
+            String s = ModOptions.WATER_COLOR.getAsString();
+            if(!s.isEmpty())
+                return Integer.decode(ModOptions.WATER_COLOR.getAsString());
         } else if(id == Block.lavaStill.blockID || id == Block.lavaMoving.blockID) {
-            int f = (int) (ModOptions.LAVA_COLOR.getAsFloat() * CustomLavaColor.list.size());
-            if (f != 0)
-                return CustomLavaColor.list.get(f - 1).getHex();
+            String s = ModOptions.LAVA_COLOR.getAsString();
+            if(!s.isEmpty())
+                return Integer.decode(ModOptions.LAVA_COLOR.getAsString());
         }
         return block.colorMultiplier(iBlockAccess, i, i1, i2);
     }

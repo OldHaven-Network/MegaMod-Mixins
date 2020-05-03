@@ -11,7 +11,7 @@ import java.io.FileReader;
 import java.util.function.Consumer;
 
 /**
- * @author ashleez_
+ * @author cutezyash
  * @version JS-0.1
  * @apiNote Unfinished
  *

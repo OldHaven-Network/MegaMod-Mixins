@@ -59,7 +59,7 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
     private GuiControlsSlot.ButtonInfo clickedButtonIsNew = null;
     private GuiButton clickedButton;
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New controls screen
      */
     @Overwrite
@@ -81,7 +81,7 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
 
     private GuiButton lastButton;
     /**
-     * @author ashleez_
+     * @author cutezyash
      * @reason New controls screen
      */
     @Overwrite

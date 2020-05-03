@@ -86,7 +86,7 @@ public class CustomGuiButton extends GuiButton {
         }
     }
 
-    public int adjustAlpha(int rgb, int alpha) {
+    public static int adjustAlpha(int rgb, int alpha) {
         int red = (rgb>>16) &0xff;
         int green = (rgb>>8) &0xff;
         int blue = (rgb>>0) &0xff;
@@ -201,16 +201,16 @@ public class CustomGuiButton extends GuiButton {
     }
 
     public static class GuiSlider extends GuiButton {
-        private ModOptions idFloat = null;
-        public float sliderValue = 1.0F;
+        private final ModOptions idFloat;
+        public float sliderValue;
         public boolean dragging = false;
-        public GuiSlider(int var1, int var2, int var3, ModOptions var4, String var5, float var6) {
+        public GuiSlider(final int var1, final int var2, final int var3, final ModOptions var4, final String var5, final float var6) {
             super(var1, var2, var3, 150, 20, var5);
-            this.idFloat = var4;
             this.sliderValue = var6;
+            this.idFloat = var4;
             CustomGameSettings gs = MegaMod.getCustomGameSettings();
             Object nullable = gs.getOption(var4.getName());
-            if(nullable == null)
+            if (nullable == null)
                 gs.setOption(var4.getName(), var4.getDefaultValue());
             this.doDisplayString();
         }
@@ -221,11 +221,11 @@ public class CustomGuiButton extends GuiButton {
             float add = this.idFloat.getAdd();
             float times = this.idFloat.getTimes();
             String startString = this.idFloat.getStartString();
-            int i = (int)((this.sliderValue * times) + add);
-            if(this.idFloat.getValues() != null) {
-                this.displayString = this.sliderValue == 0.0 ? option + ": "+ startString : option + ": " + this.idFloat.getValues()[i] + end;
+            int i = (int) ((this.sliderValue * times) + add);
+            if (this.idFloat.getValues() != null) {
+                this.displayString = this.sliderValue == 0.0 ? option + ": " + startString : option + ": " + this.idFloat.getValues()[i] + end;
             } else
-                this.displayString = this.sliderValue == 0.0 ? option + ": "+ startString : option + ": " + i + end;
+                this.displayString = this.sliderValue == 0.0 ? option + ": " + startString : option + ": " + i + end;
         }
 
         protected int getHoverState(boolean var1) {

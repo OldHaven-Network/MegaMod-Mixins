@@ -16,7 +16,10 @@ public abstract class MixinEntityOtherPlayerMP extends EntityPlayer {
 
     @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;toString()Ljava/lang/String;"))
     private String toStr(StringBuilder builder, World var2, String var3) {
-        return SkinFix.getSkinUrl(var3);
+        SkinFix.UserSkin userSkin = SkinFix.getUserSkin(var3);
+        if(userSkin == null)
+            return null;
+        return userSkin.skinUrl;
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))

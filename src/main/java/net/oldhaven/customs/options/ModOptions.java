@@ -1,8 +1,6 @@
 package net.oldhaven.customs.options;
 
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.shaders.water.CustomLavaColor;
-import net.oldhaven.customs.shaders.water.CustomWaterColor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,10 +19,8 @@ public enum ModOptions {
             new String[]{
                     "OFF", "Checkerboard", "Faked-Real", "Outline"
             }),
-    WATER_COLOR(new ModOption("Water Color", "Shader", false), true, false, "OFF", (float)CustomWaterColor.list.size(), "", 0.0F, 0.0F,
-            CustomWaterColor.toNameArray()),
-    LAVA_COLOR(new ModOption("Lava Color", "Shader", false), true, false, "OFF", (float)CustomLavaColor.list.size(), "", 0.0F, 0.0F,
-            CustomLavaColor.toNameArray()),
+    WATER_COLOR(new ModOption("Water Color Hex", "Shader", null), "", 0, 6),
+    LAVA_COLOR(new ModOption("Lava Color Hex", "Shader", null), "", 0, 6),
     DYNAMIC_LIGHTING(new ModOption("Dynamic Lighting", "Shader", false), false, true, 0),
 
     CLOUD_HEIGHT(new ModOption("Cloud Height", "Sky", false), true, false, "OFF", 140.0F, "", 60.0F, 0.75F),
@@ -148,18 +144,18 @@ public enum ModOptions {
         this.name = modOption.getName();
         this.isFloat = floa;
         this.isBoolean = bool;
-        if(!modOption.isDisabled()) {
-            update(this.name);
-            String name = modOption.getSection();
-            if(ModOption.sectionMap.containsKey(name))
-                ModOption.sectionMap.get(name).list.add(this);
-            else
-                ModOption.sectionMap.put(name, new Section(name).add(this));
-            if(!ModOption.sectionList.contains(ModOption.sectionMap.get(name)))
-                ModOption.sectionList.add(ModOption.sectionMap.get(name));
-            this.ordinal = ModOption.sectionMap.get(name).list.size();
-            this.currentSection = ModOption.sectionMap.get(name);
-        } else {
+        update(this.name);
+        String name = modOption.getSection();
+        if(ModOption.sectionMap.containsKey(name))
+            ModOption.sectionMap.get(name).list.add(this);
+        else
+            ModOption.sectionMap.put(name, new Section(name).add(this));
+        if(!ModOption.sectionList.contains(ModOption.sectionMap.get(name)))
+            ModOption.sectionList.add(ModOption.sectionMap.get(name));
+        this.ordinal = ModOption.sectionMap.get(name).list.size();
+        this.currentSection = ModOption.sectionMap.get(name);
+        if(modOption.disabled == null || modOption.isDisabled()) {
+            modOption.disabled = true;
             this.setDisabled();
         }
     }
@@ -273,8 +269,8 @@ public enum ModOptions {
 
         private String name;
         private String section;
-        private boolean disabled;
-        public ModOption(String s, String section, boolean disabled) {
+        private Boolean disabled;
+        public ModOption(String s, String section, Boolean disabled) {
             this.name = s;
             this.section = section;
             this.disabled = disabled;
@@ -289,7 +285,7 @@ public enum ModOptions {
             return section;
         }
 
-        public boolean isDisabled() {
+        public Boolean isDisabled() {
             return disabled;
         }
     }

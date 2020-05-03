@@ -1,19 +1,23 @@
 package net.oldhaven;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SkinFix {
     private static final Map<String, String> uuids = new HashMap();
-
     static boolean connected = false;
     public static void tryConnection() {
         try {
@@ -27,37 +31,29 @@ public class SkinFix {
         System.out.println("Connected online");
         connected = true;
     }
-    public SkinFix() {
 
-    }
-
-    private static Map<String, Boolean> isAlex = new HashMap<>();
+    private static Map<String, UserSkin> savedSkins = new HashMap<>();
     public static Boolean isSkinAlex(String name) {
-        if(isAlex.containsKey(name))
-            return isAlex.get(name);
-        if(getUuidStringFromName(name) == null) {
-            isAlex.put(name, false);
+        UserSkin userSkin = getUserSkin(name);
+        if(userSkin == null)
             return false;
-        }
-        UUID uuid = UUID.fromString(getUuidStringFromName(name).replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5"));
-        isAlex.put(name, (uuid.hashCode() & 1) != 0);
-        return isAlex.get(name);
+        return userSkin.slim;
     }
 
-    private static Map<String, String> savedUrl = new HashMap<>();
-    public static String getSkinUrl(String playerName) {
+    public static UserSkin getUserSkin(String playerName) {
         if(playerName == null)
             return null;
-        /*String uuid = getUuidStringFromName(playerName);
-        if(uuid == null)
-            return null;*/
-        if(savedUrl.containsKey(playerName))
-            return savedUrl.get(playerName);
-        /*String s = "https://sessionserver.mojang.com/session/minecraft/profile/"+uuid;
-        String skinUrl = getSkinFromUrl(s);
-        System.out.println(skinUrl);
-        savedUrl.put(playerName, skinUrl);*/
-        return "https://minotar.net/skin/"+playerName;
+        if(savedSkins.containsKey(playerName))
+            return savedSkins.get(playerName);
+        String uuid = getUuidStringFromName(playerName);
+        if(uuid == null) {
+            savedSkins.put(playerName, new UserSkin(null, null, false));
+            return null;
+        }
+        String s = "https://sessionserver.mojang.com/session/minecraft/profile/"+uuid+"?unsigned=false";
+        UserSkin userSkin = getSkinFromUrl(s);
+        savedSkins.put(playerName, userSkin);
+        return userSkin;
     }
 
     private static boolean codeIs404(int code) {
@@ -85,28 +81,22 @@ public class SkinFix {
         if(!connected)
             return null;
         String uuid = getUuidStringFromName(playerName);
-        /*String[] capeListings = capeListing.split("|");
-        for(int i=0;i < capeListings.length;i++) {
-            int o = Integer.parseInt(capeListings[i]);
-            String urlBase = capeList[o];
-        }*/
-        String urlBase = "https://crafatar.com/capes/";
-        String toSend = uuid;
-        if(uuid != null && tryConnect(urlBase + toSend))
-            return urlBase + toSend;
-        else {
-            urlBase = "http://s.optifine.net/capes/";
-            toSend = playerName + ".png";
-            if(tryConnect(urlBase + toSend))
-                return urlBase + toSend;
-            else {
-                urlBase = "https://minecraftcapes.co.uk/getCape/";
-                toSend = uuid;
-                if(tryConnect(urlBase + toSend))
-                    return urlBase + toSend;
-                return null;
-            }
+        UserSkin userSkin = getUserSkin(playerName);
+        if(userSkin != null && userSkin.capeUrl != null) {
+            if(tryConnect(userSkin.capeUrl))
+                return userSkin.capeUrl;
         }
+        String urlBase;
+        String toSend;
+        urlBase = "http://s.optifine.net/capes/";
+        toSend = playerName + ".png";
+        if(tryConnect(urlBase + toSend))
+            return urlBase + toSend;
+         urlBase = "https://minecraftcapes.co.uk/getCape/";
+        toSend = uuid;
+        if(tryConnect(urlBase + toSend))
+            return urlBase + toSend;
+        return null;
     }
 
     private static String getUuidStringFromName(String playerName) {
@@ -121,29 +111,89 @@ public class SkinFix {
         }
     }
 
-    private static String getSkinFromUrl(String ur) {
+    /**
+     * Some code from here to help with doing signature stuff:
+     * https://github.com/Steveice10/MCAuthLib/blob/master/src/main/java/com/github/steveice10/mc/auth/data/GameProfile.java
+     */
+    private static final PublicKey SIGNATURE_KEY;
+    static {
+        try(InputStream in = SkinFix.class.getResourceAsStream("/yggdrasil_session_pubkey.der")) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[4096];
+            int length = -1;
+            while((length = in.read(buffer)) != -1) {
+                out.write(buffer, 0, length);
+            }
+
+            out.close();
+
+            SIGNATURE_KEY = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(out.toByteArray()));
+        } catch(Exception e) {
+            throw new ExceptionInInitializerError("Missing/invalid yggdrasil public key.");
+        }
+    }
+
+    public static class UserSkin {
+        public final boolean slim;
+        public final String skinUrl;
+        private final String capeUrl;
+        UserSkin(String skinUrl, String capeUrl, boolean slim) {
+            this.slim = slim;
+            this.skinUrl = skinUrl;
+            this.capeUrl = capeUrl;
+        }
+    }
+    private static Gson gson = new Gson();
+    private static UserSkin getSkinFromUrl(String ur) {
         try {
             URL url = new URL(ur);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            Pattern pattern = Pattern.compile("(\"value\": \"(.*)\")");
-            String uuidString = null;
 
+            StringBuilder lines = new StringBuilder();
             String line;
-            while((line = in.readLine()) != null && uuidString == null) {
+            while((line = in.readLine()) != null) {
                 if (!line.isEmpty()) {
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.find()) {
-                        uuidString = matcher.group(2);
-                    }
+                    lines.append(line);
                 }
             }
-
             in.close();
-            return uuidString;
-        } catch (IOException e) {
+
+            JsonObject json = gson.fromJson(lines.toString(), JsonObject.class);
+            Signature sig = Signature.getInstance("SHA1withRSA");
+            sig.initVerify(SIGNATURE_KEY);
+            if(json.get("properties") != null) {
+                JsonObject properties = ((JsonArray)json.get("properties")).get(0).getAsJsonObject();
+                String value = properties.get("value").getAsString();
+                if(properties.get("signature") == null)
+                    return null;
+                String yourSig = properties.get("signature").getAsString();
+                sig.update(value.getBytes());
+                boolean b = sig.verify(Base64.getDecoder().decode(yourSig.getBytes(StandardCharsets.UTF_8)));
+                if(b) { /*verified*/
+                    String toJson = new String(Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8)));
+                    JsonObject user = gson.fromJson(toJson, JsonObject.class);
+                    JsonObject textures = user.get("textures").getAsJsonObject();
+                    JsonObject skin = textures.get("SKIN").getAsJsonObject();
+                    String capeUrl = null;
+                    if(textures.get("CAPE") != null) {
+                        capeUrl = textures.get("CAPE").getAsJsonObject().get("url").getAsString();
+                    }
+                    String skinUrl = skin.get("url").getAsString();
+                    if(skin.get("metadata") != null) {
+                        String alex = skin.get("metadata").getAsJsonObject().get("model").getAsString();
+                        if(alex.equalsIgnoreCase("slim")) {
+                            return new UserSkin(skinUrl, capeUrl,true);
+                        }
+                    }
+                    return new UserSkin(skinUrl, capeUrl, false);
+                }
+            }
+            return null;
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
-        return null;
+        return new UserSkin(null, null, false);
     }
     private static String getUuidFromMojang(String playerName) {
         try {

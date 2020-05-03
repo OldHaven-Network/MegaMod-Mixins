@@ -10,6 +10,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -29,6 +30,9 @@ public abstract class MixinEntityRenderer {
     @Shadow private float field_22224_v;
     @Shadow private float field_22227_s;
     @Shadow private float field_22228_r;
+    @Shadow private float field_22230_A;
+    @Shadow private float field_22220_z;
+    @Shadow private boolean cloudFog;
     private float flyFoV = 0.0F;
     private float zoomFoV = 0.0F;
     private float sprintFoV() {
@@ -113,68 +117,100 @@ public abstract class MixinEntityRenderer {
         return 70;
     }
 
-    @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glRotatef(FFFF)V", ordinal = 9, shift = At.Shift.AFTER))
-    public void redirectCatchThirdPersonView(float var1, CallbackInfo ci) {
+    /**
+     * @author cutezyash
+     * @param partialTick
+     */
+    @Overwrite
+    private void orientCamera(float partialTick) {
         EntityLiving var2 = this.mc.renderViewEntity;
-        float var3 = var2.yOffset - 1.62F;
-        double var4 = var2.prevPosX + (var2.posX - var2.prevPosX) * (double)var1;
-        double var6 = var2.prevPosY + (var2.posY - var2.prevPosY) * (double)var1 - (double)var3;
-        double var8 = var2.prevPosZ + (var2.posZ - var2.prevPosZ) * (double)var1;
-        double var27 = (double)(this.field_22227_s + (this.field_22228_r - this.field_22227_s) * var1) /
-                ((ModOptions.THIRDPERSON_DISTANCE.getAsFloat() * 30 + 1));
-        float var13;
-        float var28;
-        var28 = var2.rotationYaw;
-        var13 = var2.rotationPitch;
-        if(MegaMod.thirdPersonView == 1)
-            var13 += 180.0F;
-        double var14 = (double)(-MathHelper.sin(var28 / 180.0F * 3.1415927F) * MathHelper.cos(var13 / 180.0F * 3.1415927F)) * var27;
-        double var16 = (double)(MathHelper.cos(var28 / 180.0F * 3.1415927F) * MathHelper.cos(var13 / 180.0F * 3.1415927F)) * var27;
-        double var18 = (double)(-MathHelper.sin(var13 / 180.0F * 3.1415927F)) * var27;
-
-        for(int i = 0; i < 8; ++i) {
-            float var21 = (float)((i & 1) * 2 - 1);
-            float var22 = (float)((i >> 1 & 1) * 2 - 1);
-            float var23 = (float)((i >> 2 & 1) * 2 - 1);
-            var21 *= 0.1F;
-            var22 *= 0.1F;
-            var23 *= 0.1F;
-            MovingObjectPosition var24 = this.mc.theWorld.rayTraceBlocks(Vec3D.createVector(var4 + (double) var21, var6 + (double) var22, var8 + (double) var23), Vec3D.createVector(var4 - var14 + (double) var21 + (double) var23, var6 - var18 + (double) var22, var8 - var16 + (double) var23));
-            if (var24 != null) {
-                double var25 = var24.hitVec.distanceTo(Vec3D.createVector(var4, var6, var8));
-                if (MegaMod.thirdPersonView == 1)
-                    var25 *= -1;
-                if (var25 < var27) {
-                    var27 = var25;
+        float yOffset = var2.yOffset - 1.62F;
+        double pX = var2.prevPosX + (var2.posX - var2.prevPosX) * (double)partialTick;
+        double pY = var2.prevPosY + (var2.posY - var2.prevPosY) * (double)partialTick - (double)yOffset;
+        double pZ = var2.prevPosZ + (var2.posZ - var2.prevPosZ) * (double)partialTick;
+        GL11.glRotatef(this.field_22230_A + (this.field_22220_z - this.field_22230_A) * partialTick, 0.0F, 0.0F, 1.0F);
+        if (var2.isPlayerSleeping()) {
+            yOffset = (float)((double)yOffset + 1.0D);
+            GL11.glTranslatef(0.0F, 0.3F, 0.0F);
+            if (!this.mc.gameSettings.field_22273_E) {
+                int blockId = this.mc.theWorld.getBlockId(MathHelper.floor_double(var2.posX), MathHelper.floor_double(var2.posY), MathHelper.floor_double(var2.posZ));
+                if (blockId == Block.blockBed.blockID) {
+                    int blockMetadata = this.mc.theWorld.getBlockMetadata(MathHelper.floor_double(var2.posX), MathHelper.floor_double(var2.posY), MathHelper.floor_double(var2.posZ));
+                    int i = blockMetadata & 3;
+                    GL11.glRotatef((float)(i * 90), 0.0F, 1.0F, 0.0F);
                 }
+
+                GL11.glRotatef(var2.prevRotationYaw + (var2.rotationYaw - var2.prevRotationYaw) * partialTick + 180.0F, 0.0F, -1.0F, 0.0F);
+                GL11.glRotatef(var2.prevRotationPitch + (var2.rotationPitch - var2.prevRotationPitch) * partialTick, -1.0F, 0.0F, 0.0F);
             }
+        } else if (this.mc.gameSettings.thirdPersonView) {
+            double dist = (double)(this.field_22227_s + (this.field_22228_r - this.field_22227_s) * partialTick) /
+                    ((ModOptions.THIRDPERSON_DISTANCE.getAsFloat() * 30 + 1));
+            float pit;
+            float yaw;
+            if (this.mc.gameSettings.field_22273_E) {
+                yaw = this.field_22225_u + (this.field_22226_t - this.field_22225_u) * partialTick;
+                pit = this.field_22223_w + (this.field_22224_v - this.field_22223_w) * partialTick;
+                GL11.glTranslatef(0.0F, 0.0F, (float)(-dist));
+                GL11.glRotatef(pit, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(yaw, 0.0F, 1.0F, 0.0F);
+            } else {
+                yaw = var2.rotationYaw;
+                pit = var2.rotationPitch;
+                if(MegaMod.thirdPersonView == 1)
+                    pit+=180.0F;
+                double var14 = (double)(-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pit / 180.0F * 3.1415927F)) * dist;
+                double var16 = (double)(MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pit / 180.0F * 3.1415927F)) * dist;
+                double var18 = (double)(-MathHelper.sin(pit / 180.0F * 3.1415927F)) * dist;
+
+                for(int i=0;i < 8;i++) {
+                    float iX = (float)((i & 1) * 2 - 1) * 0.1F;
+                    float iY = (float)((i >> 1 & 1) * 2 - 1) * 0.1F;
+                    float iZ = (float)((i >> 2 & 1) * 2 - 1) * 0.1F;
+                    MovingObjectPosition var24 = this.mc.theWorld.rayTraceBlocks(
+                            Vec3D.createVector(
+                                    pX + (double)iX,
+                                    pY + (double)iY,
+                                    pZ + (double)iZ
+                            ), Vec3D.createVector(
+                                    pX - var14 + (double)iX + (double)iZ,
+                                    pY - var18 + (double)iY,
+                                    pZ - var16 + (double)iZ
+                            )
+                    );
+                    if (var24 != null) {
+                        double var25 = var24.hitVec.distanceTo(Vec3D.createVector(pX, pY, pZ));
+                        if (var25 < dist) {
+                            dist = var25;
+                        }
+                    }
+                }
+
+                if(MegaMod.thirdPersonView == 1) {
+                    GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+                }
+
+                GL11.glRotatef(var2.rotationPitch - pit, 1.0F, 0.0F, 0.0F);
+                GL11.glRotatef(var2.rotationYaw - yaw, 0.0F, 1.0F, 0.0F);
+                GL11.glTranslatef(0.0F, 0.0F, (float)(-dist));
+                GL11.glRotatef(yaw - var2.rotationYaw, 0.0F, 1.0F, 0.0F);
+                GL11.glRotatef(pit - var2.rotationPitch, 1.0F, 0.0F, 0.0F);
+            }
+        } else {
+            GL11.glTranslatef(0.0F, 0.0F, -0.1F);
         }
 
-        if(MegaMod.thirdPersonView == 1) {
-            GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
+        if (!this.mc.gameSettings.field_22273_E) {
+            GL11.glRotatef(var2.prevRotationPitch + (var2.rotationPitch - var2.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
+            GL11.glRotatef(var2.prevRotationYaw + (var2.rotationYaw - var2.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
         }
 
-        GL11.glRotatef(var2.rotationPitch - var13, 1.0F, 0.0F, 0.0F);
-        GL11.glRotatef(var2.rotationYaw - var28, 0.0F, 1.0F, 0.0F);
-        GL11.glTranslatef(0.0F, 0.0F, (float)(-var27));
-        GL11.glRotatef(var28 - var2.rotationYaw, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(var13 - var2.rotationPitch, 1.0F, 0.0F, 0.0F);
+        GL11.glTranslatef(0.0F, yOffset, 0.0F);
+        pX = var2.prevPosX + (var2.posX - var2.prevPosX) * (double)partialTick;
+        pY = var2.prevPosY + (var2.posY - var2.prevPosY) * (double)partialTick - (double)yOffset;
+        pZ = var2.prevPosZ + (var2.posZ - var2.prevPosZ) * (double)partialTick;
+        this.cloudFog = this.mc.renderGlobal.func_27307_a(pX, pY, pZ, partialTick);
     }
-
-    /*@Redirect(method = "orientCamera", at = @At(value = "FIELD", target = "Lnet/minecraft/src/EntityLiving;rotationPitch:F", opcode = Opcodes.GETFIELD))
-    private float redirectPitch(EntityLiving entityLiving) {
-        float pitch = entityLiving.rotationPitch;
-        if(MegaMod.thirdPersonView == 1)
-            return pitch - 6F;
-        return pitch;
-    }
-
-    @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glRotatef(FFFF)V", shift = At.Shift.BEFORE, ordinal = 6))
-    private void orientThirdTwo(float v, CallbackInfo ci) {
-        if(MegaMod.thirdPersonView == 1) {
-            GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
-        }
-    }*/
 
     @Inject(method = "renderRainSnow", at = @At("HEAD"), cancellable = true)
     private void renderRainSnow(float v, CallbackInfo ci) {
