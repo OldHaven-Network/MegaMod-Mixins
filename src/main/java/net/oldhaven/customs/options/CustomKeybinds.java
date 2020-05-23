@@ -87,6 +87,9 @@ public class CustomKeybinds {
         MegaMod.getInstance().isSprinting = b;
     }
     private void onKey_Fly(boolean b) {
+        if(MegaMod.getInstance().getConnectedServer() != null && !MegaMod.getServerPacketInformation().canFly()) {
+            return;
+        }
         boolean flying = MegaMod.getInstance().isFlying;
         MegaMod.getInstance().isFlying = !flying;
     }
@@ -164,7 +167,6 @@ public class CustomKeybinds {
     }
 
     public void loadKeys() {
-        keyCheck();
         if(savedKeysFile.exists()) {
             try {
                 BufferedReader bufferedreader = new BufferedReader(new FileReader(savedKeysFile));
@@ -172,9 +174,8 @@ public class CustomKeybinds {
                     String[] serverSplit = s.split(":");
                     int key = Integer.parseInt(serverSplit[0]);
                     String name = serverSplit[1];
-                    if(!savedKeysMap.containsKey(name)) {
+                    if(!savedKeysMap.containsKey(name))
                         continue;
-                    }
                     SavedKey savedKey = savedKeysMap.get(name);
                     savedKey.key = key;
                     savedKeysMap.put(name, savedKey);
@@ -186,5 +187,6 @@ public class CustomKeybinds {
         }
         saveIntegers();
         saveKeys();
+        keyCheck();
     }
 }

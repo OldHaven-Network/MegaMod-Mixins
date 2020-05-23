@@ -16,6 +16,7 @@ public class CustomPackets {
             put("playerjoin", new CustomPacket_PlayerJoin());
             put("playerquit", new CustomPacket_PlayerQuit());
             put("disconnect", new CustomPacket_Disconnect());
+            put("option", new CustomPacket_Option());
             put("mobhealth", new CustomPacket_MobHealth());
         }
     };

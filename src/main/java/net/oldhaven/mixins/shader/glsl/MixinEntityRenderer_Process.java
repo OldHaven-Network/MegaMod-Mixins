@@ -1,7 +1,6 @@
 package net.oldhaven.mixins.shader.glsl;
 
 import net.minecraft.src.EntityRenderer;
-import net.oldhaven.customs.shaders.Shader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -70,6 +69,6 @@ public class MixinEntityRenderer_Process {
 
     @Inject(method = "updateCameraAndRender", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;limitFramerate:I", ordinal = 3))
     private void shaderProcess(float v, CallbackInfo ci) {
-        Shader.processScene(this.fogColorRed, this.fogColorGreen, this.fogColorBlue);
+        //Shader.processScene(this.fogColorRed, this.fogColorGreen, this.fogColorBlue);
     }
 }

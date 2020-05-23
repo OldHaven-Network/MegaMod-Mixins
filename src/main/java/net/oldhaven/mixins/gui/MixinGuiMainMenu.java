@@ -179,8 +179,7 @@ public class MixinGuiMainMenu extends GuiScreen {
         GL11.glColorMask(true, true, true, true);
     }
 
-    private void func_35356_c(int i, int j, float f)
-    {
+    private void func_35356_c(int i, int j, float f) {
         GL11.glViewport(0, 0, 256, 256);
         func_35355_b(i, j, f);
         func_35354_a(f);
@@ -238,15 +237,24 @@ public class MixinGuiMainMenu extends GuiScreen {
         }
     }
 
+
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawDefaultBackground()V"))
     public void drawDefaultBackground(GuiMainMenu mainMenu, int i, int j, float f) {
         int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
-        if(o == 1) {
+        if(MegaMod.getInstance().failedToDrawBG || o == 1) {
+            if(MegaMod.getInstance().failedToDrawBG) {
+                this.drawCenteredString(fontRenderer, "OpenGL errored drawing background", width/2, height/7, 0xf54242);
+                this.drawCenteredString(fontRenderer, "Could be a possible incompatibility with OptiFine", width/2, height/7+25, 0xf54242);
+            }
             this.drawDefaultBackground();
         } else {
-            func_35356_c(i, j, f);
-            drawGradientRect(0, 0, width, height, 0xaaffffff, 0xffffff);
-            drawGradientRect(0, 0, width, height, 0, 0xaa000000);
+            try {
+                func_35356_c(i, j, f);
+                drawGradientRect(0, 0, width, height, 0xaaffffff, 0xffffff);
+                drawGradientRect(0, 0, width, height, 0, 0xaa000000);
+            } catch(Exception openglException) {
+                MegaMod.getInstance().failedToDrawBG = true;
+            }
         }
     }
 

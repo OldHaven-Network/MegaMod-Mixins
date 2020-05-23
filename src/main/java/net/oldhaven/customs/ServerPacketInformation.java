@@ -15,6 +15,8 @@ public class ServerPacketInformation {
 
     public void setCanFly(boolean canFly) {
         this.canFly = canFly;
+        if(!canFly)
+            MegaMod.getInstance().isFlying = false;
     }
     public void setCustomChat(boolean customChat) {
         this.customChat = customChat;

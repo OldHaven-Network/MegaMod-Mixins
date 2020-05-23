@@ -174,6 +174,8 @@ public class SkinFix {
                     String toJson = new String(Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8)));
                     JsonObject user = gson.fromJson(toJson, JsonObject.class);
                     JsonObject textures = user.get("textures").getAsJsonObject();
+                    if(textures == null || textures.get("SKIN") == null)
+                        return new UserSkin(null, null, false);
                     JsonObject skin = textures.get("SKIN").getAsJsonObject();
                     String capeUrl = null;
                     if(textures.get("CAPE") != null) {
@@ -189,8 +191,7 @@ public class SkinFix {
                     return new UserSkin(skinUrl, capeUrl, false);
                 }
             }
-            return null;
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+        } catch (NullPointerException | IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
         return new UserSkin(null, null, false);

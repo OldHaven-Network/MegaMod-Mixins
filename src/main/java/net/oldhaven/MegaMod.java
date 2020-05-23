@@ -115,7 +115,7 @@ public class MegaMod {
         return Sys.getTime() * 1000L / Sys.getTimerResolution();
     }
 
-    public static String version = "0.6.1";
+    public static String version = "0.6.3";
     public static boolean hasUpdated = false;
     public static String requiresUpdate = null;
 
@@ -171,6 +171,8 @@ public class MegaMod {
     public static Player getPlayerInstance() {
         return player;
     }
+
+    public boolean failedToDrawBG = false;
 
     public int signCursorLoc = 0;
     public int chatCursorLoc = 0;
