@@ -8,7 +8,7 @@ import net.minecraft.src.Packet3Chat;
 import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.customs.packets.CustomPackets;
+import net.oldhaven.customs.packets.Packets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +23,7 @@ public class MixinNetClientHandler {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
-        CustomPackets.receiveNetworkClient(this.netManager);
+        Packets.receiveNetworkClient(this.netManager);
     }
 
     @Inject(method = "handleChat", at = @At("RETURN"))
@@ -33,8 +33,8 @@ public class MixinNetClientHandler {
 
     @Inject(method = "handleArmAnimation", at=@At("HEAD"), cancellable = true)
     private void handleArmAnimation(Packet18Animation packet18Animation, CallbackInfo ci) {
-        if(!CustomPackets.canUsePackets())
-            if(CustomPackets.tryInitalize(String.valueOf(packet18Animation.animate)))
+        if(!Packets.canUsePackets())
+            if(Packets.tryInitalize(String.valueOf(packet18Animation.animate)))
                 ci.cancel();
     }
 

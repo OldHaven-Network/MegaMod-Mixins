@@ -4,6 +4,7 @@ import net.minecraft.src.EnumSkyBlock;
 import net.minecraft.src.World;
 import net.minecraft.src.WorldProvider;
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,22 +24,31 @@ public abstract class MixinWorld {
 
     @Inject(method = "getLightBrightness", at = @At("INVOKE"), cancellable = true)
     private void getLightBrightness(int x, int y, int z, CallbackInfoReturnable<Float> cir) {
-        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, true, this.worldProvider.lightBrightnessTable[this.getBlockLightValue(x, y, z)]);
+        int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
+        if(shaders <= 1 || ModOptions.DYNAMIC_LIGHTING.getAsInt() != 1)
+            return;
+        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, this.worldProvider.lightBrightnessTable[this.getBlockLightValue(x, y, z)]);
         if((float)i != 0.0F)
             cir.setReturnValue((float)i);
     }
 
     @Inject(method = "getBlockLightValue", at = @At("INVOKE"), cancellable = true)
     private void getLightValue(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
-        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, false, this.getBlockLightValue_do(x, y, z, true));
+        int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
+        if(shaders <= 1 || ModOptions.DYNAMIC_LIGHTING.getAsInt() != 1)
+            return;
+        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, this.getBlockLightValue_do(x, y, z, true));
         if((int)i != 0)
             cir.setReturnValue((int)i);
     }
 
     @Inject(method = "getFullBlockLightValue", at=@At("INVOKE"), cancellable = true)
     private void getFullBlockLightValue(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
-        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, false, this.getBlockLightValue_do(x, y, z, true));
-        if((int)i != 0.0F)
+        int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
+        if(shaders <= 1 || ModOptions.DYNAMIC_LIGHTING.getAsInt() != 1)
+            return;
+        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, this.getBlockLightValue_do(x, y, z, true));
+        if((int)i != 0)
             cir.setReturnValue((int)i);
     }
 }

@@ -1,8 +1,6 @@
 package net.oldhaven.mixins.world;
 
 import net.minecraft.src.WorldProvider;
-import net.oldhaven.customs.options.CustomGameSettings;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class MixinWorldProvider {
     @Inject(method = "getCloudHeight", at = @At("HEAD"), cancellable = true)
     private void getCloudHeight(CallbackInfoReturnable<Float> ci) {
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
         float f = ModOptions.CLOUD_HEIGHT.getAsFloat();
         if(f == 0.0F) {
             ci.setReturnValue(-50.0F);

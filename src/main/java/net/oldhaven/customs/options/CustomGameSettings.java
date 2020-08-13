@@ -64,7 +64,7 @@ public class CustomGameSettings {
             for(ModOptions.Section section : ModOptions.getAllSections()) {
                 for(ModOptions enumOption : section.getList()) {
                     if (enumOption != null) {
-                        if (enumOption.disabled) {
+                        if (enumOption.isDisabled) {
                             disabled.put(enumOption.getName(), enumOption.getCurrentValue());
                             continue;
                         }
@@ -123,20 +123,23 @@ public class CustomGameSettings {
             String name = enu.getName();
             float f = enu.getDefaultValue();
             if(f != -1.0158F && !map.containsKey(name)) {
-                if(enu.getBoolean() && !enu.getFloat())
-                    map.put(name, (int)f);
-                else if(enu.getFloat() && !enu.getBoolean())
-                    map.put(name, f);
-                else
-                    map.put(name, enu.getDefaultValueString());
+                switch(enu.getStyle()) {
+                    case BOOL:
+                    case INTEGER:
+                        map.put(name, (int) f);break;
+                    case FLOAT:
+                        map.put(name, f);break;
+                    default:
+                        map.put(name, enu.getDefaultValueString());break;
+                }
                 save = true;
             }
         }
-        /* 0.4.0 fixes */
+        /* 0.4.0 fixes
         if(getOptionS("Button ADV Color").equalsIgnoreCase("(NOTWORKING)")) {
             setOption("Button ADV Color", "0xffffff");
             save = true;
-        }
+        } */
         if(getOptionI("Enable WAILA") != null) {
             setOption("Toggle WAILA", getOptionI("Enable WAILA"));
             removeOption("Enable WAILA");

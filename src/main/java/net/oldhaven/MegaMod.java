@@ -1,25 +1,80 @@
 package net.oldhaven;
 
+import club.minnced.discord.rpc.DiscordEventHandlers;
+import club.minnced.discord.rpc.DiscordRPC;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.Entity;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.Vec3D;
-import net.oldhaven.customs.*;
+import net.oldhaven.customs.IFontRenderer;
+import net.oldhaven.customs.ServerPacketInformation;
+import net.oldhaven.customs.alexskins.CustomRenderPlayer;
 import net.oldhaven.customs.options.*;
 import net.oldhaven.customs.shaders.FakeShaderThread;
 import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.util.Color;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MegaMod {
-    public static int thirdPersonView = 0;
-    public static boolean debug = false;
+    private static Minecraft mcInstance;
     private static MegaMod instance;
+
+    public static int
+            thirdPersonView, signCursorLoc,
+            chatCursorLoc, chatScrollUp,
+            pointingBlock =                     0;
+
+    private String connectedServer;
+    public static String version =              "0.7.0";
+    public static String requiresUpdate =       null;
+
+    public boolean
+            hasLoggedIn, isZooming,
+            isSprinting, isFlying,
+            flyStill, modLoaderEnabled,
+            failedToDrawBG, playerList =        false;
+    public static boolean hasUpdated, debug =   false;
+
+    private static ServerPacketInformation serverPacketInformation;
+    private static CustomGameSettings customGameSettings;
+    private static CustomKeybinds customKeybinds;
+    private static IFontRenderer fontRenderer;
+    private static SavedShaders savedShaders;
+    private static SavedServers savedServers;
+    private static SavedLogins autoLogins;
+
+    private LinkedHashMap<String, OnScreenText> onScreenTextMap;
+    private static PlayerInstanced playerInstanced;
+    private static FakeShaderThread fakeShaderThread;
+    public Entity pointingEntity = null;
+
+    private List<String> joinedNames;
+
+
+    public static MegaMod getInstance() {
+        return instance;
+    }
+    public static long getSystemTime() {
+        return Sys.getTime() * 1000L / Sys.getTimerResolution();
+    }
+
     public MegaMod() {
+        DiscordRPC dLib = DiscordRPC.INSTANCE;
+        String applicationId = "588975277733052432";
+        DiscordEventHandlers handlers = new DiscordEventHandlers();
+        handlers.ready = (user) -> System.out.println("DiscordRPC started");
+        dLib.Discord_Initialize(applicationId, handlers, true, null);
+        MegaModDiscord.handOverTheGoods();
+        MegaModDiscord.setImages(MegaModDiscord.Images.MainMenu);
+        MegaModDiscord.setDetails("In main menu");
+        //MegaModDiscord.setState(null);
+        //MegaModDiscord.setParty("With", 1, 100);
+        MegaModDiscord.updatePresence();
         instance = this;
         onScreenTextMap = new LinkedHashMap<>();
         autoLogins = new SavedLogins(this);
@@ -28,104 +83,33 @@ public class MegaMod {
         serverPacketInformation = new ServerPacketInformation(this);
         customGameSettings = new CustomGameSettings();
         customKeybinds = new CustomKeybinds();
-        player = new Player();
+        playerInstanced = new PlayerInstanced(new CustomRenderPlayer());
         joinedNames = new ArrayList<>();
         fakeShaderThread = new FakeShaderThread();
         //BeginThread();
     }
 
-    public static boolean modLoaderEnabled = false;
-    public void modLoaderTest() {
-        if(null == null)
-            return;
-        try {
-            Class<?> clazz = Class.forName("ModLoader");
-            Method m = clazz.getMethod("getLoadedMods");
-            List<Class<?>> list = (List<Class<?>>) m.invoke(null);
-            for(Class<?> mod : list) {
-                System.out.println("a: " + mod.getClass().getSimpleName());
-            }
-            modLoaderEnabled = true;
-        } catch (Exception ignore) {
-        }
+    public void onMinecraftStarted() {
+        System.out.println("" +
+                "YOU ARE USING A DEVELOPMENT VERSION OF MEGAMOD\n" +
+                "IF YOU HAVE ANY SUGGESTIONS PLEASE REPORT THEM ON OUR GITHUB PAGE!\n\n" +
+                "MegaMod Version: " + version + "\n" +
+                "Thank you for testing MegaMod. - cutezyash#7654\n"
+        );
     }
 
-    //private static MMThread mmThread;
-    /**
-     * Deprecated because use is no longer needed.
-     */
-    @Deprecated
-    public void BeginThread() {
-        /*new Thread(() -> {
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(mmThread=new MMThread(), 0, 2000);
-        }).start();*/
-    }
+    public void modLoaderTest() { }
 
-    /*public static float[] getRainbowColor() {
-        return mmThread.lastRainbow;
-    }*/
-    private static class MMThread extends TimerTask {
-        private int seconds = 0;
-        MMThread() {
-            this.lastRainbow = new float[]{1, 1, 1, 1};
-        }
-        @Override
-        public void run() {
-            //if(seconds >= 1) {
-                //if (renderBlocks != null) {
-                    //System.out.println("compute shaders 1?");
-                    //renderBlocks.computeShaders();
-                //}
-            //    seconds = 0;
-            //}
-            if(getFontRenderer() != null)
-                this.rainbowNext();
-            seconds++;
-        }
-        private List<Color> colors;
-        private int colorNext = 0;
-        private float[] lastRainbow;
-
-        public float[] rainbowNext() {
-            if (colors == null) {
-                colors = new ArrayList<>();
-                for (int r = 0; r < 100; r++) colors.add(new Color(r * 255 / 100, 255, 0));
-                for (int g = 100; g > 0; g--) colors.add(new Color(255, g * 255 / 100, 0));
-                for (int b = 0; b < 100; b++) colors.add(new Color(255, 0, b * 255 / 100));
-                for (int r = 100; r > 0; r--) colors.add(new Color(r * 255 / 100, 0, 255));
-                for (int g = 0; g < 100; g++) colors.add(new Color(0, g * 255 / 100, 255));
-                for (int b = 100; b > 0; b--) colors.add(new Color(0, 255, b * 255 / 100));
-                colors.add(new Color(0, 255, 0));
-            }
-            colorNext++;
-            if (colorNext >= colors.size())
-                colorNext = 0;
-            Color color = colors.get(colorNext);
-            lastRainbow = new float[]{color.getRed()/255F, color.getGreen()/255F, color.getBlue()/255F, 1.0F};
-            return lastRainbow;
-        }
-    }
-
-    public static MegaMod getInstance() {
-        return instance;
-    }
-
-    public static long getSystemTime() {
-        return Sys.getTime() * 1000L / Sys.getTimerResolution();
-    }
-
-    public static String version = "0.6.3";
-    public static boolean hasUpdated = false;
-    public static String requiresUpdate = null;
-
-    public boolean playerList;
-    private List<String> joinedNames;
+    /* -- PLAYER JOIN PACKETS -- */
     public void addPlayerJoin(String name) {
         joinedNames.add(name);
+        MegaModDiscord.setState("With " + joinedNames.size() + " players");
+        MegaModDiscord.updatePresence();
     }
     public void removePlayerJoin(String name) {
         joinedNames.remove(name);
+        MegaModDiscord.setState("With " + joinedNames.size() + " players");
+        MegaModDiscord.updatePresence();
     }
     public List<String> getJoinedNames() {
         return joinedNames;
@@ -133,16 +117,23 @@ public class MegaMod {
     public void clearJoinedNames() {
         joinedNames.clear();
     }
+    /* -- PLAYER JOIN PACKETS END */
 
-    public static boolean isConnected() {
+    /**
+     * Is connected online?
+     * @return bool
+     */
+    public static boolean isOnline() {
         return SkinFix.connected;
     }
-
-    public static class Player {
-        Player() {}
+    public static class PlayerInstanced {
+        public final CustomRenderPlayer customRenderPlayer;
+        PlayerInstanced(CustomRenderPlayer crp) {
+            this.customRenderPlayer = crp;
+        }
         private double exp;
         private int level;
-        public EntityPlayerSP getPlayer() {
+        public EntityPlayerSP getPlayerSP() {
             return getMinecraftInstance().thePlayer;
         }
         public boolean doesPlayerExist() {
@@ -151,13 +142,13 @@ public class MegaMod {
         public double getPlayerSpeed() {
             if(!doesPlayerExist())
                 return -1;
-            EntityPlayerSP p = getPlayer();
+            EntityPlayerSP p = getPlayerSP();
             return Vec3D.createVector(p.posX, p.posY, p.posZ).distanceTo(Vec3D.createVector(p.lastTickPosX, p.lastTickPosY, p.lastTickPosZ));
         }
         public double getPlayerMotion() {
             if(!doesPlayerExist())
                 return -1;
-            EntityPlayerSP p = getPlayer();
+            EntityPlayerSP p = getPlayerSP();
             return (p.motionX * p.motionX + p.motionZ * p.motionZ);
         }
         public double getExp() {
@@ -167,24 +158,9 @@ public class MegaMod {
             return level;
         }
     }
-    private static Player player;
-    public static Player getPlayerInstance() {
-        return player;
+    public static PlayerInstanced getPlayer() {
+        return playerInstanced;
     }
-
-    public boolean failedToDrawBG = false;
-
-    public int signCursorLoc = 0;
-    public int chatCursorLoc = 0;
-    public int chatScrollUp = 0;
-
-    public boolean isZooming = false;
-    public boolean isSprinting = false;
-    public boolean isFlying = false;
-    public boolean flyStill = false;
-
-    public Entity pointingEntity = null;
-    public int pointingBlock = 0;
 
     /**
      * @deprecated un-used, impossible.
@@ -202,7 +178,6 @@ public class MegaMod {
         }
     }
 
-    private static FakeShaderThread fakeShaderThread;
     public static FakeShaderThread getFakeShaderThread() {
         return fakeShaderThread;
     }
@@ -223,7 +198,6 @@ public class MegaMod {
             return text;
         }
     }
-    private LinkedHashMap<String, OnScreenText> onScreenTextMap;
     public Map<String, OnScreenText> getOnScreenText() {
         return onScreenTextMap;
     }
@@ -241,27 +215,22 @@ public class MegaMod {
         onScreenTextMap.remove(name);
     }
 
-    private static ServerPacketInformation serverPacketInformation;
     public static ServerPacketInformation getServerPacketInformation() {
         return serverPacketInformation;
     }
 
-    private static SavedShaders savedShaders;
     public static SavedShaders getSavedShaders() {
         return savedShaders;
     }
 
-    private static CustomKeybinds customKeybinds;
     public static CustomKeybinds getCustomKeybinds() {
         return customKeybinds;
     }
 
-    private static CustomGameSettings customGameSettings;
     public static CustomGameSettings getCustomGameSettings() {
         return customGameSettings;
     }
 
-    private static IFontRenderer fontRenderer;
     public static void setFontRenderer(IFontRenderer fontRendere) {
         fontRenderer = fontRendere;
     }
@@ -269,26 +238,38 @@ public class MegaMod {
         return fontRenderer;
     }
 
-    private static SavedLogins autoLogins;
     public static SavedLogins getAutoLogins() {
         return autoLogins;
     }
 
-    private static SavedServers savedServers;
     public static SavedServers getSavedServers() {
         return savedServers;
     }
 
-    private String connectedServer;
-    public boolean hasLoggedIn = false;
     public void setConnectedServer(String s) {
         connectedServer = s;
+        if(s != null) {
+            String server = s.replaceAll("\\.", "").toLowerCase().split(":")[0];
+            String noport = s.split(":")[0];
+            for(MegaModDiscord.Images images : MegaModDiscord.Images.values()) {
+                if(images.name().toLowerCase().equals(server)) {
+                    MegaModDiscord.setImages(images);
+                    break;
+                }
+            }
+            MegaModDiscord.setDetails("Playing " + noport);
+            MegaModDiscord.setState("");
+        } else {
+            MegaModDiscord.setDetails("In main menu");
+            MegaModDiscord.setState("");
+            MegaModDiscord.setImages(MegaModDiscord.Images.MainMenu);
+        }
+        MegaModDiscord.updatePresence();
     }
     public String getConnectedServer() {
         return connectedServer;
     }
 
-    private static Minecraft mcInstance;
     public static Minecraft getMinecraftInstance() {
         if(mcInstance == null) {
             try {
@@ -310,7 +291,7 @@ public class MegaMod {
         }
         return mcInstance;
     }
-    private static Object getPrivateValue(Class instanceClass, Object instance, String field)
+    private static Object getPrivateValue(Class<?> instanceClass, Object instance, String field)
             throws IllegalArgumentException, SecurityException, NoSuchFieldException {
         try {
             Field f = instanceClass.getDeclaredField(field);

@@ -3,7 +3,7 @@ package net.oldhaven.customs.packets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomPacket_MobHealth extends CustomPacket {
+public class Packet_Runnable_MobHealth extends PacketRunnable {
     public static Map<Integer /*mob id*/, Integer /*health*/> mobIds = new HashMap<>();
 
     @Override

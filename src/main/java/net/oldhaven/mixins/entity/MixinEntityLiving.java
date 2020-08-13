@@ -154,7 +154,7 @@ public class MixinEntityLiving extends Entity {
         if(!isPlayer(this))
             return f;
         if(MegaMod.getInstance().isSprinting) {
-            if(MegaMod.getPlayerInstance().getPlayer().movementInput.moveForward == 0.0F) {
+            if(MegaMod.getPlayer().getPlayerSP().movementInput.moveForward == 0.0F) {
                 MegaMod.getInstance().isSprinting = false;
             }
         }

@@ -3,6 +3,7 @@
   "package": "net.oldhaven.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "gui.MixinGuiContainer",
     "shader.dynamiclighting.MixinEntityPlayer",
     "shader.dynamiclighting.MixinWorld",
     "shader.faked.MixinChunk",
@@ -13,7 +14,13 @@
     "shader.glsl.MixinMinecraft_CreateShaders",
     "shader.glsl.MixinRenderLiving_ShaderUse",
     "shader.glsl.MixinTessellator_EntityAttrib",
-    "shader.glsl.MixinWorldRenderer_EntityAttrib"
+    "shader.glsl.MixinWorldRenderer_EntityAttrib",
+    "shader.mine_diver.MixinEntityRenderer",
+    "shader.mine_diver.MixinRenderBlocks",
+    "shader.mine_diver.MixinRenderGlobal",
+    "shader.mine_diver.MixinRenderLiving",
+    "shader.mine_diver.MixinTessellator",
+    "shader.mine_diver.MixinWorldRenderer"
   ],
   "client": [
     "MixinGameSettings",
@@ -24,6 +31,7 @@
     "MixinThreadCheckHasPaid",
     "MixinThreadDownloadResources",
     "MixinTileEntitySignRenderer",
+    "blocks.MixinBlock",
     "blocks.MixinRenderBlocks",
     "blocks.MixinTextureWaterFX",
     "entity.MixinEntity",
@@ -48,6 +56,7 @@
     "gui.MixinGuiMultiplayer",
     "gui.MixinGuiOptions",
     "gui.MixinGuiScreen",
+    "gui.MixinGuiSelectWorld",
     "world.MixinNetClientHandler",
     "world.MixinWorldInfo",
     "world.MixinWorldProvider"

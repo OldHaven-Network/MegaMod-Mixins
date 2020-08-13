@@ -2,7 +2,6 @@ package net.oldhaven.mixins;
 
 import net.minecraft.src.ChatAllowedCharacters;
 import net.minecraft.src.FontRenderer;
-import net.minecraft.src.GLAllocation;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.IFontRenderer;
 import org.lwjgl.opengl.GL11;

@@ -2,6 +2,7 @@ package net.oldhaven.mixins.blocks;
 
 import net.minecraft.src.TextureFX;
 import net.minecraft.src.TextureWaterFX;
+import net.oldhaven.customs.options.ModOptions;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ public class MixinTextureWaterFX extends TextureFX {
         if(f == 5) {
             ci.cancel();
             return;
-        }
+        }*/
         if(ModOptions.DISABLE_WATER_ANIMATION.getAsInt() == 1) {
             float[] af = field_1157_h;
             field_1157_h = field_1158_g;
@@ -41,6 +42,6 @@ public class MixinTextureWaterFX extends TextureFX {
                 imageData[i1 * 4 + 3] = (byte) l2;
             }
             ci.cancel();
-        }*/
+        }
     }
 }

@@ -11,10 +11,8 @@ package net.oldhaven.gui.modsettings;
 
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.gui.CustomGuiButton;
-import net.oldhaven.gui.GuiYesNo;
 import net.oldhaven.gui.rgb.GuiRGB;
 import net.oldhaven.gui.rgb.RGBButton;
 
@@ -42,8 +40,10 @@ public class GuiShaderSettings extends ModdedSettingsGui
         return "Shader";
     }
 
+    private GuiButton optionButton;
     public void initGui()
     {
+        this.controlList.clear();
         int i = 0;
         String waterStr = ModOptions.WATER_COLOR.getAsString();
         int waterColor;
@@ -60,11 +60,12 @@ public class GuiShaderSettings extends ModdedSettingsGui
         else
             lavaColor  = Integer.decode(lavaStr);
         controlList.add(new RGBButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Lava Color", lavaColor));
-        super.initGui(i+1);
+        i = super.initGui(i+1);
+        controlList.add(optionButton=new GuiSmallButton(203, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "GLSL Settings"));
         StringTranslate stringtranslate = StringTranslate.getInstance();
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
         //colorField.enabled = ((int) (gs.getOptionF("Button Outline") * 11.0F)) == 11;
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+        glslCheck();
     }
 
     protected void actionPerformed(GuiButton guibutton)
@@ -78,29 +79,14 @@ public class GuiShaderSettings extends ModdedSettingsGui
             }
         } else if (guibutton.id == 200) {
             MegaMod.getCustomGameSettings().saveSettings();
-            int nS = getShaderInt();
-            if(nS != this.lastShader) {
-                if(nS == 1 || nS == 3) {
-                    if(!mc.gameSettings.ambientOcclusion) {
-                        mc.displayGuiScreen(new GuiYesNo(
-                            () -> { /* yes */
-                                mc.gameSettings.ambientOcclusion = true;
-                                mc.gameSettings.saveOptions();
-                                if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                                    MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
-                                mc.displayGuiScreen(parentGuiScreen);
-                            }, () -> {
-                                MegaMod.getCustomGameSettings().setOption(ModOptions.SHADERS.getName(), (float)this.lastShader/ModOptions.SHADERS.getTimes());
-                                mc.displayGuiScreen(this);
-                            }, "Smooth Lighting is required for these shaders.", " Would you like to turn it on?"
-                        ));
-                        return;
-                    }
-                }
-            }
             if(MegaMod.getMinecraftInstance().renderGlobal != null)
                 MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
             mc.displayGuiScreen(parentGuiScreen);
+        } else if(guibutton.id == 203) {
+            if(optionButton.displayString.startsWith("GLSL"))
+                mc.displayGuiScreen(new GuiShaderGLSLSettings(this, guiGameSettings));
+            else
+                mc.displayGuiScreen(new GuiShaderNonGLSLSettings(this, guiGameSettings));
         } else if(guibutton.id == 201) {
             mc.displayGuiScreen(new GuiRGB(
                 (int hex) -> {
@@ -140,11 +126,25 @@ public class GuiShaderSettings extends ModdedSettingsGui
         }
     }
 
+    private int glslCheck() {
+        String value = ModOptions.SHADERS.getStringValue();
+        optionButton.enabled = !value.equals("OFF");
+        if(value.equals("GLSL")) {
+            optionButton.displayString = "GLSL Settings";
+            return 1;
+        } else {
+            optionButton.displayString = "Non-GLSL Settings";
+            if(optionButton.enabled)
+                return 0;
+            return 2;
+        }
+    }
     public void drawScreen(int i, int j, float f)
     {
         drawDefaultBackground();
         drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         drawCenteredString(fontRenderer, "Shaders are in alpha stage", width / 2, 30, 0xeb4034);
+        glslCheck();
         //drawCenteredString(fontRenderer, "Smooth Lighting in Video Settings is needed", width / 2, height / 6 + 168-20, 0x4287f5);
         //drawCenteredString(fontRenderer, "for anything other then Faked-Real shading!!", width / 2, height / 6 + 168-10, 0x4287f5);
         super.drawScreen(i, j, f);

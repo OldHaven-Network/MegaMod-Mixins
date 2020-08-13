@@ -66,7 +66,8 @@ public class CustomKeybinds {
     private long lastJump = 0;
     private boolean didLastJump = false;
     private void onKey_Jump(boolean b) {
-        if(ModOptions.DOUBLE_JUMP_TO_FLY.getAsInt() == 1) {
+        if(     MegaMod.getServerPacketInformation().canFly() &&
+                ModOptions.DOUBLE_JUMP_TO_FLY.getAsInt() == 1) {
             long jump = MegaMod.getSystemTime();
             if (jump < (lastJump + 1000)) {
                 if (didLastJump) {

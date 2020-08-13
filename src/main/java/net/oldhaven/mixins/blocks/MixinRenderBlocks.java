@@ -96,7 +96,8 @@ public abstract class MixinRenderBlocks {
 
     @Inject(method = "renderBlockByRenderType", at = @At("HEAD"), cancellable = true)
     public void renderBlockByRenderType(Block var1, int var2, int var3, int var4, CallbackInfoReturnable<Boolean> ci) {
-        boolean fancyTress = (ModOptions.ENABLE_FANCY_TREES.getAsInt() == 1);
+        //System.out.println(ModOptions.ENABLE_FANCY_TREES.getAsInt());
+        boolean fancyTress = (ModOptions.ENABLE_FANCY_TREES.getAsInt() > 0);
         if(fancyTress && var1.blockID == 18)
             ci.setReturnValue(renderBlockLeaves(var1, var2, var3, var4));
     }
@@ -216,14 +217,13 @@ public abstract class MixinRenderBlocks {
         }
         float f19 = block.getBlockBrightness(blockAccess, i, j, k);
         if(blockAccess.getBlockId(i, j-1, k) != block.blockID) {
-            if (true || renderAllFaces || block.shouldSideBeRendered(blockAccess, i, j - 1, k, 0)) {
+            if (true) {
                 float f20 = block.getBlockBrightness(blockAccess, i, j - 1, k);
                 tessellator.setColorRGBA_F(f10 * f20, f13 * f20, f16 * f20, 0.25F);
                 renderBottomFace(block, i, j, k, block.getBlockTexture(blockAccess, i, j, k, 0));
             }
         }
-        if(true || renderAllFaces || block.shouldSideBeRendered(blockAccess, i, j + 1, k, 1))
-        {
+        if(true) {
             float f21 = block.getBlockBrightness(blockAccess, i, j + 1, k);
             if(block.maxY != 1.0D && !block.blockMaterial.getIsLiquid())
                 f21 = f19;
@@ -342,21 +342,21 @@ public abstract class MixinRenderBlocks {
         aoLightValueXPos = block.getBlockBrightness(blockAccess, x + 1, y, z);
         aoLightValueYPos = block.getBlockBrightness(blockAccess, x, y + 1, z);
         aoLightValueZPos = block.getBlockBrightness(blockAccess, x, y, z + 1);
-        EntityPlayerSP player = MegaMod.getPlayerInstance().getPlayer();
+        EntityPlayerSP player = MegaMod.getPlayer().getPlayerSP();
         Vec3D curVec = Vec3D.createVector(x, y+1, z);
         Vec3D pos = player.getPosition(1.0F);
-        int newType = (int) (ModOptions.SHADERS.getAsFloat() * 3);
+        int newType = (int) (ModOptions.SHADERS.getAsFloat() * 4);
         if (newType != shaderType)
             shaderType = newType;
         if (pos.distanceTo(curVec) < 50 && shaderType != 0) {
-            if (shaderType == 1) {
+            if (shaderType == 2) {
                 if (x % 2 == 0 && z % 2 == 0)
                     divide = 7.0F;
                 else if (x % 2 == 1 && z % 2 == 1)
                     divide = 7.0F;
                 else
                     divide = 4.0F;
-            } else if(shaderType == 3) {
+            } else if(shaderType == 4) {
                 divide = aoLightValueYNeg+5*((aoLightValueXNeg+aoLightValueZNeg)+1);
             } else
                 divide = 4.0F;

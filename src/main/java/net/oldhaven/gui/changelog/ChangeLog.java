@@ -1,7 +1,6 @@
 package net.oldhaven.gui.changelog;
 
 import net.oldhaven.MegaMod;
-import net.oldhaven.SkinFix;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -26,7 +25,7 @@ public class ChangeLog {
         return textFields;
     }
     public ChangeLog() {
-        if(!MegaMod.isConnected())
+        if(!MegaMod.isOnline())
             return;
         textFields = new LinkedList<>();
         try {

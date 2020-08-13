@@ -1,16 +1,11 @@
 package net.oldhaven.mixins.shader.glsl;
 
 import net.minecraft.src.Tessellator;
-import net.oldhaven.customs.shaders.Shader;
-import org.lwjgl.opengl.ARBVertexProgram;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Tessellator.class)
 public class MixinTessellator_EntityAttrib {
-    @Inject(method = "draw", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glDrawArrays(III)V", ordinal = 0, shift = At.Shift.BEFORE), require = 0)
+    /*@Inject(method = "draw", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glDrawArrays(III)V", ordinal = 0, shift = At.Shift.BEFORE), require = 0)
     private void tessShader10(CallbackInfo ci) {
         if (Shader.entityAttrib >= 0) {
             ARBVertexProgram.glEnableVertexAttribArrayARB(Shader.entityAttrib);
@@ -38,5 +33,5 @@ public class MixinTessellator_EntityAttrib {
         if (Shader.entityAttrib >= 0) {
             ARBVertexProgram.glDisableVertexAttribArrayARB(Shader.entityAttrib);
         }
-    }
+    }*/
 }

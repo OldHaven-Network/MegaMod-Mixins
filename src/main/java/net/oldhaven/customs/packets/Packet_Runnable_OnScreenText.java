@@ -4,7 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.ScaledResolution;
 import net.oldhaven.MegaMod;
 
-public class CustomPacket_OnScreenText extends CustomPacket {
+public class Packet_Runnable_OnScreenText extends PacketRunnable {
     @Override
     public void run(String[] args) {
         StringBuilder builder = new StringBuilder();

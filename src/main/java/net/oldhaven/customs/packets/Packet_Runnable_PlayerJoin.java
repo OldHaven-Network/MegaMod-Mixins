@@ -2,7 +2,7 @@ package net.oldhaven.customs.packets;
 
 import net.oldhaven.MegaMod;
 
-public class CustomPacket_PlayerJoin extends CustomPacket {
+public class Packet_Runnable_PlayerJoin extends PacketRunnable {
     @Override
     public void run(String[] args) {
         System.out.println("Player Join: " + args[0]);

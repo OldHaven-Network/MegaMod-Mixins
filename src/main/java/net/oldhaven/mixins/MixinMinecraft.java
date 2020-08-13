@@ -1,10 +1,7 @@
 package net.oldhaven.mixins;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.EntityPlayerSP;
-import net.minecraft.src.FontRenderer;
-import net.minecraft.src.GameSettings;
-import net.minecraft.src.Session;
+import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.SkinFix;
 import net.oldhaven.customs.options.CustomKeybinds;
@@ -28,11 +25,14 @@ import java.util.Map;
 public class MixinMinecraft {
 	@Shadow public FontRenderer fontRenderer;
 	@Shadow public GameSettings gameSettings;
-	@Shadow public Session session;
 	@Shadow public EntityPlayerSP thePlayer;
 	@Shadow private static Minecraft theMinecraft;
-	private CustomKeybinds customKeybinds;
+	@Shadow public RenderGlobal renderGlobal;
 
+	/**
+	 * Before MC starts, initiate MegaMod
+	 * @param ci callback, unused
+	 */
 	@Inject(method = "startGame", at = @At("HEAD"))
 	private void onRun(CallbackInfo ci) {
 		new JSEngine();
@@ -41,6 +41,18 @@ public class MixinMinecraft {
 		new ChangeLog();
 	}
 
+	/**
+	 * Indicates Minecraft window has fully started
+	 * @param ci callback
+	 */
+	@Inject(method = "startGame", at = @At("RETURN"))
+	private void onStarted(CallbackInfo ci) {
+		MegaMod.getInstance().onMinecraftStarted();
+	}
+
+	/**
+	 * Overwrite display creation for Shaders
+	 */
 	@Redirect(method = "startGame", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/Display;create()V"), require = 0)
 	private void displayCreate() {
 		try {
@@ -54,6 +66,29 @@ public class MixinMinecraft {
 		}
 	}
 
+	/**
+	 * Reloads renderer if ctrl+fogKey is pressed, turns
+	 * down fog if ctrl is not pressed as normal.
+	 * @author cutezyash
+	 * @param settings gameSettings
+	 * @param enumOptions option
+	 * @param i integer
+	 */
+	@Redirect(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GameSettings;setOptionValue(Lnet/minecraft/src/EnumOptions;I)V"))
+	private void setRenderDistance(GameSettings settings, EnumOptions enumOptions, int i) {
+		if(renderGlobal != null) {
+			if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+				renderGlobal.loadRenderers();
+			} else {
+				settings.setOptionValue(enumOptions, i);
+			}
+		}
+	}
+
+	/**
+	 * MegaMod custom keybinds trigger
+	 * @param ci callback
+	 */
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;handleKeyPress(IZ)V", shift = At.Shift.BEFORE))
 	private void onKeyPressHold(CallbackInfo ci) {
 		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getCustomKeybinds().getSavedKeys();
@@ -65,6 +100,11 @@ public class MixinMinecraft {
 		}
 	}
 
+	/**
+	 * MegaMod third person overwrite
+	 * @param settings used variable in original
+	 * @param value value that it was set to in original code
+	 */
 	@Redirect(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;thirdPersonView:Z", opcode = Opcodes.PUTFIELD))
 	private void constant63(GameSettings settings, boolean value) {
 		int third = MegaMod.thirdPersonView;
@@ -75,16 +115,29 @@ public class MixinMinecraft {
 		gameSettings.thirdPersonView = third != 0 && (third == 1 ? true : true);
 	}
 
+	/**
+	 * MegaMod third person overwrite
+	 * @param ci callback
+	 */
 	@Inject(method = "run", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;thirdPersonView:Z", shift = At.Shift.AFTER))
 	private void redirectThird(CallbackInfo ci) {
 		MegaMod.thirdPersonView = 0;
 	}
 
+	/**
+	 * MegaMod always multiplayer overwrite
+	 * @param minecraft mc
+	 * @return is MP bool
+	 */
 	@Redirect(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isMultiplayerWorld()Z"))
 	private boolean isMultiplayer(Minecraft minecraft) {
 		return true;
 	}
 
+	/**
+	 * MegaMod custom keybinds trigger
+	 * @param ci callback
+	 */
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", ordinal = 2, shift = At.Shift.BEFORE))
 	private void onKeyPress(CallbackInfo ci) {
 		if(Keyboard.getEventKey() == 63) {

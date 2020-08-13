@@ -1,7 +1,7 @@
 package net.oldhaven.customs.options;
-
 import net.oldhaven.MegaMod;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,82 +10,96 @@ import java.util.Map;
 public enum ModOptions {
     MM_VERSION(new ModOption("MM Version", "MegaMod", false), MegaMod.version, 0, 5),
 
-    BRIGHTNESS(new ModOption("Brightness", "Mod", true), true, false),
-    FIELD_OF_VIEW(new ModOption("Field of View", "Mod", false), true, false, "70", 70.0F, "", 70.0F, 0.1F),
-    FLY_SPEED(new ModOption("Fly Speed", "Mod", false), true, false, "OFF", 100.0F, "%", 0.0F, 0.25F),
+    BRIGHTNESS(new ModOption("Brightness", "Mod", true), Style.FLOAT),
+    FIELD_OF_VIEW(new ModOption("Field of View", "Mod", false), Style.FLOAT, "70", 70.0F, "", 70.0F, 0.1F),
+    FLY_SPEED(new ModOption("Fly Speed", "Mod", false), Style.FLOAT, "OFF", 100.0F, "%", 0.0F, 0.25F),
 
-    SHADOW_DENSITY(new ModOption("Shadow Density", "Shader", false), true, false, "DEFAULT", 20.0F, "", 1.0F, 0),
-    SHADERS(new ModOption("Shaders", "Shader", false), true, false, "OFF", 3.0F, "", 0.0F, 0.0F,
+    SHADERS(new ModOption("Shaders", "Shader", false), Style.FLOAT, "OFF", 4.0F, "", 0.0F, 0.0F,
             new String[]{
-                    "OFF", "Checkerboard", "Faked-Real", "Outline"
+                    "OFF", "GLSL", "Checkerboard", "Faked-Real", "Outline"
             }),
+    SHADOW_DENSITY(new ModOption("Shadow Density", "ShaderNonGLSL", false), Style.FLOAT, "DEFAULT", 20.0F, "", 1.0F, 0),
+    DYNAMIC_LIGHTING(new ModOption("Dynamic Lighting", "ShaderNonGLSL", false), Style.BOOL, 0),
     WATER_COLOR(new ModOption("Water Color Hex", "Shader", null), "", 0, 6),
     LAVA_COLOR(new ModOption("Lava Color Hex", "Shader", null), "", 0, 6),
-    DYNAMIC_LIGHTING(new ModOption("Dynamic Lighting", "Shader", false), false, true, 0),
 
-    CLOUD_HEIGHT(new ModOption("Cloud Height", "Sky", false), true, false, "OFF", 140.0F, "", 60.0F, 0.75F),
-    FORCE_TIME(new ModOption("Force Time", "Sky", false), true, false, "OFF", 24000.0F, " Ticks", 0.0F, 0.0F),
-    TOGGLE_RAINSNOW(new ModOption("Toggle Rain/Snow", "Sky", false), false, true, 1),
+    CLOUD_HEIGHT(new ModOption("Cloud Height", "Sky", false), Style.FLOAT, "OFF", 140.0F, "", 60.0F, 0.75F),
+    FORCE_TIME(new ModOption("Force Time", "Sky", false), Style.FLOAT, "OFF", 24000.0F, " Ticks", 0.0F, 0.0F),
+    TOGGLE_RAINSNOW(new ModOption("Toggle Rain/Snow", "Sky", false), Style.BOOL, 1),
 
-    ENABLE_FANCY_TREES(new ModOption("Enable Fancy Trees", "Blocks", false), false, true, 1),
-    DISABLE_WATER_ANIMATION(new ModOption("Disable Water Animation", "Blocks", false), false, true, 0),
-    DISABLE_LADDERS(new ModOption("Disable Ladders", "Blocks", false), false, true, 0),
+    ENABLE_FANCY_TREES(new ModOption("Fancy Trees", "Blocks", false), Style.FLOAT, "OFF", 1.0F, "", 0.0F, 0.0F,
+            new String[]{
+                    "Fast", "Fancy"
+            }),
+    DISABLE_WATER_ANIMATION(new ModOption("Disable Water Animation", "Blocks", false), Style.BOOL, 0),
+    DISABLE_LADDERS(new ModOption("Disable Ladders", "Blocks", false), Style.BOOL, 0),
 
-    SKIN_HAT(new ModOption("Hat", "Skin", false), false, true, 1),
-    SKIN_CAPE(new ModOption("Cape", "Skin", false), false, true, 1),
-    SKIN_JACKET(new ModOption("Jacket", "Skin", false), false, true, 1),
-    SKIN_LEFT_SLEEVE(new ModOption("Left Sleeve", "Skin", false), false, true, 1),
-    SKIN_RIGHT_SLEEVE(new ModOption("Right Sleeve", "Skin", false), false, true, 1),
-    SKIN_LEFT_PANTS_LEG(new ModOption("Left Pants Leg", "Skin", false), false, true, 1),
-    SKIN_RIGHT_PANTS_LEG(new ModOption("Right Pants Leg", "Skin", false), false, true, 1),
-    SKIN_DEFAULT_CAPE(new ModOption("Default Cape", "Skin", false), true, false, "Minecraft", 2.0F, "", 0.0F, 0.0F,
+    CUSTOM_SKIN(new ModOption("Custom Skins", "Skin", false), Style.BOOL, 1),
+    SKIN_HAT(new ModOption("Hat", "Skin", false), Style.BOOL, 1),
+    SKIN_CAPE(new ModOption("Cape", "Skin", false), Style.BOOL, 1),
+    SKIN_JACKET(new ModOption("Jacket", "Skin", false), Style.BOOL, 1),
+    SKIN_LEFT_SLEEVE(new ModOption("Left Sleeve", "Skin", false), Style.BOOL, 1),
+    SKIN_RIGHT_SLEEVE(new ModOption("Right Sleeve", "Skin", false), Style.BOOL, 1),
+    SKIN_LEFT_PANTS_LEG(new ModOption("Left Pants Leg", "Skin", false), Style.BOOL, 1),
+    SKIN_RIGHT_PANTS_LEG(new ModOption("Right Pants Leg", "Skin", false), Style.BOOL, 1),
+    SKIN_DEFAULT_CAPE(new ModOption("Default Cape", "Skin", false), Style.FLOAT, "Minecraft", 2.0F, "", 0.0F, 0.0F,
             new String[]{
                     "Minecraft", "Optifine", "MCCapes"
             }),
 
-    SUBTITLES(new ModOption("Subtitles", "GUI", false), false, true, 0),
-    CHAT_BG_OPACITY(new ModOption("Chat BG Opacity", "GUI", false), true, false, 0.0F),
+    DEFAULT_MAIN_MENU_BG(new ModOption("Default Main Menu BG", "GuiScreen", false), Style.BOOL, 0),
+    SHOW_MAIN_MENU_QUIT_BUTTON(new ModOption("Show Main Menu Quit Btn", "GuiScreen", false), Style.BOOL, 1),
+    DISABLE_MULTIPLAYER_GUI(new ModOption("Disable Custom MP GUI", "GuiScreen", false), Style.BOOL, 0),
 
-    SHOW_TOOLTIP(new ModOption("Show Tooltip", "GUI", false), false, true, 1),
-    TOGGLE_WAILA(new ModOption("Toggle WAILA", "GUI", false), false, true, 1),
-    TOGGLE_XPBAR(new ModOption("Toggle XP-Bar", "GUI", true), false, true, 1),
-    SHOW_MAIN_MENU_QUIT_BUTTON(new ModOption("Show Main Menu Quit Btn", "GUI", false), false, true, 1),
-    SHOW_MOTION_IN_GAME(new ModOption("Show Motion In-Game", "GUI", false), false, true, 0),
-    SHOW_SPEED_IN_GAME(new ModOption("Show Speed In-Game", "GUI", false), false, true, 0),
-    DEFAULT_MAIN_MENU_BG(new ModOption("Default Main Menu BG", "GUI", false), false, true, 0),
-    BUTTON_OUTLINE(new ModOption("Button Outline", "GUI", false), true, false, "OFF", 11.0F, "", 0.0F, 0.0F,
-            new String[]{
-                    "White", "Blue", "Purple", "Red", "Aqua", "Green", "Yellow", "Orange", "Light Grey", "Grey", "Black", "ADVANCED"
-            }),
-    BUTTON_ADV_COLOR(new ModOption("Button ADV Color", "GUI", false), "0xffffff", 2, 8),
-    THIRDPERSON_DISTANCE(new ModOption("ThirdPerson Distance", "GUI", false), true, false, "FAR", 29.0F, "", 1.0F, 1.0F),
+    //SUBTITLES(new ModOption("Subtitles", "GUI", false), ModStyle.BOOL, 0),
+    MODERN_TOOLTIPS(new ModOption("Modern Tooltips", "GUI", false), Style.BOOL, 1),
+    CHAT_BG_OPACITY(new ModOption("Chat BG Opacity", "GUI", false), Style.FLOAT, 0.0F),
+    //SHOW_TOOLTIP(new ModOption("Show Tooltip", "GUI", false), ModStyle.BOOL, 1),
+    TOGGLE_WAILA(new ModOption("Toggle WAILA", "GUI", false), Style.BOOL, 1),
+    TOGGLE_XPBAR(new ModOption("Toggle XP-Bar", "GUI", true), Style.BOOL, 1),
+    SHOW_MOTION_IN_GAME(new ModOption("Show Motion In-Game", "GUI", false), Style.BOOL, 0),
+    SHOW_SPEED_IN_GAME(new ModOption("Show Speed In-Game", "GUI", false), Style.BOOL, 0),
+    BUTTON_OUTLINE_HEX(new ModOption("Button Outline Hex", "GUI", null), "", 0, 6),
 
-    DOUBLE_JUMP_TO_FLY(new ModOption("Double Jump to Fly", "Keybinds", false), false, true, 0),
-    HOLD_SPRINT(new ModOption("Hold Sprint", "Keybinds", false), false, true, 0),
-    HOLD_SNEAK(new ModOption("Hold Sneak", "Keybinds", false), false, true, 0),
-    DISABLE_PLAYERLIST(new ModOption("Disable PlayerList", "Keybinds", false), false, true, 0),
-    DISABLE_SPRINT(new ModOption("Disable Sprint", "Keybinds", false), false, true, 0),
-    DISABLE_FLY(new ModOption("Disable Fly", "Keybinds", false), false, true, 0),
-    DISABLE_ZOOM(new ModOption("Disable Zoom", "Keybinds", false), false, true, 0);
+    THIRDPERSON_DISTANCE(new ModOption("ThirdPerson Distance", "Player", false), Style.FLOAT, "FAR", 29.0F, "", 1.0F, 0.0F),
 
-    private final boolean isFloat;
-    private final boolean isBoolean;
+    DOUBLE_JUMP_TO_FLY(new ModOption("Double Jump to Fly", "Keybinds", false), Style.BOOL, 0),
+    DOUBLE_TAP_TO_SPRINT(new ModOption("Double Tap Forward To Sprint", "Keybinds", false), Style.BOOL, 0),
+    HOLD_SPRINT(new ModOption("Hold Sprint", "Keybinds", false), Style.BOOL, 0),
+    HOLD_SNEAK(new ModOption("Hold Sneak", "Keybinds", false), Style.BOOL, 0),
+    DISABLE_PLAYERLIST(new ModOption("Disable PlayerList", "Keybinds", false), Style.BOOL, 0),
+    DISABLE_SPRINT(new ModOption("Disable Sprint", "Keybinds", false), Style.BOOL, 0),
+    DISABLE_FLY(new ModOption("Disable Fly", "Keybinds", false), Style.BOOL, 0),
+    DISABLE_ZOOM(new ModOption("Disable Zoom", "Keybinds", false), Style.BOOL, 0);
+
+    private final Style style;
+    public boolean isDisabled;
+
     private final String name;
-    private int defaultValueInt = -83;
-    private float defaultValue = -1.0158F;
-    private String defaultValueString = "";
-    private String startString = "OFF";
-    private float start = 0.0F;
-    private float times = 100.0F;
-    private String slideEnd = "%";
-    private float add = 0.0F;
     private String[] values = null;
-    private int minString = 0;
-    private int maxString = 20;
-    private int ordinal = 0;
-    private Object currentValue;
+    private String defaultValueString = "";
+    private String startString =        "OFF";
+    private String slideEnd =           "%";
 
-    private Section currentSection = null;
+    private float defaultValue =        -1.0158F;
+    private float start, add =          0.0F;
+    private float times =               100.0F;
+
+    private int defaultValueInt = -83;
+    private int minString, ordinal;
+    private int maxString =             20;
+
+    private Object currentValue;
+    private Section currentSection;
+
+    public Style getStyle() {
+        return style;
+    }
+
+    public static enum Style {
+        BOOL, INTEGER, FLOAT, STRING
+    }
+
     public static class Section {
         private List<ModOptions> list;
         private String name;
@@ -103,11 +117,6 @@ public enum ModOptions {
         public String getName() {
             return name;
         }
-    }
-    public boolean disabled;
-    private ModOptions setDisabled() {
-        this.disabled = true;
-        return this;
     }
     public static List<Section> getAllSections() {
         return ModOption.sectionList;
@@ -140,10 +149,9 @@ public enum ModOptions {
     }
     
 
-    private ModOptions(ModOption modOption, boolean floa, boolean bool) {
+    private ModOptions(ModOption modOption, Style style) {
         this.name = modOption.getName();
-        this.isFloat = floa;
-        this.isBoolean = bool;
+        this.style = style;
         update(this.name);
         String name = modOption.getSection();
         if(ModOption.sectionMap.containsKey(name))
@@ -154,8 +162,7 @@ public enum ModOptions {
             ModOption.sectionList.add(ModOption.sectionMap.get(name));
         this.ordinal = ModOption.sectionMap.get(name).list.size();
         this.currentSection = ModOption.sectionMap.get(name);
-        if(modOption.disabled == null || modOption.isDisabled()) {
-            modOption.disabled = true;
+        if(modOption.isDisabled()) {
             this.setDisabled();
         }
     }
@@ -163,23 +170,23 @@ public enum ModOptions {
         ModOption.mapToList.put(name, this);
         ModOption.list.add(this);
     }
-    private ModOptions(ModOption modOption, boolean floa, boolean bool, int valueInt) {
-        this(modOption, floa, bool);
+    private ModOptions(ModOption modOption, Style style, int valueInt) {
+        this(modOption, style);
         this.defaultValue = valueInt;
     }
-    private ModOptions(ModOption modOption, boolean floa, boolean bool, float valueFloat) {
-        this(modOption, floa, bool);
+    private ModOptions(ModOption modOption, Style style, float valueFloat) {
+        this(modOption, style);
         this.defaultValue = valueFloat;
     }
     private ModOptions(ModOption modOption, String valueString, int min, int max) {
-        this(modOption, false, false);
+        this(modOption, Style.STRING);
         this.defaultValueString = valueString;
         this.defaultValue = 0.0F;
         this.minString = min;
         this.maxString = max;
     }
-    private ModOptions(ModOption modOption, boolean floa, boolean bool, String startString, Float times, String end, Float add, float defaultValue) {
-        this(modOption, floa, bool);
+    private ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue) {
+        this(modOption, style);
         this.startString = startString;
         if(times != null)
             this.times = times;
@@ -189,18 +196,43 @@ public enum ModOptions {
             this.add = add;
         this.defaultValue = defaultValue;
     }
-    private ModOptions(ModOption modOption, boolean floa, boolean bool, String startString, Float times, String end, Float add, float defaultValue, String[] values) {
-        this(modOption, floa, bool, startString, times, end, add, defaultValue);
+    private ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue, String[] values) {
+        this(modOption, style, startString, times, end, add, defaultValue);
         this.values = values;
+    }
+
+    private void setDisabled() {
+        this.isDisabled = true;
     }
 
     public Object getCurrentValue() {
         return currentValue;
     }
+    public String getStringValue() {
+        switch(style) {
+            case FLOAT:
+                float f = Float.parseFloat(getAsString());
+                return values[(int) (f * this.times)];
+            case INTEGER:
+            case BOOL:
+                int i = Integer.parseInt(getAsString());
+                return values[(int) (i * this.times)];
+            default:
+                return getAsString();
+        }
+    }
     public String getAsString() {
-        return String.valueOf(currentValue);
+        return this.currentValue+"";
     }
     public int getAsInt() {
+        if(style == Style.FLOAT) {
+            float f = Float.parseFloat(getAsString());
+            float add = this.getAdd();
+            float times = this.getTimes();
+            if(f == 0.0F)
+                return 0;
+            return (int) ((f * times) + add)+1;
+        }
         return Integer.parseInt(getAsString());
     }
     public float getAsFloat() {
@@ -221,14 +253,6 @@ public enum ModOptions {
 
     public String[] getValues() {
         return values;
-    }
-
-    public boolean getFloat() {
-        return this.isFloat;
-    }
-
-    public boolean getBoolean() {
-        return this.isBoolean;
     }
 
     public int getOrdinal() {
@@ -267,15 +291,16 @@ public enum ModOptions {
         static List<Section> sectionList = new ArrayList<>();
         static Map<String, Section> sectionMap = new HashMap<>();
 
-        private String name;
-        private String section;
-        private Boolean disabled;
-        public ModOption(String s, String section, Boolean disabled) {
+        private final String name;
+        private final String section;
+        private final Boolean disabled;
+        public ModOption(@Nonnull String s, @Nonnull String section, Boolean disabled) {
+            if(disabled == null)
+                disabled = true;
             this.name = s;
             this.section = section;
             this.disabled = disabled;
         }
-
 
         public String getName() {
             return name;

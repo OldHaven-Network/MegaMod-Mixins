@@ -35,7 +35,11 @@ public class GuiModSettings extends ModdedSettingsGui
         int i = 0;
         controlList.add(new GuiSmallButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Sky Settings..."));
         i++;
-        controlList.add(new GuiSmallButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Gui Settings..."));
+        controlList.add(new GuiSmallButton(207, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Player Settings..."));
+        i++;
+        controlList.add(new GuiSmallButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "UI Settings..."));
+        i++;
+        controlList.add(new GuiSmallButton(206, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "GuiScreen Settings..."));
         i++;
         controlList.add(new GuiSmallButton(203, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "KeyBind Settings..."));
         i++;
@@ -43,7 +47,7 @@ public class GuiModSettings extends ModdedSettingsGui
         i++;
         controlList.add(new GuiSmallButton(205, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Shader Settings..."));
         i++;
-        controlList.add(new GuiSmallButton(206, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Skin Settings..."));
+        controlList.add(new GuiSmallButton(208, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Discord Settings..."));
         i++;
         super.initGui(i);
         controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
@@ -74,6 +78,10 @@ public class GuiModSettings extends ModdedSettingsGui
                 case 205:
                     mc.displayGuiScreen(new GuiShaderSettings(this, guiGameSettings));break;
                 case 206:
+                    mc.displayGuiScreen(new GuiGuiScreenSettings(this, guiGameSettings));break;
+                case 207:
+                    mc.displayGuiScreen(new GuiPlayerSettings(this, guiGameSettings));break;
+                case 208:
                     mc.displayGuiScreen(new GuiSkinSettings(this, guiGameSettings));break;
             }
         }

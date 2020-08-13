@@ -36,6 +36,7 @@ minecraft {
 }
 
 repositories {
+    jcenter()
     maven {
         name = 'Jitpack'
         url = 'https://jitpack.io/'
@@ -48,6 +49,7 @@ dependencies {
     mappings loom.mcp(loom.BETA, "${project.minecraft_version}.1", loom.mediafire("http://www.mediafire.com/file/03d94f13c9ulj5a/mcp43.zip/file"))
     modImplementation "com.github.modmuss50:fabric-loader:${project.loader_version}"
 
+    implementation 'club.minnced:java-discord-rpc:2.0.2'
     compile 'com.google.code.gson:gson:2.8.6'
     compile 'com.google.guava:guava:28.2-jre'
     compile 'commons-io:commons-io:2.5'
@@ -90,6 +92,7 @@ jar {
 
 remapJar {
     toMappings = 'official'
+
 }
 
 // configure the maven publication

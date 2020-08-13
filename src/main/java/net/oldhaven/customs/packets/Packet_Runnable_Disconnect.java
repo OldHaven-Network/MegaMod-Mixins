@@ -5,11 +5,11 @@ import net.minecraft.src.GuiConnectFailed;
 import net.minecraft.src.NetworkManager;
 import net.oldhaven.MegaMod;
 
-public class CustomPacket_Disconnect extends CustomPacket {
+public class Packet_Runnable_Disconnect extends PacketRunnable {
     @Override
     public void run(String[] args) {
         Minecraft mc = MegaMod.getMinecraftInstance();
-        NetworkManager handler = CustomPackets.getNetworkClient();
+        NetworkManager handler = Packets.getNetworkClient();
         handler.networkShutdown("disconnect.kicked", new Object[0]);
         mc.changeWorld1(null);
         StringBuilder builder = new StringBuilder();

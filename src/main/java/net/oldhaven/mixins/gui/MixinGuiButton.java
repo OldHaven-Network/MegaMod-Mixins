@@ -19,11 +19,10 @@ public class MixinGuiButton extends Gui {
 
     @Inject(method = "drawButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiButton;getHoverState(Z)I", shift = At.Shift.AFTER))
     private void drawButton(Minecraft minecraft, int i, int j, CallbackInfo ci) {
-        float f = ModOptions.BUTTON_OUTLINE.getAsFloat();
-        int value = (int)(f * 11.0F);
-        if(f > 0.0F) {
-            int color;
-            switch(value) {
+        String f = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
+        if(!f.isEmpty()) {
+            int color = Integer.decode(f);
+            /*switch(value) {
                 case 1: color = 0x3232a8;break;
                 case 2: color = 0xa032a8;break;
                 case 3: color = 0xa8324e;break;
@@ -36,7 +35,7 @@ public class MixinGuiButton extends Gui {
                 case 10: color = 0x000000;break;
                 case 11: color = Integer.decode(ModOptions.BUTTON_ADV_COLOR.getAsString());break;
                 default: color = 0xffffff;break;
-            }
+            }*/
             if (i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height)
                 drawRect(xPosition - 1, yPosition - 1, xPosition + width + 1, yPosition + height + 1, adjustAlpha(color, 255));
         }

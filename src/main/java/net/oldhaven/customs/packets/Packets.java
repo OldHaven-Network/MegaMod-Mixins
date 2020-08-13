@@ -8,18 +8,23 @@ import net.oldhaven.MegaMod;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomPackets {
+public class Packets {
     private static boolean canUsePackets = false;
-    private static Map<String, CustomPacket> customPackets = new HashMap<String, CustomPacket>(){
+    private static Map<String, PacketRunnable> customPackets = new HashMap<String, PacketRunnable>(){
         {
-            put("onscreentext", new CustomPacket_OnScreenText());
-            put("playerjoin", new CustomPacket_PlayerJoin());
-            put("playerquit", new CustomPacket_PlayerQuit());
-            put("disconnect", new CustomPacket_Disconnect());
-            put("option", new CustomPacket_Option());
-            put("mobhealth", new CustomPacket_MobHealth());
+            put("onscreentext", new Packet_Runnable_OnScreenText());
+            put("playerjoin", new Packet_Runnable_PlayerJoin());
+            put("playerquit", new Packet_Runnable_PlayerQuit());
+            put("disconnect", new Packet_Runnable_Disconnect());
+            put("option", new Packet_Runnable_Option());
+            put("mobhealth", new Packet_Runnable_MobHealth());
         }
     };
+    public static PacketRunnable getPacketByName(String name) {
+        if(customPackets.containsKey(name))
+            return customPackets.get(name);
+        return null;
+    }
     public static boolean doPacketCheck(Packet195Custom packetCustom) {
         if(!canUsePackets)
             return false;

@@ -171,16 +171,18 @@ public class FakeShaderThread implements Runnable {
             f = 1.0F;
         return f;
     }
-    public Object calculateLightRender(int x, int y, int z, boolean isFloat, Object originalLight) {
+    public Object calculateLightRender(int x, int y, int z, Object lightSource) {
+        System.out.println("Calculate lights");
+        boolean isFloat = (lightSource instanceof Float);
         Vec3D vec3D = Vec3D.createVector(x, y, z);
         if(isFloat) {
-            float f = calculateLightingF(x, y, z, (float)originalLight);
-            if(f != (float)originalLight)
+            float f = calculateLightingF(x, y, z, (float)lightSource);
+            if(f != (float)lightSource)
                 this.blocksToRender.add(vec3D);
             return f;
         } else {
-            int i = calculateLightingI(x, y, z, (int)originalLight);
-            if(i != (int)originalLight)
+            int i = calculateLightingI(x, y, z, (int)lightSource);
+            if(i != (int)lightSource)
                 this.blocksToRender.add(vec3D);
             return i;
         }

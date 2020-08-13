@@ -23,7 +23,7 @@ public abstract class MixinWorld_ShaderDraw implements IWorld {
     private void tickInject(CallbackInfo ci) {
         if(tick > 2000) {
             MegaMod.getFakeShaderThread().setWorld(this);
-            if (((int) ModOptions.SHADERS.getAsFloat() * 3) > 0) {
+            if (((int) ModOptions.SHADERS.getAsFloat() * 4) > 1) {
                 MegaMod.getFakeShaderThread().cleanup();
                 if (MegaMod.getMinecraftInstance().thePlayer != null) {
                     Vec3D pos = MegaMod.getMinecraftInstance().thePlayer.getPosition(1.0F);

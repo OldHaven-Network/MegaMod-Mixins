@@ -4,7 +4,7 @@ import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayerSP;
 import net.oldhaven.MegaMod;
 
-public abstract class CustomPacket {
+public abstract class PacketRunnable {
     public abstract void run(String[] args);
     public void sendOut(String packet, String... args) {
         StringBuilder utfBuild = new StringBuilder();

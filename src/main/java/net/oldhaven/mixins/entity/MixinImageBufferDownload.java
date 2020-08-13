@@ -28,6 +28,7 @@ public class MixinImageBufferDownload implements ImageBuffer {
     @Overwrite
     public BufferedImage parseUserSkin(BufferedImage image)
     {
+        System.out.println("Parsing user skin");
         if (image == null)
             return null;
         else {

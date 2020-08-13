@@ -47,10 +47,10 @@ public class CustomGuiButton extends GuiButton {
                 boolean var5 = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width && j < this.yPosition + this.height;
                 int var6 = this.getHoverState(var5);
                 CustomGameSettings gs = MegaMod.getCustomGameSettings();
-                int value = (int)(ModOptions.BUTTON_OUTLINE.getAsFloat() * 11.0F);
-                if(value > 0) {
-                    int color;
-                    switch(value) {
+                String value = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
+                if(!value.isEmpty()) {
+                    int color = Integer.decode(value);
+                    /*switch(value) {
                         case 1: color = 0x3232a8;break;
                         case 2: color = 0xa032a8;break;
                         case 3: color = 0xa8324e;break;
@@ -63,7 +63,7 @@ public class CustomGuiButton extends GuiButton {
                         case 10: color = 0x000000;break;
                         case 11: color = Integer.decode(gs.getOptionS("Button ADV Color"));break;
                         default: color = 0xffffff;break;
-                    }
+                    }*/
                     if (i >= xPosition && j >= yPosition && i < xPosition + width && j < yPosition + height)
                         drawRect(xPosition - 1, yPosition - 1, xPosition + width + 1, yPosition + height + 1, adjustAlpha(color, 255));
                 }

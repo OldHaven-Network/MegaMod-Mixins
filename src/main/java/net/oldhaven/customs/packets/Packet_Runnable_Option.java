@@ -3,11 +3,10 @@ package net.oldhaven.customs.packets;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.ServerPacketInformation;
 
-public class CustomPacket_Option extends CustomPacket {
+public class Packet_Runnable_Option extends PacketRunnable {
     @Override
     public void run(String[] args) {
         if(args.length > 1) {
-            System.out.println(args[0] + " " + args[1]);
             ServerPacketInformation spi = MegaMod.getServerPacketInformation();
             boolean b = args[1].equalsIgnoreCase("true");
             if (args[0].equals("canFly"))

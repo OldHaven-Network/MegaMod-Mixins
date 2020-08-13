@@ -5,8 +5,8 @@ import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.options.SavedLogins;
-import net.oldhaven.customs.packets.CustomPacket_MobHealth;
-import net.oldhaven.customs.packets.CustomPackets;
+import net.oldhaven.customs.packets.Packet_Runnable_MobHealth;
+import net.oldhaven.customs.packets.Packets;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -53,7 +53,7 @@ public class MixinGuiIngame extends Gui {
             ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
             int k = scaledresolution.getScaledWidth();
             int l = scaledresolution.getScaledHeight();
-            int tooltip = ModOptions.SHOW_TOOLTIP.getAsInt();
+            int tooltip = ModOptions.MODERN_TOOLTIPS.getAsInt();
             if(tooltip == 1) {
                 ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
                 if (stack != null) {
@@ -76,12 +76,12 @@ public class MixinGuiIngame extends Gui {
             int showSpeed = ModOptions.SHOW_SPEED_IN_GAME.getAsInt();
             int showMotion = ModOptions.SHOW_MOTION_IN_GAME.getAsInt();
             if(showSpeed == 1) {
-                double speed = MegaMod.getPlayerInstance().getPlayerSpeed();
+                double speed = MegaMod.getPlayer().getPlayerSpeed();
                 MegaMod.getInstance().replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
             } else
                 MegaMod.getInstance().hideOnScreenText("speed");
             if(showMotion == 1) {
-                double motion = MegaMod.getPlayerInstance().getPlayerMotion();
+                double motion = MegaMod.getPlayer().getPlayerMotion();
                 MegaMod.getInstance().replaceOnScreenText("motion", "Motion: " + df.format(motion*(0.98F * 5)), 0xffffff);
             } else
                 MegaMod.getInstance().hideOnScreenText("motion");
@@ -155,7 +155,7 @@ public class MixinGuiIngame extends Gui {
     private void guiPlayerList(ScaledResolution sc) {
         int width = sc.getScaledWidth();
         int centerW = sc.getScaledWidth()/2;
-        if(CustomPackets.canUsePackets()) {
+        if(Packets.canUsePackets()) {
             List<String> names = MegaMod.getInstance().getJoinedNames();
             int height = sc.getScaledHeight()/2 - (12 * names.size());
             int graidentOH = height - 12;
@@ -222,8 +222,8 @@ public class MixinGuiIngame extends Gui {
             int health = entityLiving.health;
 
             String connectedServer = MegaMod.getInstance().getConnectedServer();
-            if(connectedServer != null && CustomPacket_MobHealth.mobIds.containsKey(entity.entityId))
-                health = CustomPacket_MobHealth.mobIds.get(entity.entityId);
+            if(connectedServer != null && Packet_Runnable_MobHealth.mobIds.containsKey(entity.entityId))
+                health = Packet_Runnable_MobHealth.mobIds.get(entity.entityId);
 
             for (int i = 0; i < 10; i++) {
                 int i6 = (width / 2 - 42) + i * 8;

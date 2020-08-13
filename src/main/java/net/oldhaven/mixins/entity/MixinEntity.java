@@ -1,7 +1,6 @@
 package net.oldhaven.mixins.entity;
 
 import net.minecraft.src.Entity;
-import net.minecraft.src.MathHelper;
 import net.minecraft.src.World;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;

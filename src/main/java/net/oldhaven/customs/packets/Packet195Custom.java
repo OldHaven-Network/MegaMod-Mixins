@@ -34,7 +34,7 @@ public class Packet195Custom extends Packet {
 
     @Override
     public void processPacket(NetHandler netHandler) {
-        CustomPackets.doPacketCheck(this);
+        Packets.doPacketCheck(this);
     }
 
     @Override

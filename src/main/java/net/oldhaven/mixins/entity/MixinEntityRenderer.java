@@ -144,8 +144,9 @@ public abstract class MixinEntityRenderer {
                 GL11.glRotatef(var2.prevRotationPitch + (var2.rotationPitch - var2.prevRotationPitch) * partialTick, -1.0F, 0.0F, 0.0F);
             }
         } else if (this.mc.gameSettings.thirdPersonView) {
-            double dist = (double)(this.field_22227_s + (this.field_22228_r - this.field_22227_s) * partialTick) /
-                    ((ModOptions.THIRDPERSON_DISTANCE.getAsFloat() * 30 + 1));
+            float distNorm = ModOptions.THIRDPERSON_DISTANCE.getAsFloat();
+            float distDiv = distNorm * 5 + 1;
+            double dist = (double)(this.field_22227_s + (this.field_22228_r - this.field_22227_s) * partialTick) / distDiv;
             float pit;
             float yaw;
             if (this.mc.gameSettings.field_22273_E) {

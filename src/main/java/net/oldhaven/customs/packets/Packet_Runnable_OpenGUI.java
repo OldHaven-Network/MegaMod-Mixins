@@ -6,7 +6,7 @@ import net.oldhaven.gui.GuiEXP;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomPacket_OpenGUI extends CustomPacket {
+public class Packet_Runnable_OpenGUI extends PacketRunnable {
     private Map<String, GuiScreen> guis = new HashMap<String, GuiScreen>(){
         {
             put("exp", new GuiEXP());

@@ -3,7 +3,7 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.customs.packets.CustomPackets;
+import net.oldhaven.customs.packets.Packets;
 import net.oldhaven.gui.GuiYesNo;
 import net.oldhaven.gui.changelog.GuiChangelog;
 import org.lwjgl.opengl.GL11;
@@ -43,7 +43,7 @@ public class MixinGuiMainMenu extends GuiScreen {
     @Inject(method = "initGui", at = @At("RETURN"), cancellable = true)
     private void initGui(CallbackInfo ci) {
         field_35358_g = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
-        CustomPackets.setUsePackets(false);
+        Packets.setUsePackets(false);
         MegaMod.getInstance().hasLoggedIn = false;
         MegaMod.getInstance().clearJoinedNames();
         MegaMod.getInstance().setConnectedServer(null);

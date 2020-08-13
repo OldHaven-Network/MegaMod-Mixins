@@ -14,6 +14,8 @@ import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.gui.CustomGuiButton;
+import net.oldhaven.gui.rgb.GuiRGB;
+import net.oldhaven.gui.rgb.RGBButton;
 
 public class GuiGuiSettings extends ModdedSettingsGui
 {
@@ -34,7 +36,14 @@ public class GuiGuiSettings extends ModdedSettingsGui
 
     public void initGui()
     {
-        super.initGui(0);
+        int i = super.initGui(0);
+        String buttonString = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
+        int buttonColor;
+        if(buttonString.isEmpty())
+            buttonColor = 0xffffff;
+        else
+            buttonColor  = Integer.decode(buttonString);
+        controlList.add(new RGBButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Button Outline Color", buttonColor));
         StringTranslate stringtranslate = StringTranslate.getInstance();
         CustomGameSettings gs = MegaMod.getCustomGameSettings();
         //colorField.enabled = ((int) (gs.getOptionF("Button Outline") * 11.0F)) == 11;
@@ -53,6 +62,20 @@ public class GuiGuiSettings extends ModdedSettingsGui
         } else if (guibutton.id == 200) {
             MegaMod.getCustomGameSettings().saveSettings();
             mc.displayGuiScreen(parentGuiScreen);
+        } else if(guibutton.id == 201) {
+            mc.displayGuiScreen(new GuiRGB(
+                (int hex) -> {
+                    MegaMod.getCustomGameSettings().setOption("Button Outline Hex", String.valueOf(hex));
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    mc.displayGuiScreen(this);
+                }, (int hex) -> {
+                    mc.displayGuiScreen(this);
+                }, () -> {
+                    MegaMod.getCustomGameSettings().setOption("Button Outline Hex", "");
+                    MegaMod.getCustomGameSettings().saveSettings();
+                    mc.displayGuiScreen(this);
+                }
+            ));
         }
     }
 
