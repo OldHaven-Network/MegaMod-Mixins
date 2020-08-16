@@ -6,9 +6,9 @@ import net.minecraft.src.NetworkManager;
 import net.minecraft.src.Packet18Animation;
 import net.minecraft.src.Packet3Chat;
 import net.oldhaven.customs.options.CustomGameSettings;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.packets.Packets;
+import net.oldhaven.customs.util.MMUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,7 +40,7 @@ public class MixinNetClientHandler {
 
     @Inject(method = "handleUpdateTime", at=@At("HEAD"), cancellable = true)
     private void handleUpdateTime(CallbackInfo ci) {
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
+        CustomGameSettings gs = MMUtil.getCustomGameSettings();
         float f = ModOptions.FORCE_TIME.getAsFloat();
         if(f != 0.0F) {
             this.mc.theWorld.setWorldTime((int) (f * 24000.0F));

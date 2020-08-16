@@ -10,27 +10,23 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
-import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 
-public class GuiModSettings extends ModdedSettingsGui
-{
-    private MegaMod megaMod;
+import javax.annotation.Nonnull;
+
+public class GuiModSettings extends ModdedSettingsGui {
     public GuiModSettings(GuiScreen guiscreen, GameSettings gamesettings)
     {
-        megaMod = MegaMod.getInstance();
-        screenTitle = "Mod Settings";
-        parentGuiScreen = guiscreen;
-        guiGameSettings = gamesettings;
+        super(guiscreen, gamesettings);
     }
 
+    @Nonnull
     @Override
     public String getModSection() {
         return "Mod";
     }
 
-    public void initGui()
-    {
+    public void initGui() {
         StringTranslate stringtranslate = StringTranslate.getInstance();
         int i = 0;
         controlList.add(new GuiSmallButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Sky Settings..."));
@@ -50,52 +46,50 @@ public class GuiModSettings extends ModdedSettingsGui
         controlList.add(new GuiSmallButton(208, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Discord Settings..."));
         i++;
         super.initGui(i);
-        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+        super.addDone();
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    protected void actionPerformed(GuiButton guibutton) {
         super.actionPerformed(guibutton);
         if(!guibutton.enabled)
             return;
-        if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton))
-        {
-            megaMod.getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
-            guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
+        if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton)) {
+            MMUtil.getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
+            guibutton.displayString = gameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
         } else {
-            megaMod.getCustomGameSettings().saveSettings();
+            MMUtil.getCustomGameSettings().saveSettings();
             switch (guibutton.id) {
                 case 200:
-                    mc.displayGuiScreen(parentGuiScreen);break;
+                    mc.displayGuiScreen(parentScreen);break;
                 case 201:
-                    mc.displayGuiScreen(new GuiSkySettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiSkySettings(this, gameSettings));break;
                 case 202:
-                    mc.displayGuiScreen(new GuiGuiSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiGuiSettings(this, gameSettings));break;
                 case 203:
-                    mc.displayGuiScreen(new GuiKeybindSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiKeybindSettings(this, gameSettings));break;
                 case 204:
-                    mc.displayGuiScreen(new GuiBlockSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiBlockSettings(this, gameSettings));break;
                 case 205:
-                    mc.displayGuiScreen(new GuiShaderSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiShaderSettings(this, gameSettings));break;
                 case 206:
-                    mc.displayGuiScreen(new GuiGuiScreenSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiGuiScreenSettings(this, gameSettings));break;
                 case 207:
-                    mc.displayGuiScreen(new GuiPlayerSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiPlayerSettings(this, gameSettings));break;
                 case 208:
-                    mc.displayGuiScreen(new GuiSkinSettings(this, guiGameSettings));break;
+                    mc.displayGuiScreen(new GuiDiscordSettings(this, gameSettings));break;
             }
         }
+    }
+
+    @Nonnull
+    @Override
+    public String getTitle() {
+        return "Mod Settings";
     }
 
     public void drawScreen(int i, int j, float f)
     {
         drawDefaultBackground();
-        drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         super.drawScreen(i, j, f);
     }
-
-    private GuiScreen parentGuiScreen;
-    protected String screenTitle;
-    private GameSettings guiGameSettings;
-    private static ModOptions videoOptions[];
 }

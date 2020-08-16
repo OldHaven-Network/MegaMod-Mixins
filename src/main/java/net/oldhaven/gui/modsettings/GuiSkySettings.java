@@ -10,55 +10,47 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
-import net.oldhaven.customs.options.CustomGameSettings;
+import net.oldhaven.customs.util.MMUtil;
+
+import javax.annotation.Nonnull;
 
 public class GuiSkySettings extends ModdedSettingsGui {
     public GuiSkySettings(GuiScreen guiscreen, GameSettings gamesettings)
     {
-        screenTitle = "Mod Sky Settings";
-        parentGuiScreen = guiscreen;
-        guiGameSettings = gamesettings;
+        super(guiscreen, gamesettings);
     }
 
-    public void initGui()
-    {
-        StringTranslate stringtranslate = StringTranslate.getInstance();
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
-        screenTitle = stringtranslate.translateKey("Sky Settings");
+    public void initGui() {
         super.initGui(0);
-        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+        super.addDone();
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    protected void actionPerformed(GuiButton guibutton) {
         if(!guibutton.enabled)
-        {
             return;
+        if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton)) {
+            gameSettings.setOptionValue(((GuiSmallButton) guibutton).returnEnumOptions(), 1);
+            guibutton.displayString = gameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
         }
-        if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton))
-        {
-            guiGameSettings.setOptionValue(((GuiSmallButton) guibutton).returnEnumOptions(), 1);
-            guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
-        }
-        if(guibutton.id == 200)
-        {
-            MegaMod.getCustomGameSettings().saveSettings();
-            mc.displayGuiScreen(parentGuiScreen);
+        if(guibutton.id == 200) {
+            MMUtil.getCustomGameSettings().saveSettings();
+            mc.displayGuiScreen(parentScreen);
         }
     }
 
     public void drawScreen(int i, int j, float f)
     {
         drawDefaultBackground();
-        drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         super.drawScreen(i, j, f);
     }
 
-    private GuiScreen parentGuiScreen;
-    protected String screenTitle;
-    private GameSettings guiGameSettings;
+    @Nonnull
+    @Override
+    public String getTitle() {
+        return "Mod Sky Settings";
+    }
 
+    @Nonnull
     @Override
     public String getModSection() {
         return "Sky";

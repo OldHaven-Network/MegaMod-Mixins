@@ -1,7 +1,7 @@
 package net.oldhaven.customs.shaders;
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,17 +30,17 @@ public class FakeShaderThread implements Runnable {
 
     @Override
     public synchronized void run() {
-        while(MegaMod.getMinecraftInstance().running) {
+        while(MMUtil.getMinecraftInstance().running) {
             /*try {
                 Thread.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
             }
-            World world = MegaMod.getMinecraftInstance().theWorld;
+            World world = MMUtil.getMinecraftInstance().theWorld;
             if(world == null)
                 continue;
-            EntityPlayerSP player = MegaMod.getMinecraftInstance().thePlayer;
+            EntityPlayerSP player = MMUtil.getMinecraftInstance().thePlayer;
             if (player != null) {
                 int to = 10;
                 for (int x = -to; x < to; x++) {
@@ -121,7 +121,7 @@ public class FakeShaderThread implements Runnable {
         }
     }
     private float isHoldingTorch() {
-        EntityPlayerSP player = MegaMod.getMinecraftInstance().thePlayer;
+        EntityPlayerSP player = MMUtil.getMinecraftInstance().thePlayer;
         ItemStack stack = player.getCurrentEquippedItem();
         if(stack != null && torchIDs.containsKey(stack.itemID))
             return torchIDs.get(stack.itemID).lower;
@@ -129,11 +129,11 @@ public class FakeShaderThread implements Runnable {
     }
     private int calculateLightingI(int x, int y, int z, int originalLight) {
         int i = originalLight;
-        if(MegaMod.getMinecraftInstance().thePlayer != null) {
+        if(MMUtil.getMinecraftInstance().thePlayer != null) {
             float lower = isHoldingTorch();
             if(lower == -1)
                 return originalLight;
-            Vec3D pPos = MegaMod.getMinecraftInstance().thePlayer.getPosition(1.0F);
+            Vec3D pPos = MMUtil.getMinecraftInstance().thePlayer.getPosition(1.0F);
             Vec3D curPos = Vec3D.createVector(x, y - 1, z);
             double distance = pPos.distanceTo(curPos);
             if (distance < (3.0F/lower))
@@ -151,11 +151,11 @@ public class FakeShaderThread implements Runnable {
     }
     private float calculateLightingF(int x, int y, int z, float originalLight) {
         float f = originalLight;
-        if(MegaMod.getMinecraftInstance().thePlayer != null) {
+        if(MMUtil.getMinecraftInstance().thePlayer != null) {
             float lower = isHoldingTorch();
             if(lower == -1)
                 return originalLight;
-            Vec3D pPos = MegaMod.getMinecraftInstance().thePlayer.getPosition(1.0F);
+            Vec3D pPos = MMUtil.getMinecraftInstance().thePlayer.getPosition(1.0F);
             Vec3D curPos = Vec3D.createVector(x, y - 1, z);
             double distance = pPos.distanceTo(curPos);
             if (distance < (3.0F/lower))

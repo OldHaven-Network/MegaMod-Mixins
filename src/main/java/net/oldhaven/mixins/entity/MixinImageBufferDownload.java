@@ -28,7 +28,7 @@ public class MixinImageBufferDownload implements ImageBuffer {
     @Overwrite
     public BufferedImage parseUserSkin(BufferedImage image)
     {
-        System.out.println("Parsing user skin");
+        long time = System.currentTimeMillis();
         if (image == null)
             return null;
         else {
@@ -73,6 +73,7 @@ public class MixinImageBufferDownload implements ImageBuffer {
             this.setAreaTransparent(0, 48 * k, 16 * k, 64 * k);
             this.setAreaOpaque(16 * k, 48 * k, 48 * k, 64 * k);
             this.setAreaTransparent(48 * k, 48 * k, 64 * k, 64 * k);
+            System.out.println("finished parsing in " + (System.currentTimeMillis() - time) + "ms");
             return bufferedimage;
         }
     }

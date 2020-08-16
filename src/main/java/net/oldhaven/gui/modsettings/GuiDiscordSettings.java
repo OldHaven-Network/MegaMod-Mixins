@@ -10,19 +10,18 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
+import net.oldhaven.MegaModDiscord;
+import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.util.MMUtil;
 
 import javax.annotation.Nonnull;
 
-public class GuiKeybindSettings extends ModdedSettingsGui
-{
-
-    public GuiKeybindSettings(GuiScreen guiscreen, GameSettings gamesettings) {
+public class GuiDiscordSettings extends ModdedSettingsGui {
+    public GuiDiscordSettings(GuiScreen guiscreen, GameSettings gamesettings) {
         super(guiscreen, gamesettings);
-    }
+}
 
     public void initGui() {
-        StringTranslate stringtranslate = StringTranslate.getInstance();
         super.initGui(0);
         super.addDone();
     }
@@ -31,18 +30,18 @@ public class GuiKeybindSettings extends ModdedSettingsGui
         if(!guibutton.enabled)
             return;
         if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton)) {
-            MMUtil.getCustomGameSettings().setOptionBtn(((GuiSmallButton)guibutton).returnEnumOptions().name());
+            gameSettings.setOptionValue(((GuiSmallButton) guibutton).returnEnumOptions(), 1);
             guibutton.displayString = gameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
         }
         if(guibutton.id == 200) {
+            MegaModDiscord.setEnabled(ModOptions.RICH_PRESENCE.getAsBool());
             MMUtil.getCustomGameSettings().saveSettings();
-            MMUtil.getCustomKeybinds().keyCheck();
-            MMUtil.getCustomKeybinds().saveIntegers();
             mc.displayGuiScreen(parentScreen);
         }
     }
 
-    public void drawScreen(int i, int j, float f) {
+    public void drawScreen(int i, int j, float f)
+    {
         drawDefaultBackground();
         super.drawScreen(i, j, f);
     }
@@ -50,12 +49,12 @@ public class GuiKeybindSettings extends ModdedSettingsGui
     @Nonnull
     @Override
     public String getModSection() {
-        return "Keybinds";
+        return "Discord";
     }
 
     @Nonnull
     @Override
     public String getTitle() {
-        return "Mod Gui Settings";
+        return "Mod Discord Settings";
     }
 }

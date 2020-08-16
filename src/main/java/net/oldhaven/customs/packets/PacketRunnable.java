@@ -2,7 +2,7 @@ package net.oldhaven.customs.packets;
 
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayerSP;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 public abstract class PacketRunnable {
     public abstract void run(String[] args);
@@ -15,7 +15,7 @@ public abstract class PacketRunnable {
                 utfBuild.append(args[i]).append(";");
         }
         String utf = utfBuild.toString();
-        EntityPlayerSP thePlayer = MegaMod.getMinecraftInstance().thePlayer;
+        EntityPlayerSP thePlayer = MMUtil.getMinecraftInstance().thePlayer;
         ((EntityClientPlayerMP)thePlayer).sendQueue.addToSendQueue(new Packet195Custom(thePlayer.username, packet+";"+utf));
     }
 

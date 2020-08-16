@@ -1,4 +1,4 @@
-package net.oldhaven;
+package net.oldhaven.customs.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class SkinFix {
     private static final Map<String, String> uuids = new HashMap();
-    static boolean connected = false;
+    public static boolean connected = false;
     public static void tryConnection() {
         try {
             URL url = new URL("http://google.com");

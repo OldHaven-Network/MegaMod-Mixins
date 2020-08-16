@@ -1,12 +1,35 @@
 package net.oldhaven.gui.modsettings;
 
+import net.minecraft.src.GameSettings;
+import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
-import net.oldhaven.MegaMod;
+import net.minecraft.src.StringTranslate;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.CustomGuiButton;
 
-abstract class ModdedSettingsGui extends GuiScreen {
-    public abstract String getModSection();
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class ModdedSettingsGui extends GuiScreen {
+    boolean hasChanged = false;
+    public List<GuiButton> controlList;
+    public GuiScreen parentScreen;
+    public GameSettings gameSettings;
+
+    public ModdedSettingsGui(GuiScreen parentScreen, GameSettings gameSettings) {
+        this.controlList = new ArrayList<>();
+        this.parentScreen = parentScreen;
+        this.gameSettings = gameSettings;
+    }
+
+    public abstract @Nonnull String getModSection();
+    public abstract @Nonnull String getTitle();
+
+    public final void setChanged() {
+        hasChanged = true;
+    }
 
     public int initGui(int i) {
         ModOptions.Section section = ModOptions.getSectionByName(getModSection());
@@ -19,7 +42,7 @@ abstract class ModdedSettingsGui extends GuiScreen {
                 continue;
             String option = enumOption.getName();
             if (enumOption.getStyle() == ModOptions.Style.FLOAT) {
-                Float value = MegaMod.getCustomGameSettings().getOptionF(enumOption.getName());
+                Float value = MMUtil.getCustomGameSettings().getOptionF(enumOption.getName());
                 controlList.add(new CustomGuiButton.GuiSlider(
                         enumOption.getOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
@@ -32,6 +55,18 @@ abstract class ModdedSettingsGui extends GuiScreen {
             }
             i++;
         }
+        super.controlList = controlList;
         return i;
+    }
+
+    final void addDone() {
+        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, StringTranslate.getInstance().translateKey("gui.done")));
+        super.controlList = controlList;
+    }
+
+    @Override
+    public void drawScreen(int i, int i1, float v) {
+        super.drawScreen(i, i1, v);
+        drawCenteredString(fontRenderer, getTitle(), width / 2, 20, 0xffffff);
     }
 }

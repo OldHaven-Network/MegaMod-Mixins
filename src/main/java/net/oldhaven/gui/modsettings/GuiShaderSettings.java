@@ -10,39 +10,22 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.gui.CustomGuiButton;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.rgb.GuiRGB;
 import net.oldhaven.gui.rgb.RGBButton;
+
+import javax.annotation.Nonnull;
 
 public class GuiShaderSettings extends ModdedSettingsGui
 {
 
-    private final int lastShader;
-    public GuiShaderSettings(GuiScreen guiscreen, GameSettings gamesettings)
-    {
-        screenTitle = "Mod Shader Settings";
-        parentGuiScreen = guiscreen;
-        guiGameSettings = gamesettings;
-        this.lastShader = this.getShaderInt();
-        System.out.println(this.lastShader);
-    }
-
-    private int getShaderInt() {
-        return (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
-    }
-
-    private CustomGuiButton.GuiTextField colorField;
-
-    @Override
-    public String getModSection() {
-        return "Shader";
+    public GuiShaderSettings(GuiScreen parent, GameSettings gamesettings) {
+        super(parent, gamesettings);
     }
 
     private GuiButton optionButton;
-    public void initGui()
-    {
+    public void initGui() {
         this.controlList.clear();
         int i = 0;
         String waterStr = ModOptions.WATER_COLOR.getAsString();
@@ -62,64 +45,61 @@ public class GuiShaderSettings extends ModdedSettingsGui
         controlList.add(new RGBButton(202, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Lava Color", lavaColor));
         i = super.initGui(i+1);
         controlList.add(optionButton=new GuiSmallButton(203, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "GLSL Settings"));
-        StringTranslate stringtranslate = StringTranslate.getInstance();
-        //colorField.enabled = ((int) (gs.getOptionF("Button Outline") * 11.0F)) == 11;
-        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+        super.addDone();
         glslCheck();
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    protected void actionPerformed(GuiButton guibutton) {
         if(!guibutton.enabled)
             return;
         if(guibutton.id < 100) {
              if(guibutton instanceof GuiSmallButton) {
-                MegaMod.getCustomGameSettings().setOptionBtn(((GuiSmallButton) guibutton).returnEnumOptions().name());
-                guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
+                MMUtil.getCustomGameSettings().setOptionBtn(((GuiSmallButton) guibutton).returnEnumOptions().name());
+                guibutton.displayString = gameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
             }
         } else if (guibutton.id == 200) {
-            MegaMod.getCustomGameSettings().saveSettings();
-            if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
-            mc.displayGuiScreen(parentGuiScreen);
+            MMUtil.getCustomGameSettings().saveSettings();
+            if(hasChanged && MMUtil.getMinecraftInstance().renderGlobal != null)
+                MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
+            mc.displayGuiScreen(parentScreen);
         } else if(guibutton.id == 203) {
             if(optionButton.displayString.startsWith("GLSL"))
-                mc.displayGuiScreen(new GuiShaderGLSLSettings(this, guiGameSettings));
+                mc.displayGuiScreen(new GuiShaderGLSLSettings(this, gameSettings));
             else
-                mc.displayGuiScreen(new GuiShaderNonGLSLSettings(this, guiGameSettings));
+                mc.displayGuiScreen(new GuiShaderNonGLSLSettings(this, gameSettings));
         } else if(guibutton.id == 201) {
             mc.displayGuiScreen(new GuiRGB(
                 (int hex) -> {
-                    MegaMod.getCustomGameSettings().setOption("Water Color Hex", String.valueOf(hex));
-                    MegaMod.getCustomGameSettings().saveSettings();
-                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    MMUtil.getCustomGameSettings().setOption("Water Color Hex", String.valueOf(hex));
+                    MMUtil.getCustomGameSettings().saveSettings();
+                    if(MMUtil.getMinecraftInstance().renderGlobal != null)
+                        MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
                 }, (int hex) -> {
                     mc.displayGuiScreen(this);
                 }, () -> {
-                    MegaMod.getCustomGameSettings().setOption("Water Color Hex", "");
-                    MegaMod.getCustomGameSettings().saveSettings();
-                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    MMUtil.getCustomGameSettings().setOption("Water Color Hex", "");
+                    MMUtil.getCustomGameSettings().saveSettings();
+                    if(MMUtil.getMinecraftInstance().renderGlobal != null)
+                        MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
                 }
             ));
         } else if(guibutton.id == 202) {
             mc.displayGuiScreen(new GuiRGB(
                 (int hex) -> {
-                    MegaMod.getCustomGameSettings().setOption("Lava Color Hex", String.valueOf(hex));
-                    MegaMod.getCustomGameSettings().saveSettings();
-                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    MMUtil.getCustomGameSettings().setOption("Lava Color Hex", String.valueOf(hex));
+                    MMUtil.getCustomGameSettings().saveSettings();
+                    if(MMUtil.getMinecraftInstance().renderGlobal != null)
+                        MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
                 }, (int hex) -> {
                     mc.displayGuiScreen(this);
                 }, () -> {
-                    MegaMod.getCustomGameSettings().setOption("Lava Color Hex", "");
-                    MegaMod.getCustomGameSettings().saveSettings();
-                    if(MegaMod.getMinecraftInstance().renderGlobal != null)
-                        MegaMod.getMinecraftInstance().renderGlobal.loadRenderers();
+                    MMUtil.getCustomGameSettings().setOption("Lava Color Hex", "");
+                    MMUtil.getCustomGameSettings().saveSettings();
+                    if(MMUtil.getMinecraftInstance().renderGlobal != null)
+                        MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
                 }
             ));
@@ -139,19 +119,25 @@ public class GuiShaderSettings extends ModdedSettingsGui
             return 2;
         }
     }
-    public void drawScreen(int i, int j, float f)
-    {
+
+    @Nonnull
+    @Override
+    public String getTitle() {
+        return "Mod Shader Settings";
+    }
+
+    @Nonnull
+    @Override
+    public String getModSection() {
+        return "Shader";
+    }
+
+    public void drawScreen(int i, int j, float f) {
         drawDefaultBackground();
-        drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         drawCenteredString(fontRenderer, "Shaders are in alpha stage", width / 2, 30, 0xeb4034);
         glslCheck();
         //drawCenteredString(fontRenderer, "Smooth Lighting in Video Settings is needed", width / 2, height / 6 + 168-20, 0x4287f5);
         //drawCenteredString(fontRenderer, "for anything other then Faked-Real shading!!", width / 2, height / 6 + 168-10, 0x4287f5);
         super.drawScreen(i, j, f);
     }
-
-    private GuiScreen parentGuiScreen;
-    protected String screenTitle;
-    private GameSettings guiGameSettings;
-    private static ModOptions videoOptions[];
 }

@@ -1,8 +1,8 @@
 package net.oldhaven.mixins.blocks;
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -88,6 +88,10 @@ public abstract class MixinRenderBlocks {
 
     @Shadow public abstract void renderSouthFace(Block block, double v, double v1, double v2, int i);
 
+    @Shadow public abstract void renderCrossedSquares(Block block, int i, double v, double v1, double v2);
+
+    @Shadow public abstract void func_1245_b(Block block, int i, double v, double v1, double v2);
+
     private boolean[] lastRendering;
     @Inject(method = "<init>(Lnet/minecraft/src/IBlockAccess;)V", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
@@ -98,8 +102,9 @@ public abstract class MixinRenderBlocks {
     public void renderBlockByRenderType(Block var1, int var2, int var3, int var4, CallbackInfoReturnable<Boolean> ci) {
         //System.out.println(ModOptions.ENABLE_FANCY_TREES.getAsInt());
         boolean fancyTress = (ModOptions.ENABLE_FANCY_TREES.getAsInt() > 0);
-        if(fancyTress && var1.blockID == 18)
+        if(fancyTress && var1.blockID == 18) {
             ci.setReturnValue(renderBlockLeaves(var1, var2, var3, var4));
+        }
     }
 
     @Redirect(method = "renderBlockFluids", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/Block;colorMultiplier(Lnet/minecraft/src/IBlockAccess;III)I"))
@@ -115,6 +120,34 @@ public abstract class MixinRenderBlocks {
                 return Integer.decode(ModOptions.LAVA_COLOR.getAsString());
         }
         return block.colorMultiplier(iBlockAccess, i, i1, i2);
+    }
+
+    @Redirect(method = "renderBlockReed", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/RenderBlocks;renderCrossedSquares(Lnet/minecraft/src/Block;IDDD)V"))
+    public void renderBlockGrass(RenderBlocks renderBlocks, Block block, int meta, double x, double y, double z) {
+        renderCrossedSquares(block, meta, x, y, z);
+        if(!ModOptions.RANDOM_TALLERGRASS.getAsBool())
+            return;
+        if(block == Block.tallGrass)
+            renderTallGrass(block, meta, x, y, z, true, 0.05F);
+    }
+
+    public void renderTallGrass(Block block, int meta, double x, double y, double z, boolean up, double times) {
+        if(up) {
+            int id = blockAccess.getBlockId((int) x, (int) y + 1, (int) z);
+            if (id != 0)
+                return;
+        }
+        Random ran = new Random((long)(x+y+z));
+        int i = (int)(ran.nextDouble()*15);
+        if(((int)x & i) == 1) {
+            x += (ran.nextDouble()*times) - (ran.nextDouble()*(times+times));
+            z += (ran.nextDouble()*times) - (ran.nextDouble()*(times+times));
+            if(up)
+                y += 0.75F;
+            //ran.setSeed(ran.nextLong()*(long)times);
+            //y += ((ran.nextDouble() / 1.15F)*times) - (ran.nextDouble() / 2);
+            renderCrossedSquares(block, meta, x, y, z);
+        }
     }
 
     public void func_1245_b(Block block, int i, double d, double d1, double d2, boolean random)
@@ -187,6 +220,7 @@ public abstract class MixinRenderBlocks {
 
     public boolean renderBlockLeaves(Block block, int i, int j, int k)
     {
+        int meta = blockAccess.getBlockMetadata(i, j, k);
         int l = block.colorMultiplier(blockAccess, i, j, k);
         float f = (float)(l >> 16 & 0xff) / 255F;
         float f1 = (float)(l >> 8 & 0xff) / 255F;
@@ -217,25 +251,27 @@ public abstract class MixinRenderBlocks {
         }
         float f19 = block.getBlockBrightness(blockAccess, i, j, k);
         if(blockAccess.getBlockId(i, j-1, k) != block.blockID) {
-            if (true) {
-                float f20 = block.getBlockBrightness(blockAccess, i, j - 1, k);
-                tessellator.setColorRGBA_F(f10 * f20, f13 * f20, f16 * f20, 0.25F);
-                renderBottomFace(block, i, j, k, block.getBlockTexture(blockAccess, i, j, k, 0));
-            }
+            float f20 = block.getBlockBrightness(blockAccess, i, j - 1, k);
+            tessellator.setColorRGBA_F(f10 * f20, f13 * f20, f16 * f20, 0.25F);
+            renderBottomFace(block, i, j, k, block.getBlockTexture(blockAccess, i, j, k, 0));
         }
-        if(true) {
-            float f21 = block.getBlockBrightness(blockAccess, i, j + 1, k);
-            if(block.maxY != 1.0D && !block.blockMaterial.getIsLiquid())
-                f21 = f19;
-            tessellator.setColorRGBA_F(f7 * f21, f8 * f21, f9 * f21, 0.25F);
-            renderTopFace(block, i, j, k, block.getBlockTexture(blockAccess, i, j, k, 1));
-        }
+        float f21 = block.getBlockBrightness(blockAccess, i, j + 1, k);
+        if(block.maxY != 1.0D && !block.blockMaterial.getIsLiquid())
+            f21 = f19;
+        tessellator.setColorRGBA_F(f7 * f21, f8 * f21, f9 * f21, 0.25F);
+        renderTopFace(block, i, j, k, block.getBlockTexture(blockAccess, i, j, k, 1));
 
         Random generator = new Random(i+j+k);
         double x = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
         double y = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
         double z = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
-        func_1245_b(block, blockAccess.getBlockMetadata(i, j, k), i+x, j+y, k+z, true);
+        int fancy = ModOptions.ENABLE_FANCY_TREES.getAsInt();
+        if(fancy == 2)
+            func_1245_b(block, meta, i+x, j+y, k+z, true);
+        else if(fancy == 1) {
+            func_1245_b(block, meta, i+x, j+y, k+z);
+            renderTallGrass(block, i, x, y, z, false,0.15F);
+        }
         return true;
     }
 
@@ -260,7 +296,7 @@ public abstract class MixinRenderBlocks {
             renderStandardBlockWithAmbientOcclusion(block, x, y, z, f, f1, f2);
         else
             renderStandardBlockWithColorMultiplier(block, x, y, z, f, f1, f2);
-        //MegaMod.getMinecraftInstance().theWorld.notifyBlocksOfNeighborChange(x, y, z, blockId);
+        //MMUtil.getMinecraftInstance().theWorld.notifyBlocksOfNeighborChange(x, y, z, blockId);
         return false;
     }
 
@@ -281,7 +317,7 @@ public abstract class MixinRenderBlocks {
     }
 
     public void computeShaders() {
-        if(MegaMod.getMinecraftInstance().thePlayer != null) {
+        if(MMUtil.getMinecraftInstance().thePlayer != null) {
             for(int i=0;i < shaderedBlocks.size();i++) {
                 ShaderedBlock shaderedBlock = shaderedBlocks.get(i);
                 Vec3D vec3D = shaderedBlock.getVec3D();
@@ -289,12 +325,12 @@ public abstract class MixinRenderBlocks {
                 int x = (int)vec3D.xCoord;
                 int y = (int)vec3D.yCoord;
                 int z = (int)vec3D.zCoord;
-                //((IWorld) MegaMod.getMinecraftInstance().theWorld).forceNotifyChange(x, y, z, block.blockID);
+                //((IWorld) MMUtil.getMinecraftInstance().theWorld).forceNotifyChange(x, y, z, block.blockID);
             }
             if(null == null)
                 return;
             //loopThroughCurrentShades();
-            EntityPlayerSP player = MegaMod.getMinecraftInstance().thePlayer;
+            EntityPlayerSP player = MMUtil.getMinecraftInstance().thePlayer;
             int pX = (int) player.posX;
             int pY = (int) player.posY;
             int pZ = (int) player.posZ;
@@ -342,7 +378,7 @@ public abstract class MixinRenderBlocks {
         aoLightValueXPos = block.getBlockBrightness(blockAccess, x + 1, y, z);
         aoLightValueYPos = block.getBlockBrightness(blockAccess, x, y + 1, z);
         aoLightValueZPos = block.getBlockBrightness(blockAccess, x, y, z + 1);
-        EntityPlayerSP player = MegaMod.getPlayer().getPlayerSP();
+        EntityPlayerSP player = MMUtil.getPlayer().getPlayerSP();
         Vec3D curVec = Vec3D.createVector(x, y+1, z);
         Vec3D pos = player.getPosition(1.0F);
         int newType = (int) (ModOptions.SHADERS.getAsFloat() * 4);

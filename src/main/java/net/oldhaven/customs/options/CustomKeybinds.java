@@ -1,6 +1,7 @@
 package net.oldhaven.customs.options;
 
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import org.lwjgl.input.Keyboard;
 
 import java.io.*;
@@ -66,12 +67,12 @@ public class CustomKeybinds {
     private long lastJump = 0;
     private boolean didLastJump = false;
     private void onKey_Jump(boolean b) {
-        if(     MegaMod.getServerPacketInformation().canFly() &&
+        if(     MMUtil.getServerPacketInformation().canFly() &&
                 ModOptions.DOUBLE_JUMP_TO_FLY.getAsInt() == 1) {
             long jump = MegaMod.getSystemTime();
             if (jump < (lastJump + 1000)) {
                 if (didLastJump) {
-                    MegaMod.getInstance().isFlying = !MegaMod.getInstance().isFlying;
+                    MMUtil.isFlying = !MMUtil.isFlying;
                     didLastJump = false;
                 } else
                     didLastJump = true;
@@ -85,21 +86,21 @@ public class CustomKeybinds {
             if(ModOptions.HOLD_SPRINT.getAsInt() != 1)
                 return;
         }
-        MegaMod.getInstance().isSprinting = b;
+        MMUtil.isSprinting = b;
     }
     private void onKey_Fly(boolean b) {
-        if(MegaMod.getInstance().getConnectedServer() != null && !MegaMod.getServerPacketInformation().canFly()) {
+        if(MMUtil.getPlayer().getConnectedServer() != null && !MMUtil.getServerPacketInformation().canFly()) {
             return;
         }
-        boolean flying = MegaMod.getInstance().isFlying;
-        MegaMod.getInstance().isFlying = !flying;
+        boolean flying = MMUtil.isFlying;
+        MMUtil.isFlying = !flying;
     }
     private void onKey_Zoom(boolean b) {
-        MegaMod.getInstance().isZooming = b;
+        MMUtil.isZooming = b;
     }
 
     private void onKey_PlayerList(boolean b) {
-        MegaMod.getInstance().playerList = b;
+        MMUtil.playerList = b;
     }
 
     public void onKey(String name, boolean b) {
@@ -112,7 +113,7 @@ public class CustomKeybinds {
     }
 
     public void setKey(String name, int key) {
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
+        CustomGameSettings gs = MMUtil.getCustomGameSettings();
         Integer i = gs.getOptionI("Disable "+name);
         if(i == null || i != 1)
             this.savedKeysMap.get(name).key = key;

@@ -88,9 +88,9 @@ public class MegaModDiscord {
             return;
         DiscordRPC.INSTANCE.Discord_UpdatePresence(richPresence);
     }
-    public static void setDisabled(boolean b) {
-        isDisabled = b;
-        if(b)
+    public static void setEnabled(boolean b) {
+        isDisabled = !b;
+        if(!b)
             DiscordRPC.INSTANCE.Discord_ClearPresence();
         else
             MegaModDiscord.updatePresence();

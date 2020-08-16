@@ -9,7 +9,7 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiTextField;
 import net.minecraft.src.StringTranslate;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import org.lwjgl.input.Keyboard;
 
 // Referenced classes of package net.minecraft.src:
@@ -76,7 +76,7 @@ public class GuiMultiplayerEditServer extends GuiScreen
         if(guibutton.id == 1)
             mc.displayGuiScreen(parentScreen);
         else if(guibutton.id == 0) {
-            MegaMod.getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
+            MMUtil.getSavedServers().saveServer(serverTextBox.getText(), serverTextBox2.getText());
             mc.gameSettings.saveOptions();
             mc.displayGuiScreen(parentScreen);
         }

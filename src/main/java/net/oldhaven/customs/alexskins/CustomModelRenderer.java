@@ -4,12 +4,11 @@ import net.minecraft.src.*;
 import org.lwjgl.opengl.GL11;
 
 public class CustomModelRenderer extends ModelRenderer {
-    private PositionTextureVertex[] corners;
     private TexturedQuad[] faces;
     private int textureOffsetX;
     private int textureOffsetY;
     private int displayList;
-    private boolean compiled = false;
+    public boolean compiled = false;
 
     public CustomModelRenderer(int var1, int var2) {
         super(var1, var2);
@@ -22,7 +21,7 @@ public class CustomModelRenderer extends ModelRenderer {
     }
 
     public void addBox(float var1, float var2, float var3, int var4, int var5, int var6, float var7, int textureWidth, int textureHeight) {
-        this.corners = new PositionTextureVertex[8];
+        PositionTextureVertex[] corners = new PositionTextureVertex[8];
         this.faces = new TexturedQuad[6];
         float var8 = var1 + (float)var4;
         float var9 = var2 + (float)var5;
@@ -47,14 +46,14 @@ public class CustomModelRenderer extends ModelRenderer {
         PositionTextureVertex var16 = new PositionTextureVertex(var8, var2, var10, 0.0F, 8.0F);
         PositionTextureVertex var17 = new PositionTextureVertex(var8, var9, var10, 8.0F, 8.0F);
         PositionTextureVertex var18 = new PositionTextureVertex(var1, var9, var10, 8.0F, 0.0F);
-        this.corners[0] = var20;
-        this.corners[1] = var12;
-        this.corners[2] = var13;
-        this.corners[3] = var14;
-        this.corners[4] = var15;
-        this.corners[5] = var16;
-        this.corners[6] = var17;
-        this.corners[7] = var18;
+        corners[0] = var20;
+        corners[1] = var12;
+        corners[2] = var13;
+        corners[3] = var14;
+        corners[4] = var15;
+        corners[5] = var16;
+        corners[6] = var17;
+        corners[7] = var18;
         this.faces[0] = new CustomTexturedQuad(new PositionTextureVertex[] {var16, var12, var13, var17}, textureOffsetX + var6 + var4, textureOffsetY + var6, textureOffsetX + var6 + var4 + var6, textureOffsetY + var6 + var5, textureWidth, textureHeight);
         this.faces[1] = new CustomTexturedQuad(new PositionTextureVertex[] {var20, var15, var18, var14}, textureOffsetX, textureOffsetY + var6, textureOffsetX + var6, textureOffsetY + var6 + var5, textureWidth, textureHeight);
         this.faces[2] = new CustomTexturedQuad(new PositionTextureVertex[] {var16, var15, var20, var12}, textureOffsetX + var6, textureOffsetY, textureOffsetX + var6 + var4, textureOffsetY + var6, textureWidth, textureHeight);
@@ -169,7 +168,7 @@ public class CustomModelRenderer extends ModelRenderer {
         }
     }
 
-    private void compileDisplayList(float var1) {
+    void compileDisplayList(float var1) {
         this.displayList = GLAllocation.generateDisplayLists(1);
         GL11.glNewList(this.displayList, 4864);
         Tessellator var2 = Tessellator.instance;

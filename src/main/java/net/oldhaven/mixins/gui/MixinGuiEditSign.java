@@ -3,7 +3,7 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.src.GuiEditSign;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.TileEntitySign;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,17 +21,17 @@ public class MixinGuiEditSign extends GuiScreen {
 
     @Inject(method = "initGui", at = @At("RETURN"))
     public void initGui(CallbackInfo ci) {
-        MegaMod.getInstance().signCursorLoc = 0;
+        MMUtil.signCursorLoc = 0;
     }
 
     @Inject(method = "onGuiClosed", at = @At("RETURN"))
     private void onGuiClosed(CallbackInfo ci) {
-        MegaMod.getInstance().signCursorLoc = 0;
+        MMUtil.signCursorLoc = 0;
     }
 
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped1(char c, int i, CallbackInfo ci) {
-        int signCursorLoc = MegaMod.getInstance().signCursorLoc;
+        int signCursorLoc = MMUtil.signCursorLoc;
         if(editLine > 3)
             editLine = 3;
         if(editLine < 0)
@@ -53,7 +53,7 @@ public class MixinGuiEditSign extends GuiScreen {
         } else if(i == 207) { /* END key */
             signCursorLoc = entitySign.signText[editLine].length();
         }
-        MegaMod.getInstance().signCursorLoc = signCursorLoc;
+        MMUtil.signCursorLoc = signCursorLoc;
     }
 
     private int substringTest(String msg, int cursorLoc) {
@@ -64,8 +64,8 @@ public class MixinGuiEditSign extends GuiScreen {
 
     @Inject(method = "drawScreen", at = @At("HEAD"))
     private void drawScreen(CallbackInfo ci) {
-        MegaMod.getInstance().signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
-        this.drawCenteredString(this.fontRenderer, "Cursor: " + MegaMod.getInstance().signCursorLoc, this.width / 2, 18, 0xffffff);
+        MMUtil.signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MMUtil.signCursorLoc);
+        this.drawCenteredString(this.fontRenderer, "Cursor: " + MMUtil.signCursorLoc, this.width / 2, 18, 0xffffff);
         this.drawCenteredString(this.fontRenderer, "Length: " + entitySign.signText[editLine].length(), this.width / 2, 28, 0xffffff);
     }
 
@@ -75,10 +75,10 @@ public class MixinGuiEditSign extends GuiScreen {
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;length()I", ordinal = 0),
                              to = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private String redirect1(String s, int a, int b, char c, int i) {
-        MegaMod.getInstance().signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
-        int cursorLoc = MegaMod.getInstance().signCursorLoc;
+        MMUtil.signCursorLoc = substringTest(this.entitySign.signText[this.editLine], MMUtil.signCursorLoc);
+        int cursorLoc = MMUtil.signCursorLoc;
         String newS = this.entitySign.signText[this.editLine].substring(0, cursorLoc-1) + this.entitySign.signText[this.editLine].substring(cursorLoc);
-        MegaMod.getInstance().signCursorLoc-=1;
+        MMUtil.signCursorLoc-=1;
         return newS;
     }
 
@@ -87,11 +87,11 @@ public class MixinGuiEditSign extends GuiScreen {
             at = @At(value = "INVOKE",target = "Ljava/lang/StringBuilder;toString()Ljava/lang/String;"),
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private String redirect3(StringBuilder builder, char c, int i) {
-        MegaMod.getInstance().signCursorLoc= substringTest(this.entitySign.signText[this.editLine], MegaMod.getInstance().signCursorLoc);
-        int cursorLoc = MegaMod.getInstance().signCursorLoc;
+        MMUtil.signCursorLoc= substringTest(this.entitySign.signText[this.editLine], MMUtil.signCursorLoc);
+        int cursorLoc = MMUtil.signCursorLoc;
         String[] var10002 = this.entitySign.signText;
         int var10004 = this.editLine;
-        MegaMod.getInstance().signCursorLoc+=1;
+        MMUtil.signCursorLoc+=1;
         return var10002[var10004].substring(0, cursorLoc) + c + var10002[var10004].substring(cursorLoc);
     }
 }

@@ -2,11 +2,12 @@ package net.oldhaven.mixins.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.options.SavedLogins;
 import net.oldhaven.customs.packets.Packet_Runnable_MobHealth;
 import net.oldhaven.customs.packets.Packets;
+import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.util.OnScreenText;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -76,17 +77,17 @@ public class MixinGuiIngame extends Gui {
             int showSpeed = ModOptions.SHOW_SPEED_IN_GAME.getAsInt();
             int showMotion = ModOptions.SHOW_MOTION_IN_GAME.getAsInt();
             if(showSpeed == 1) {
-                double speed = MegaMod.getPlayer().getPlayerSpeed();
-                MegaMod.getInstance().replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
+                double speed = MMUtil.getPlayer().getPlayerSpeed();
+                OnScreenText.replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
             } else
-                MegaMod.getInstance().hideOnScreenText("speed");
+                OnScreenText.hideOnScreenText("speed");
             if(showMotion == 1) {
-                double motion = MegaMod.getPlayer().getPlayerMotion();
-                MegaMod.getInstance().replaceOnScreenText("motion", "Motion: " + df.format(motion*(0.98F * 5)), 0xffffff);
+                double motion = MMUtil.getPlayer().getPlayerMotion();
+                OnScreenText.replaceOnScreenText("motion", "Motion: " + df.format(motion*(0.98F * 5)), 0xffffff);
             } else
-                MegaMod.getInstance().hideOnScreenText("motion");
+                OnScreenText.hideOnScreenText("motion");
             int down = 2;
-            for(Map.Entry<String, MegaMod.OnScreenText> entry : MegaMod.getInstance().getOnScreenText().entrySet()) {
+            for(Map.Entry<String, OnScreenText> entry : OnScreenText.getOnScreenText().entrySet()) {
                 if(!entry.getKey().isEmpty()) {
                     //mc.fontRenderer.renderString(entry.getValue().getText(), 2, down, new float[]{}, false);
                     this.drawString(mc.fontRenderer, entry.getValue().getText(), 2, down, adjustAlpha(entry.getValue().getColor(), 255));
@@ -97,7 +98,7 @@ public class MixinGuiIngame extends Gui {
                 //guiEXPBar(scaledresolution);
             if(ModOptions.TOGGLE_WAILA.getAsInt() == 1)
                 guiWAILA(scaledresolution);
-            if(ModOptions.DISABLE_PLAYERLIST.getAsInt() != 1 && MegaMod.getInstance().playerList)
+            if(ModOptions.DISABLE_PLAYERLIST.getAsInt() != 1 && MMUtil.playerList)
                 guiPlayerList(scaledresolution);
         }
     }
@@ -105,7 +106,6 @@ public class MixinGuiIngame extends Gui {
     private boolean getListFromChat = false;
     @Redirect(method = "renderGameOverlay", at = @At(value = "FIELD", target = "Lnet/minecraft/src/ChatLine;message:Ljava/lang/String;", opcode = 180))
     private String getMessage(ChatLine chatLine) {
-        MegaMod megaMod = MegaMod.getInstance();
         String msg = chatLine.message;
         if(getListFromChat) {
             if(msg.startsWith("§9There are §c2")) {
@@ -125,26 +125,26 @@ public class MixinGuiIngame extends Gui {
         boolean b =
                 msg.equals("§cPlease identify yourself with /login <password>") ||
                 msg.equals("§cPlease login with \"/login password\"");
-        if(!megaMod.hasLoggedIn && b) {
+        if(!MMUtil.hasLoggedIn && b) {
             /* holy this was long */
-            SavedLogins savedLoginsClass = megaMod.getAutoLogins();
-            SavedLogins.SavedLogin logins = savedLoginsClass.getSavedLoginsByIP(megaMod.getConnectedServer());
+            SavedLogins savedLoginsClass = MMUtil.getAutoLogins();
+            SavedLogins.SavedLogin logins = savedLoginsClass.getSavedLoginsByIP(MMUtil.getPlayer().getConnectedServer());
             if(logins != null) {
                 String login = logins.getName(mc.thePlayer.username);
                 if(login != null) {
                     mc.thePlayer.sendChatMessage("/login " + login);
-                    megaMod.hasLoggedIn = true;
+                    MMUtil.hasLoggedIn = true;
                 } else
-                    megaMod.hasLoggedIn = true; /* ignore */
+                    MMUtil.hasLoggedIn = true; /* ignore */
             } else
-                megaMod.hasLoggedIn = true; /* ignore */
+                MMUtil.hasLoggedIn = true; /* ignore */
         }
         return chatLine.message;
     }
 
     @ModifyConstant(method = "renderGameOverlay", constant = @Constant(intValue = 32))
     private int modify32(int test) {
-        //CustomGameSettings gs = MegaMod.getCustomGameSettings();
+        //CustomGameSettings gs = MMUtil.getCustomGameSettings();
         //if(gs.getOptionI("Toggle XP-Bar") == 1)
         //    return 32+6;
         return 32;
@@ -156,7 +156,7 @@ public class MixinGuiIngame extends Gui {
         int width = sc.getScaledWidth();
         int centerW = sc.getScaledWidth()/2;
         if(Packets.canUsePackets()) {
-            List<String> names = MegaMod.getInstance().getJoinedNames();
+            List<String> names = MMUtil.getPlayer().getJoinedNames();
             int height = sc.getScaledHeight()/2 - (12 * names.size());
             int graidentOH = height - 12;
             int gradientH = height + (12 * names.size()) + 12;
@@ -192,8 +192,8 @@ public class MixinGuiIngame extends Gui {
     }
 
     private void guiWAILA(ScaledResolution sc) {
-        Entity entity = MegaMod.getInstance().pointingEntity;
-        int blockId = MegaMod.getInstance().pointingBlock;
+        Entity entity = MMUtil.getPlayer().pointingEntity;
+        int blockId = MMUtil.pointingBlock;
         int width = sc.getScaledWidth();
 
         if(entity instanceof EntityLiving || blockId != 0) {
@@ -221,7 +221,7 @@ public class MixinGuiIngame extends Gui {
             GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mc.renderEngine.getTexture("/gui/icons.png"));
             int health = entityLiving.health;
 
-            String connectedServer = MegaMod.getInstance().getConnectedServer();
+            String connectedServer = MMUtil.getPlayer().getConnectedServer();
             if(connectedServer != null && Packet_Runnable_MobHealth.mobIds.containsKey(entity.entityId))
                 health = Packet_Runnable_MobHealth.mobIds.get(entity.entityId);
 
@@ -289,6 +289,6 @@ public class MixinGuiIngame extends Gui {
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/src/GuiIngame;chatMessageList:Ljava/util/List;"), to = @At("RETURN")),
             constant = @Constant(intValue = 9, ordinal = 0))
     private int changeIntValue(int oV) {
-        return (9)+(MegaMod.getInstance().chatScrollUp*9);
+        return (9)+(MMUtil.chatScrollUp*9);
     }
 }

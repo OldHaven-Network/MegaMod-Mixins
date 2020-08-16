@@ -6,13 +6,10 @@
 package net.oldhaven.gui.autologins;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.StringTranslate;
-import net.oldhaven.MegaMod;
-
-import java.io.File;
+import net.oldhaven.customs.util.MMUtil;
 
 // Referenced classes of package net.minecraft.src:
 //            GuiScreen, StringTranslate, GuiSmallButton, TexturePackList, 
@@ -20,12 +17,7 @@ import java.io.File;
 
 public class GuiAutoLogins extends GuiScreen
 {
-    private MegaMod megaMod;
-    public GuiAutoLogins(GuiScreen guiscreen)
-    {
-        this.megaMod = MegaMod.getInstance();
-        refreshTimer = -1;
-        fileLocation = "";
+    public GuiAutoLogins(GuiScreen guiscreen) {
         guiScreen = guiscreen;
     }
 
@@ -33,21 +25,18 @@ public class GuiAutoLogins extends GuiScreen
     private GuiButton deleteBtn;
     private GuiButton doneBtn;
     private GuiButton newBtn;
-    public void initGui()
-    {
+    public void initGui() {
         StringTranslate stringtranslate = StringTranslate.getInstance();
         controlList.add(newBtn=new GuiButton(5, this.width / 2 + 4, this.height - 48, 150, 20, stringtranslate.translateKey("New AutoLogin")));
         controlList.add(viewBtn=new GuiButton(4, this.width / 2 - 154, this.height - 48, 150, 20, "View Selected"));
         controlList.add(deleteBtn=new GuiButton(3, this.width / 2 - 154, this.height - 22, 150, 20, "Delete All Selected"));
         controlList.add(doneBtn=new GuiButton(6, this.width / 2 + 4, this.height - 22, 150, 20, stringtranslate.translateKey("Cancel")));
         mc.texturePackList.updateAvaliableTexturePacks();
-        fileLocation = (new File(Minecraft.getMinecraftDir(), "texturepacks")).getAbsolutePath();
         slotGui = new GuiAutoLoginsSlot(this);
         slotGui.registerScrollButtons(controlList, 7, 8);
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    protected void actionPerformed(GuiButton guibutton) {
         if(!guibutton.enabled)
             return;
         else if(guibutton.id == 4) {
@@ -57,9 +46,9 @@ public class GuiAutoLogins extends GuiScreen
                 slotGui.selectIP(slotGui.selected);
         } else if(guibutton.id == 3) {
             if(!slotGui.viewingIP.equals(""))
-                megaMod.getAutoLogins().getSavedLoginsByIP(slotGui.viewingIP).remove(slotGui.selected);
+                MMUtil.getAutoLogins().getSavedLoginsByIP(slotGui.viewingIP).remove(slotGui.selected);
             else if(!slotGui.selected.equals(""))
-                megaMod.getAutoLogins().removeAllLogins(slotGui.selected);
+                MMUtil.getAutoLogins().removeAllLogins(slotGui.selected);
         } else if(guibutton.id == 6) {
             if(!slotGui.viewingIP.equals(""))
                 slotGui.selectIP("");
@@ -81,8 +70,7 @@ public class GuiAutoLogins extends GuiScreen
         super.mouseMovedOrUp(i, j, k);
     }
 
-    public void drawScreen(int i, int j, float f)
-    {
+    public void drawScreen(int i, int j, float f) {
         slotGui.drawScreen(i, j, f);
         deleteBtn.enabled=viewBtn.enabled=!slotGui.selected.equals("");
         viewBtn.displayString = !slotGui.viewingIP.equals("") ? "Edit Selected Login" : "View Selected";
@@ -97,10 +85,8 @@ public class GuiAutoLogins extends GuiScreen
         super.drawScreen(i, j, f);
     }
 
-    public void updateScreen()
-    {
+    public void updateScreen() {
         super.updateScreen();
-        refreshTimer--;
     }
 
     public Minecraft getMinecraft(GuiAutoLogins guitexturepacks)
@@ -108,13 +94,6 @@ public class GuiAutoLogins extends GuiScreen
         return guitexturepacks.mc;
     }
 
-    public FontRenderer getFontRenderer(GuiAutoLogins guitexturepacks)
-    {
-        return guitexturepacks.fontRenderer;
-    }
-
     protected GuiScreen guiScreen;
-    private int refreshTimer;
-    private String fileLocation;
     private GuiAutoLoginsSlot slotGui;
 }

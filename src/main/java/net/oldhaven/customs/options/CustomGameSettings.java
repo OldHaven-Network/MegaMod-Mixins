@@ -14,8 +14,9 @@ public class CustomGameSettings {
 
     public void setOptionBtn(String name) {
         int newValue = 1;
-        if(map.containsKey(name))
-            newValue = (Integer)map.get(name) == 1 ? 0 : 1;
+        if(map.containsKey(name)) {
+            newValue = Integer.parseInt(map.get(name).toString()) == 1 ? 0 : 1;
+        }
         ModOptions option = ModOptions.getOptionByName(name);
         if(option != null)
             option.setCurrentValue(newValue);

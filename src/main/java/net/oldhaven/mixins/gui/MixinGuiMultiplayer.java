@@ -1,8 +1,8 @@
 package net.oldhaven.mixins.gui;
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.multiplayer.GuiMultiplayerDirectConnect;
 import net.oldhaven.gui.multiplayer.GuiMultiplayerEditServer;
 import net.oldhaven.gui.multiplayer.GuiMultiplayerSlot;
@@ -24,7 +24,6 @@ public class MixinGuiMultiplayer extends GuiScreen {
     private GuiButton btnSelectServer;
     private GuiButton btnRefresh;
     private GuiMultiplayerSlot slotGui;
-    private MegaMod megaMod;
     @Shadow private GuiScreen parentScreen;
 
     @Shadow private GuiTextField field_22111_h;
@@ -35,8 +34,6 @@ public class MixinGuiMultiplayer extends GuiScreen {
         noNew = ModOptions.DISABLE_MULTIPLAYER_GUI.getAsInt() == 1;
         if(noNew)
             this.parentScreen = guiScreen;
-        else
-            megaMod = MegaMod.getInstance();
         System.out.println(noNew);
     }
 
@@ -90,9 +87,9 @@ public class MixinGuiMultiplayer extends GuiScreen {
             if (guibutton.id == 0)
                 mc.displayGuiScreen(parentScreen);
             String serverKey = null;
-            Map<String, String> savedServers = megaMod.getSavedServers().getSavedServersMap();
-            if (megaMod.getSavedServers().selectedServer != -1)
-                serverKey = (String) savedServers.keySet().toArray()[megaMod.getSavedServers().selectedServer];
+            Map<String, String> savedServers = MMUtil.getSavedServers().getSavedServersMap();
+            if (MMUtil.getSavedServers().selectedServer != -1)
+                serverKey = (String) savedServers.keySet().toArray()[MMUtil.getSavedServers().selectedServer];
             if (serverKey != null) {
                 if (guibutton.id == 1) {
                     String ip = savedServers.get(serverKey);
@@ -100,9 +97,9 @@ public class MixinGuiMultiplayer extends GuiScreen {
                     mc.displayGuiScreen(new GuiConnecting(mc, as[0], as.length <= 1 ? 25565 : parseIntWithDefault(as[1], 25565)));
                     return;
                 } else if (guibutton.id == 2) {
-                    megaMod.getSavedServers().selectedServer = -1;
-                    megaMod.getSavedServers().removeServer(serverKey);
-                    megaMod.getSavedServers().saveServers();
+                    MMUtil.getSavedServers().selectedServer = -1;
+                    MMUtil.getSavedServers().removeServer(serverKey);
+                    MMUtil.getSavedServers().saveServers();
                     return;
                 } else if (guibutton.id == 7) {
                     mc.displayGuiScreen(new GuiMultiplayerEditServer(this, new ServerInfo(serverKey, savedServers.get(serverKey))));
@@ -190,7 +187,7 @@ public class MixinGuiMultiplayer extends GuiScreen {
     {
         if(!noNew) {
             slotGui.drawScreen(i, j, f);
-            if (MegaMod.getSavedServers().selectedServer != -1)
+            if (MMUtil.getSavedServers().selectedServer != -1)
                 btnEditServer.enabled = btnDeleteServer.enabled = btnSelectServer.enabled = true;
             StringTranslate stringtranslate = StringTranslate.getInstance();
             drawCenteredString(fontRenderer, stringtranslate.translateKey("multiplayer.title"), width / 2, 16, 0xffffff);

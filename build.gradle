@@ -56,6 +56,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.9'
     compile 'org.apache.logging.log4j:log4j-api:2.13.0'
     compile 'org.apache.logging.log4j:log4j-core:2.13.0'
+    compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
 }
 
 processResources {

@@ -7,6 +7,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <h1>MegaMod ModOptions</h1>
+ * <p>
+ *     This class controls everything about
+ *     MegaMod's settings and options, including
+ *     turning on and off each option, all
+ *     option names, how they react, and more
+ * </p>
+ * {@code aaaaaaaaaaaaa}
+ * @see ModOption
+ * @see Section
+ * @see Style
+ */
 public enum ModOptions {
     MM_VERSION(new ModOption("MM Version", "MegaMod", false), MegaMod.version, 0, 5),
 
@@ -27,6 +40,7 @@ public enum ModOptions {
     FORCE_TIME(new ModOption("Force Time", "Sky", false), Style.FLOAT, "OFF", 24000.0F, " Ticks", 0.0F, 0.0F),
     TOGGLE_RAINSNOW(new ModOption("Toggle Rain/Snow", "Sky", false), Style.BOOL, 1),
 
+    RANDOM_TALLERGRASS(new ModOption("Random Taller-Grass", "Blocks", false), Style.BOOL, 0),
     ENABLE_FANCY_TREES(new ModOption("Fancy Trees", "Blocks", false), Style.FLOAT, "OFF", 1.0F, "", 0.0F, 0.0F,
             new String[]{
                     "Fast", "Fancy"
@@ -34,7 +48,7 @@ public enum ModOptions {
     DISABLE_WATER_ANIMATION(new ModOption("Disable Water Animation", "Blocks", false), Style.BOOL, 0),
     DISABLE_LADDERS(new ModOption("Disable Ladders", "Blocks", false), Style.BOOL, 0),
 
-    CUSTOM_SKIN(new ModOption("Custom Skins", "Skin", false), Style.BOOL, 1),
+    CUSTOM_SKIN(new ModOption("Alex Skins", "Skin", false), Style.BOOL, 1),
     SKIN_HAT(new ModOption("Hat", "Skin", false), Style.BOOL, 1),
     SKIN_CAPE(new ModOption("Cape", "Skin", false), Style.BOOL, 1),
     SKIN_JACKET(new ModOption("Jacket", "Skin", false), Style.BOOL, 1),
@@ -63,14 +77,18 @@ public enum ModOptions {
 
     THIRDPERSON_DISTANCE(new ModOption("ThirdPerson Distance", "Player", false), Style.FLOAT, "FAR", 29.0F, "", 1.0F, 0.0F),
 
-    DOUBLE_JUMP_TO_FLY(new ModOption("Double Jump to Fly", "Keybinds", false), Style.BOOL, 0),
-    DOUBLE_TAP_TO_SPRINT(new ModOption("Double Tap Forward To Sprint", "Keybinds", false), Style.BOOL, 0),
+    DOUBLE_JUMP_TO_FLY(new ModOption("Double Jump To Fly", "Keybinds", false), Style.BOOL, 0),
+    DOUBLE_TAP_TO_SPRINT(new ModOption("Double Tap To Sprint", "Keybinds", false), Style.BOOL, 0),
     HOLD_SPRINT(new ModOption("Hold Sprint", "Keybinds", false), Style.BOOL, 0),
     HOLD_SNEAK(new ModOption("Hold Sneak", "Keybinds", false), Style.BOOL, 0),
     DISABLE_PLAYERLIST(new ModOption("Disable PlayerList", "Keybinds", false), Style.BOOL, 0),
     DISABLE_SPRINT(new ModOption("Disable Sprint", "Keybinds", false), Style.BOOL, 0),
     DISABLE_FLY(new ModOption("Disable Fly", "Keybinds", false), Style.BOOL, 0),
-    DISABLE_ZOOM(new ModOption("Disable Zoom", "Keybinds", false), Style.BOOL, 0);
+    DISABLE_ZOOM(new ModOption("Disable Zoom", "Keybinds", false), Style.BOOL, 0),
+
+    RICH_PRESENCE(new ModOption("Rich Presence", "Discord", false), Style.BOOL, 0),
+
+    SP_CHEATS(new ModOption("SP Cheats", "SP", false), Style.BOOL, 0);
 
     private final Style style;
     public boolean isDisabled;
@@ -96,10 +114,21 @@ public enum ModOptions {
         return style;
     }
 
-    public static enum Style {
+    /**
+     * MegaMod's ModOptions Style is how
+     * mods are used in GUI, if they
+     * should be a slider, button or
+     * something else.
+     */
+    public enum Style {
         BOOL, INTEGER, FLOAT, STRING
     }
 
+    /**
+     * MegaMod's ModOptions Section
+     * controls how each option is
+     * visible to which gui
+     */
     public static class Section {
         private List<ModOptions> list;
         private String name;
@@ -118,38 +147,55 @@ public enum ModOptions {
             return name;
         }
     }
+
+    /**
+     * Get all concurring sections in MegaMod
+     * @return List of all sections
+     * @see Section
+     */
     public static List<Section> getAllSections() {
         return ModOption.sectionList;
     }
+
+    /**
+     * Get section of this current option
+     * @return Section.class
+     * @see Section
+     */
     public Section getSection() {
         return currentSection;
     }
+
+    /**
+     * Get a section by name, if exists
+     * @param name sectionName
+     * @return Section.class
+     * @see Section
+     */
     public static Section getSectionByName(String name) {
         if(!ModOption.sectionMap.containsKey(name))
             return null;
         return ModOption.sectionMap.get(name);
     }
-    public static Map<String, Section> getModOption() {
-        return ModOption.sectionMap;
-    }
 
-    public static ModOptions getOptionByInt(int var0) {
-        for(ModOptions enumOption : ModOption.list) {
-            if(enumOption.getOrdinal() == var0)
-                return enumOption;
-        }
-        return null;
-    }
+    /**
+     * Get all ModOptions
+     * @return List of ModOptions
+     */
     public static List<ModOptions> getList() {
         return  ModOption.list;
     }
 
+    /**
+     * Get a ModOption by name
+     * @param name modOptionName
+     * @return self of enum
+     */
     public static ModOptions getOptionByName(String name) {
         return  ModOption.mapToList.get(name);
     }
-    
 
-    private ModOptions(ModOption modOption, Style style) {
+    ModOptions(ModOption modOption, Style style) {
         this.name = modOption.getName();
         this.style = style;
         update(this.name);
@@ -170,22 +216,22 @@ public enum ModOptions {
         ModOption.mapToList.put(name, this);
         ModOption.list.add(this);
     }
-    private ModOptions(ModOption modOption, Style style, int valueInt) {
+    ModOptions(ModOption modOption, Style style, int valueInt) {
         this(modOption, style);
         this.defaultValue = valueInt;
     }
-    private ModOptions(ModOption modOption, Style style, float valueFloat) {
+    ModOptions(ModOption modOption, Style style, float valueFloat) {
         this(modOption, style);
         this.defaultValue = valueFloat;
     }
-    private ModOptions(ModOption modOption, String valueString, int min, int max) {
+    ModOptions(ModOption modOption, String valueString, int min, int max) {
         this(modOption, Style.STRING);
         this.defaultValueString = valueString;
         this.defaultValue = 0.0F;
         this.minString = min;
         this.maxString = max;
     }
-    private ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue) {
+    ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue) {
         this(modOption, style);
         this.startString = startString;
         if(times != null)
@@ -196,7 +242,7 @@ public enum ModOptions {
             this.add = add;
         this.defaultValue = defaultValue;
     }
-    private ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue, String[] values) {
+    ModOptions(ModOption modOption, Style style, String startString, Float times, String end, Float add, float defaultValue, String[] values) {
         this(modOption, style, startString, times, end, add, defaultValue);
         this.values = values;
     }
@@ -234,6 +280,9 @@ public enum ModOptions {
             return (int) ((f * times) + add)+1;
         }
         return Integer.parseInt(getAsString());
+    }
+    public boolean getAsBool() {
+        return getAsInt() == 1;
     }
     public float getAsFloat() {
         return Float.parseFloat(getAsString());

@@ -3,7 +3,7 @@ package net.oldhaven.customs.packets;
 import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.NetworkManager;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +60,7 @@ public class Packets {
         return String.valueOf(stringToSeed(str)).equals(gotSeed);
     }
     public static boolean tryInitalize(String seed) {
-        EntityPlayerSP thePlayer = MegaMod.getMinecraftInstance().thePlayer;
+        EntityPlayerSP thePlayer = MMUtil.getMinecraftInstance().thePlayer;
         String pName = thePlayer.username;
         if(seed.equals("-17")) {
             System.out.println(" ");

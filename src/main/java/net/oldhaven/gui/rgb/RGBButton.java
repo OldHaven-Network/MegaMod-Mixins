@@ -3,9 +3,9 @@ package net.oldhaven.gui.rgb;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiButton;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.CustomGuiButton;
 import org.lwjgl.opengl.GL11;
 
@@ -35,7 +35,7 @@ public class RGBButton extends GuiButton {
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             boolean var5 = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width && j < this.yPosition + this.height;
             int var6 = this.getHoverState(var5);
-            CustomGameSettings gs = MegaMod.getCustomGameSettings();
+            CustomGameSettings gs = MMUtil.getCustomGameSettings();
             String value = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
             if(!value.isEmpty()) {
                 int color = Integer.decode(value);

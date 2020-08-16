@@ -3,11 +3,11 @@ package net.oldhaven.mixins;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
-import net.oldhaven.SkinFix;
+import net.oldhaven.customs.util.SkinFix;
 import net.oldhaven.customs.options.CustomKeybinds;
 import net.oldhaven.customs.shaders.Shader;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.changelog.ChangeLog;
-import net.oldhaven.javascript.JSEngine;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.PixelFormat;
@@ -35,7 +35,6 @@ public class MixinMinecraft {
 	 */
 	@Inject(method = "startGame", at = @At("HEAD"))
 	private void onRun(CallbackInfo ci) {
-		new JSEngine();
 		new MegaMod();
 		SkinFix.tryConnection();
 		new ChangeLog();
@@ -91,12 +90,12 @@ public class MixinMinecraft {
 	 */
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;handleKeyPress(IZ)V", shift = At.Shift.BEFORE))
 	private void onKeyPressHold(CallbackInfo ci) {
-		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getCustomKeybinds().getSavedKeys();
+		Map<String, CustomKeybinds.SavedKey> keys = MMUtil.getCustomKeybinds().getSavedKeys();
 		for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keys.entrySet()) {
 			if(entry.getValue().getKeyType() != 1)
 				continue;
 			boolean b = Keyboard.isKeyDown(entry.getValue().getKey());
-			MegaMod.getCustomKeybinds().onKey(entry.getKey(), b);
+			MMUtil.getCustomKeybinds().onKey(entry.getKey(), b);
 		}
 	}
 
@@ -107,11 +106,11 @@ public class MixinMinecraft {
 	 */
 	@Redirect(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;thirdPersonView:Z", opcode = Opcodes.PUTFIELD))
 	private void constant63(GameSettings settings, boolean value) {
-		int third = MegaMod.thirdPersonView;
+		int third = MMUtil.thirdPersonView;
 		third++;
 		if(third > 2)
 			third = 0;
-		MegaMod.thirdPersonView = third;
+		MMUtil.thirdPersonView = third;
 		gameSettings.thirdPersonView = third != 0 && (third == 1 ? true : true);
 	}
 
@@ -121,7 +120,7 @@ public class MixinMinecraft {
 	 */
 	@Inject(method = "run", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;thirdPersonView:Z", shift = At.Shift.AFTER))
 	private void redirectThird(CallbackInfo ci) {
-		MegaMod.thirdPersonView = 0;
+		MMUtil.thirdPersonView = 0;
 	}
 
 	/**
@@ -141,19 +140,19 @@ public class MixinMinecraft {
 	@Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;getEventKey()I", ordinal = 2, shift = At.Shift.BEFORE))
 	private void onKeyPress(CallbackInfo ci) {
 		if(Keyboard.getEventKey() == 63) {
-			int third = MegaMod.thirdPersonView+1;
+			int third = MMUtil.thirdPersonView+1;
 			if(third > 2)
 				third = 0;
-			MegaMod.thirdPersonView = third;
+			MMUtil.thirdPersonView = third;
 		}
 		if(Keyboard.getEventKey() == gameSettings.keyBindJump.keyCode)
-			MegaMod.getCustomKeybinds().onKey("Jump", true);
-		Map<String, CustomKeybinds.SavedKey> keys = MegaMod.getCustomKeybinds().getSavedKeys();
+			MMUtil.getCustomKeybinds().onKey("Jump", true);
+		Map<String, CustomKeybinds.SavedKey> keys = MMUtil.getCustomKeybinds().getSavedKeys();
 		for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keys.entrySet()) {
 			if(entry.getValue().getKeyType() != 0)
 				continue;
 			if(Keyboard.getEventKey() == entry.getValue().getKey()) {
-				MegaMod.getCustomKeybinds().onKey(entry.getKey(), true);
+				MMUtil.getCustomKeybinds().onKey(entry.getKey(), true);
 			}
 		}
 	}

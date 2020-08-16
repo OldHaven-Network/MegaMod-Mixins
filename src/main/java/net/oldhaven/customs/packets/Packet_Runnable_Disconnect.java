@@ -3,12 +3,12 @@ package net.oldhaven.customs.packets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.GuiConnectFailed;
 import net.minecraft.src.NetworkManager;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 public class Packet_Runnable_Disconnect extends PacketRunnable {
     @Override
     public void run(String[] args) {
-        Minecraft mc = MegaMod.getMinecraftInstance();
+        Minecraft mc = MMUtil.getMinecraftInstance();
         NetworkManager handler = Packets.getNetworkClient();
         handler.networkShutdown("disconnect.kicked", new Object[0]);
         mc.changeWorld1(null);

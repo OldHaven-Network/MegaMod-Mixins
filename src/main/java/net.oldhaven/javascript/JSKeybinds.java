@@ -1,8 +1,9 @@
 package net.oldhaven.javascript;
 
+import org.mozilla.javascript.Function;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class JSKeybinds {
     public JSEngine jsEngine;
@@ -13,13 +14,13 @@ public class JSKeybinds {
     private static Map<String, JSKey> keys = new HashMap<>();
     public static class JSKey {
         public int key;
-        public Consumer<String> function;
-        private JSKey(int key, Consumer<String> consumer) {
+        public Function function;
+        private JSKey(int key, Function consumer) {
             this.key = key;
             this.function = consumer;
         }
     }
-    public void createKey(String name, int key, Consumer<String> consumer) {
+    public void createKey(String name, int key, Function consumer) {
         if(keys.containsKey(name))
             jsEngine.console.error("NAME " + name + " ALREADY EXISTS FOR KEYBIND! Ignoring...");
         else

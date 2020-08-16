@@ -2,9 +2,10 @@ package net.oldhaven.mixins.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.util.OnScreenText;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -36,7 +37,7 @@ public abstract class MixinEntityRenderer {
     private float flyFoV = 0.0F;
     private float zoomFoV = 0.0F;
     private float sprintFoV() {
-        if (MegaMod.getInstance().isSprinting) {
+        if (MMUtil.isSprinting) {
             if (flyFoV >= 5.0F)
                 flyFoV = 5.0F;
             else
@@ -80,34 +81,34 @@ public abstract class MixinEntityRenderer {
             MovingObjectPosition mob = mc.objectMouseOver;
             if (mc.objectMouseOver != null) {
                 if (mc.theWorld.blockExists(mob.blockX, mob.blockY, mob.blockZ)) {
-                    MegaMod.getInstance().pointingBlock = mc.theWorld.getBlockId(mob.blockX, mob.blockY, mob.blockZ);
+                    MMUtil.pointingBlock = mc.theWorld.getBlockId(mob.blockX, mob.blockY, mob.blockZ);
                     blockExists = true;
                 }
             }
             if (!blockExists)
-                MegaMod.getInstance().pointingBlock = 0;
+                MMUtil.pointingBlock = 0;
             if (!(mc.playerController instanceof PlayerControllerTest))
-                MegaMod.getInstance().pointingEntity = pointedEntity;
+                MMUtil.getPlayer().pointingEntity = pointedEntity;
         } else {
-            MegaMod.getInstance().pointingEntity = null;
-            MegaMod.getInstance().pointingBlock = 0;
+            MMUtil.getPlayer().pointingEntity = null;
+            MMUtil.pointingBlock = 0;
         }
     }
 
     @ModifyConstant(method = "getFOVModifier", constant = @Constant(floatValue = 70.0F))
     private float getFovModifier(float var1) {
-        if(MegaMod.getInstance().isZooming) { /* zoom zoom */
-            MegaMod.getInstance().replaceOnScreenText("zoom", "Zoom (x" + (int) zoomFoV + ")", 0xffffff);
+        if(MMUtil.isZooming) { /* zoom zoom */
+            OnScreenText.replaceOnScreenText("zoom", "Zoom (x" + (int) zoomFoV + ")", 0xffffff);
             return (getZoomFoV() + 70);
         }
-        MegaMod.getInstance().hideOnScreenText("zoom");
+        OnScreenText.hideOnScreenText("zoom");
         float f = ModOptions.FIELD_OF_VIEW.getAsFloat();
         return ((f * 70) + 70 + sprintFoV());
     }
 
     @ModifyConstant(method = "getFOVModifier", constant = @Constant(floatValue = 60.0F))
     private float getFoVModifierWater(float var1) {
-        if(MegaMod.getInstance().isZooming)
+        if(MMUtil.isZooming)
             return (getZoomFoV() + 70);
         float f = ModOptions.FIELD_OF_VIEW.getAsFloat();
         return (f * 70) + 70  + sprintFoV() - 10;
@@ -158,7 +159,7 @@ public abstract class MixinEntityRenderer {
             } else {
                 yaw = var2.rotationYaw;
                 pit = var2.rotationPitch;
-                if(MegaMod.thirdPersonView == 1)
+                if(MMUtil.thirdPersonView == 1)
                     pit+=180.0F;
                 double var14 = (double)(-MathHelper.sin(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pit / 180.0F * 3.1415927F)) * dist;
                 double var16 = (double)(MathHelper.cos(yaw / 180.0F * 3.1415927F) * MathHelper.cos(pit / 180.0F * 3.1415927F)) * dist;
@@ -187,7 +188,7 @@ public abstract class MixinEntityRenderer {
                     }
                 }
 
-                if(MegaMod.thirdPersonView == 1) {
+                if(MMUtil.thirdPersonView == 1) {
                     GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
                 }
 
@@ -225,10 +226,10 @@ public abstract class MixinEntityRenderer {
         Float temp = ModOptions.FIELD_OF_VIEW.getAsFloat();
         GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        CustomGameSettings gs = MegaMod.getCustomGameSettings();
+        CustomGameSettings gs = MMUtil.getCustomGameSettings();
         gs.setOption("Field of View", 0.0F);
-        float zoom = MegaMod.getInstance().isZooming ? (getZoomFoV() + 70 - 10) : getFovModifierDefault(f);
-        if(MegaMod.getInstance().isZooming && zoom <= 20)
+        float zoom = MMUtil.isZooming ? (getZoomFoV() + 70 - 10) : getFovModifierDefault(f);
+        if(MMUtil.isZooming && zoom <= 20)
             zoom = 20;
         GLU.gluPerspective(zoom, (float)this.mc.displayWidth / (float)this.mc.displayHeight,
                 0.05F, this.farPlaneDistance * 2.0F);

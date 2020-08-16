@@ -3,6 +3,9 @@
   "package": "net.oldhaven.mixins",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "blocks.MixinItem",
+    "entity.MixinItemRenderer",
+    "entity.MixinRenderPlayer",
     "gui.MixinGuiContainer",
     "shader.dynamiclighting.MixinEntityPlayer",
     "shader.dynamiclighting.MixinWorld",

@@ -9,7 +9,7 @@ import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiTextField;
 import net.minecraft.src.StringTranslate;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import org.lwjgl.input.Keyboard;
 
 // Referenced classes of package net.minecraft.src:
@@ -30,7 +30,7 @@ public class GuiAutoLoginsEdit extends GuiScreen
         this.editing = true;
         this.editingForIP = ip;
         this.editingName = username;
-        this.editingPass = MegaMod.getAutoLogins().getSavedLoginsByIP(ip).getName(username);
+        this.editingPass = MMUtil.getAutoLogins().getSavedLoginsByIP(ip).getName(username);
     }
 
     public void updateScreen()
@@ -38,8 +38,7 @@ public class GuiAutoLoginsEdit extends GuiScreen
         username.updateCursorCounter();
     }
 
-    public void initGui()
-    {
+    public void initGui() {
         StringTranslate stringtranslate = StringTranslate.getInstance();
         Keyboard.enableRepeatEvents(true);
         controlList.clear();
@@ -73,24 +72,21 @@ public class GuiAutoLoginsEdit extends GuiScreen
         Keyboard.enableRepeatEvents(false);
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    protected void actionPerformed(GuiButton guibutton) {
         if(!guibutton.enabled)
             return;
         if(guibutton.id == 1)
             mc.displayGuiScreen(parentScreen);
         else if(guibutton.id == 0) {
-            MegaMod megaMod = MegaMod.getInstance();
             if(editing)
-                megaMod.getAutoLogins().getSavedLoginsByIP(editingForIP).remove(editingName);
-            megaMod.getAutoLogins().saveLogin(username.getText(), password.getText());
+                MMUtil.getAutoLogins().getSavedLoginsByIP(editingForIP).remove(editingName);
+            MMUtil.getAutoLogins().saveLogin(username.getText(), password.getText());
             mc.gameSettings.saveOptions();
             mc.displayGuiScreen(parentScreen);
         }
     }
 
-    protected void keyTyped(char c, int i)
-    {
+    protected void keyTyped(char c, int i) {
         if(!password.isFocused)
             username.textboxKeyTyped(c, i);
         if(!username.isFocused)
@@ -100,17 +96,15 @@ public class GuiAutoLoginsEdit extends GuiScreen
         ((GuiButton)controlList.get(0)).enabled = username.getText().length() > 0 && password.getText().length() > 0;
     }
 
-    protected void mouseClicked(int i, int j, int k)
-    {
+    protected void mouseClicked(int i, int j, int k) {
         super.mouseClicked(i, j, k);
         username.mouseClicked(i, j, k);
         password.mouseClicked(i, j, k);
     }
 
-    public void drawScreen(int i, int j, float f)
-    {
+    public void drawScreen(int i, int j, float f) {
         drawDefaultBackground();
-        String server = MegaMod.getInstance().getConnectedServer();
+        String server = MMUtil.getPlayer().getConnectedServer();
         drawCenteredString(fontRenderer, editing ? "Edit Login Info" : "Adding Auto-Login", width / 2, 16, 0xffffff);
         drawCenteredString(fontRenderer, "For IP " + (editing ? editingForIP : server), width / 2, 34, 0xffffff);
         drawString(fontRenderer, "Username", width / 2 - 100, (height / 4 - (10+60+20)) + 60 + 36, 0xa0a0a0);

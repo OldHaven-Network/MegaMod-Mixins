@@ -9,7 +9,7 @@ import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.GuiSlot;
 import net.minecraft.src.Tessellator;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 import java.util.Map;
 
@@ -19,25 +19,23 @@ import java.util.Map;
 
 public class GuiMultiplayerSlot extends GuiSlot
 {
-    private MegaMod megaMod;
     public GuiMultiplayerSlot(GuiScreen gui)
     {
-        super(MegaMod.getMinecraftInstance(), gui.width, gui.height, 32, (gui.height - 55) + 4, 36);
-        megaMod = MegaMod.getInstance();
+        super(MMUtil.getMinecraftInstance(), gui.width, gui.height, 32, (gui.height - 55) + 4, 36);
         parGui = gui;
     }
 
     protected int getSize() {
-        return megaMod.getSavedServers().getSavedServersMap().size();
+        return MMUtil.getSavedServers().getSavedServersMap().size();
     }
 
     protected void elementClicked(int i, boolean flag)
     {
-        megaMod.getSavedServers().selectedServer = i;
+        MMUtil.getSavedServers().selectedServer = i;
     }
 
     protected boolean isSelected(int i) {
-        return megaMod.getSavedServers().selectedServer == i;
+        return MMUtil.getSavedServers().selectedServer == i;
     }
 
     protected int getContentHeight()
@@ -52,7 +50,7 @@ public class GuiMultiplayerSlot extends GuiSlot
 
     protected void drawSlot(int i, int j, int k, int l, Tessellator tessellator)
     {
-        Map<String, String> savedServers = megaMod.getSavedServers().getSavedServersMap();
+        Map<String, String> savedServers = MMUtil.getSavedServers().getSavedServersMap();
         //TexturePackBase texturepackbase = (TexturePackBase)parGui.getMinecraft(parGui).texturePackList.availableTexturePacks().get(i);
         //texturepackbase.bindThumbnailTexture(parGui.getMinecraft(parentTexturePackGui));
         /*GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -64,7 +62,7 @@ public class GuiMultiplayerSlot extends GuiSlot
         tessellator.addVertexWithUV(j, k, 0.0D, 0.0D, 0.0D);
         tessellator.draw();*/
         String key = (String)savedServers.keySet().toArray()[i];
-        FontRenderer fontRenderer = MegaMod.getMinecraftInstance().fontRenderer;
+        FontRenderer fontRenderer = MMUtil.getMinecraftInstance().fontRenderer;
         parGui.drawString(fontRenderer, key, j + 32 + 2, k + 1, 0xffffff);
         parGui.drawString(fontRenderer, savedServers.get(key), j + 32 + 2, k + 12, 0x808080);
         //parentTexturePackGui.drawString(GuiAutoLogins.getFontRenderer(parentTexturePackGui), texturepackbase.firstDescriptionLine, j + 32 + 2, k + 12, 0x808080);

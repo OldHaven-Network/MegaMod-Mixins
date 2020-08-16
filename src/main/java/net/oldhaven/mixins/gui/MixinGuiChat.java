@@ -3,10 +3,10 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiScreen;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.SinglePlayerCommands;
+import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import org.objectweb.asm.Opcodes;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,24 +22,23 @@ import java.util.LinkedList;
 public class MixinGuiChat extends GuiScreen {
     @Shadow protected String message;
     @Shadow private int updateCounter;
-    @Final @Shadow private static String field_20082_i;
     private static LinkedList<String> enteredChats = new LinkedList<>();
     private int currentUp = -1;
 
     @Inject(method = "initGui", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
-        MegaMod.chatCursorLoc = 0;
+        MMUtil.chatCursorLoc = 0;
     }
 
     @Inject(method = "onGuiClosed", at = @At("RETURN"))
     private void onGuiClosed(CallbackInfo ci) {
-        MegaMod.chatCursorLoc = 0;
+        MMUtil.chatCursorLoc = 0;
     }
 
     @Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;sendChatMessage(Ljava/lang/String;)V"))
     private void sendMessage(EntityPlayerSP entityPlayerSP, String s) {
         entityPlayerSP.sendChatMessage(s);
-        if(!mc.isMultiplayerWorld()) {
+        if(ModOptions.SP_CHEATS.getAsBool() && !mc.isMultiplayerWorld()) {
             if(s.startsWith("/")) {
                 String[] split = s.split(" ");
                 String cmd = split[0].substring(1).toLowerCase();
@@ -54,8 +53,7 @@ public class MixinGuiChat extends GuiScreen {
 
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped(char c, int i, CallbackInfo ci) {
-        MegaMod megaMod = MegaMod.getInstance();
-        int cursorLoc = megaMod.chatCursorLoc;
+        int cursorLoc = MMUtil.chatCursorLoc;
         if(i == 203 && cursorLoc > 0) { /* LEFT key */
             cursorLoc -= 1;
         } else if(i == 205 && cursorLoc < this.message.length()) { /* RIGHT key */
@@ -83,7 +81,7 @@ public class MixinGuiChat extends GuiScreen {
             cursorLoc = 0;
         else if(i == 207) /* END key */
             cursorLoc = message.length();
-        megaMod.chatCursorLoc = cursorLoc;
+        MMUtil.chatCursorLoc = cursorLoc;
     }
 
     @Inject(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;lineIsCommand(Ljava/lang/String;)Z", ordinal = 0))
@@ -96,7 +94,7 @@ public class MixinGuiChat extends GuiScreen {
     private int substringTest(String msg, int cursorLoc) {
         if(cursorLoc > msg.length())
             cursorLoc = msg.length();
-        MegaMod.getInstance().chatCursorLoc = cursorLoc;
+        MMUtil.chatCursorLoc = cursorLoc;
         return cursorLoc;
     }
 
@@ -106,11 +104,11 @@ public class MixinGuiChat extends GuiScreen {
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;length()I", ordinal = 2),
                 to = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 0)))
     private void redirect1(GuiChat guiChat, String value) {
-        int cursorLoc = MegaMod.getInstance().chatCursorLoc;
+        int cursorLoc = MMUtil.chatCursorLoc;
         if(cursorLoc-1 < 0)
             return;
         this.message = this.message.substring(0, cursorLoc-1) + this.message.substring(cursorLoc);
-        MegaMod.getInstance().chatCursorLoc = cursorLoc-1;
+        MMUtil.chatCursorLoc = cursorLoc-1;
     }
 
     @Redirect(
@@ -118,9 +116,9 @@ public class MixinGuiChat extends GuiScreen {
             at = @At(value = "FIELD",target = "Lnet/minecraft/src/GuiChat;message:Ljava/lang/String;", opcode = Opcodes.PUTFIELD),
             slice = @Slice(from = @At(value = "INVOKE", target = "Ljava/lang/String;indexOf(I)I", ordinal = 3)))
     private void redirect2(GuiChat guiChat, String value, char c, int i) {
-        int cursorLoc = MegaMod.getInstance().chatCursorLoc;
+        int cursorLoc = MMUtil.chatCursorLoc;
         this.message = this.message.substring(0, cursorLoc) + c + this.message.substring(cursorLoc);
-        MegaMod.getInstance().chatCursorLoc = cursorLoc+1;
+        MMUtil.chatCursorLoc = cursorLoc+1;
     }
 
     /**
@@ -130,9 +128,8 @@ public class MixinGuiChat extends GuiScreen {
     @Overwrite
     public void drawScreen(int var1, int var2, float var3) {
         this.drawRect(2, this.height - 14, this.width - 2, this.height - 2, -2147483648);
-        MegaMod megaMod = MegaMod.getInstance();
-        MegaMod.getInstance().chatCursorLoc = substringTest(this.message, megaMod.chatCursorLoc);
-        int cursor = megaMod.chatCursorLoc;
+        MMUtil.chatCursorLoc = substringTest(this.message, MMUtil.chatCursorLoc);
+        int cursor = MMUtil.chatCursorLoc;
         String msg = this.message;
         msg = msg.substring(0, cursor) + ((updateCounter / 6) % 2 != 0 ? "" : "|") + msg.substring(cursor);
         this.drawString(this.fontRenderer, "> " + msg, 4, this.height - 12, 14737632);

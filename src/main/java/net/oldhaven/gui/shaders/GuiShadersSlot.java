@@ -8,8 +8,8 @@ package net.oldhaven.gui.shaders;
 import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiSlot;
 import net.minecraft.src.Tessellator;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.SavedLogins;
+import net.oldhaven.customs.util.MMUtil;
 
 import java.util.Map;
 
@@ -19,25 +19,23 @@ import java.util.Map;
 
 class GuiShadersSlot extends GuiSlot
 {
-    private MegaMod megaMod;
     public GuiShadersSlot(GuiShaders gui)
     {
         super(gui.getMinecraft(gui), gui.width, gui.height, 32, (gui.height - 55) + 4, 36);
-        megaMod = MegaMod.getInstance();
         parGui = gui;
     }
 
     protected int getSize() {
         if(!viewingIP.equals(""))
-            return megaMod.getAutoLogins().getSavedLoginsMap().get(viewingIP).getSize();
-        return megaMod.getAutoLogins().getSavedLoginsSize();
+            return MMUtil.getAutoLogins().getSavedLoginsMap().get(viewingIP).getSize();
+        return MMUtil.getAutoLogins().getSavedLoginsSize();
     }
 
     protected void elementClicked(int i, boolean flag) {
         if(!viewingIP.equals("")) {
-            this.selected = megaMod.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i);
+            this.selected = MMUtil.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i);
         } else {
-            Map<String, SavedLogins.SavedLogin> savedLoginMap = megaMod.getAutoLogins().getSavedLoginsMap();
+            Map<String, SavedLogins.SavedLogin> savedLoginMap = MMUtil.getAutoLogins().getSavedLoginsMap();
             this.selected = (String) savedLoginMap.keySet().toArray()[i];
         }
     }
@@ -45,8 +43,8 @@ class GuiShadersSlot extends GuiSlot
     protected boolean isSelected(int i)
     {
         if(!viewingIP.equals(""))
-            return this.selected.equals(megaMod.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i));
-        Map<String, SavedLogins.SavedLogin> savedLoginMap = megaMod.getAutoLogins().getSavedLoginsMap();
+            return this.selected.equals(MMUtil.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i));
+        Map<String, SavedLogins.SavedLogin> savedLoginMap = MMUtil.getAutoLogins().getSavedLoginsMap();
         String ip = (String)savedLoginMap.keySet().toArray()[i];
         return this.selected.equals(ip);
     }
@@ -62,13 +60,13 @@ class GuiShadersSlot extends GuiSlot
     }
 
     protected void drawSlot(int i, int j, int k, int l, Tessellator tessellator) {
-        FontRenderer fontRenderer = MegaMod.getMinecraftInstance().fontRenderer;
+        FontRenderer fontRenderer = MMUtil.getMinecraftInstance().fontRenderer;
         if(!viewingIP.equals("")) {
-            String name = megaMod.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i);
+            String name = MMUtil.getAutoLogins().getSavedLoginsMap().get(viewingIP).getIndex(i);
             parGui.drawString(fontRenderer, name, j + 32 + 2, k + 1, 0xffffff);
             parGui.drawString(fontRenderer, "Edit to view password", j + 32 + 2, k + 12, 0x808080);
         } else {
-            Map<String, SavedLogins.SavedLogin> savedLoginMap = megaMod.getAutoLogins().getSavedLoginsMap();
+            Map<String, SavedLogins.SavedLogin> savedLoginMap = MMUtil.getAutoLogins().getSavedLoginsMap();
             String[] fullIp = ((String) savedLoginMap.keySet().toArray()[i]).split(":");
             String ip = fullIp[0];
             String port = fullIp[1];

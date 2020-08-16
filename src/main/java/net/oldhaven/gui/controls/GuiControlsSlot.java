@@ -2,8 +2,8 @@ package net.oldhaven.gui.controls;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.CustomKeybinds;
+import net.oldhaven.customs.util.MMUtil;
 import org.lwjgl.input.Keyboard;
 
 import java.util.LinkedList;
@@ -33,7 +33,7 @@ public class GuiControlsSlot extends GuiSlot {
     private GuiControls guiControls;
     public GuiControlsSlot(IGuiControls gui, Minecraft mc, int i, int i1, int i2, int i3, int i4, List<GuiButton> list) {
         super(mc, i, i1, i2, i3, i4);
-        keybinds = MegaMod.getCustomKeybinds();
+        keybinds = MMUtil.getCustomKeybinds();
         LinkedList<String> defaultStrings = new LinkedList<>();
         for(int p=0;p < mc.gameSettings.keyBindings.length;p++) {
             defaultStrings.addLast(mc.gameSettings.getKeyBindingDescription(p));

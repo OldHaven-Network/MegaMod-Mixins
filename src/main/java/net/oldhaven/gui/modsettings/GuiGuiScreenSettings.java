@@ -10,53 +10,49 @@ package net.oldhaven.gui.modsettings;
 //            GameSettings, GuiSlider, GuiButton, ScaledResolution
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
-import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
+
+import javax.annotation.Nonnull;
 
 public class GuiGuiScreenSettings extends ModdedSettingsGui
 {
 
-    public GuiGuiScreenSettings(GuiScreen guiscreen, GameSettings gamesettings)
-    {
-        screenTitle = "Mod GuiScreen Settings";
-        parentGuiScreen = guiscreen;
-        guiGameSettings = gamesettings;
+    public GuiGuiScreenSettings(GuiScreen guiscreen, GameSettings gamesettings) {
+        super(guiscreen, gamesettings);
     }
 
+    @Nonnull
     @Override
     public String getModSection() {
         return "GuiScreen";
     }
 
-    public void initGui()
-    {
-        super.initGui(0);
-        StringTranslate stringtranslate = StringTranslate.getInstance();
-        controlList.add(new GuiButton(200, width / 2 - 100, height / 6 + 168, stringtranslate.translateKey("gui.done")));
+    @Nonnull
+    @Override
+    public String getTitle() {
+        return "Mod GuiScreen Settings";
     }
 
-    protected void actionPerformed(GuiButton guibutton)
-    {
+    public void initGui() {
+        super.initGui(0);
+        super.addDone();
+    }
+
+    protected void actionPerformed(GuiButton guibutton) {
         if(!guibutton.enabled)
             return;
         if(guibutton.id < 100 && (guibutton instanceof GuiSmallButton)) {
-            MegaMod.getCustomGameSettings().setOptionBtn(((GuiSmallButton) guibutton).returnEnumOptions().name());
-            guibutton.displayString = guiGameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
+            MMUtil.getCustomGameSettings().setOptionBtn(((GuiSmallButton) guibutton).returnEnumOptions().name());
+            guibutton.displayString = gameSettings.getKeyBinding(EnumOptions.getEnumOptions(guibutton.id));
         } else if (guibutton.id == 200) {
-            MegaMod.getCustomGameSettings().saveSettings();
-            mc.displayGuiScreen(parentGuiScreen);
+            MMUtil.getCustomGameSettings().saveSettings();
+            mc.displayGuiScreen(parentScreen);
         }
     }
 
     public void drawScreen(int i, int j, float f)
     {
         drawDefaultBackground();
-        drawCenteredString(fontRenderer, screenTitle, width / 2, 20, 0xffffff);
         super.drawScreen(i, j, f);
     }
-
-    private GuiScreen parentGuiScreen;
-    protected String screenTitle;
-    private GameSettings guiGameSettings;
-    private static ModOptions videoOptions[];
 }

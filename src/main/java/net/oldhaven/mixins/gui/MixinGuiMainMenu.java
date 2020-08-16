@@ -4,6 +4,7 @@ import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.packets.Packets;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.GuiYesNo;
 import net.oldhaven.gui.changelog.GuiChangelog;
 import org.lwjgl.opengl.GL11;
@@ -44,11 +45,11 @@ public class MixinGuiMainMenu extends GuiScreen {
     private void initGui(CallbackInfo ci) {
         field_35358_g = mc.renderEngine.allocateAndSetupTexture(new java.awt.image.BufferedImage(256, 256, 2));
         Packets.setUsePackets(false);
-        MegaMod.getInstance().hasLoggedIn = false;
-        MegaMod.getInstance().clearJoinedNames();
-        MegaMod.getInstance().setConnectedServer(null);
+        MMUtil.hasLoggedIn = false;
+        MMUtil.getPlayer().clearJoinedNames();
+        MMUtil.getPlayer().setConnectedServer(null);
         MegaMod.getInstance().modLoaderTest();
-        MegaMod.getServerPacketInformation().reset();
+        MMUtil.getServerPacketInformation().reset();
         for(Object o : controlList) {
             GuiButton guiButton = (GuiButton) o;
             //System.out.println(guiButton.displayString + ", x" + guiButton.xPosition + " y" + guiButton.yPosition);
@@ -220,11 +221,14 @@ public class MixinGuiMainMenu extends GuiScreen {
             else
                 this.drawCenteredString(this.fontRenderer, "MegaMod ChangeLog", MM_CL.xPosition-15, MM_CL.yPosition + 22+2, 0xffffff);
         }
-        if(MegaMod.requiresUpdate != null) {
+        if(MegaMod.requiresUpdate != null && !MegaMod.devVersion) {
             this.drawString(fontRenderer, "UPDATE FROM " + MegaMod.version + " TO " + MegaMod.requiresUpdate, 2, height - 10, 0xff7575);
             this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 20, 0xFFFFFF);
-        } else
-            this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 10, 0xFFFFFF);
+        } else {
+            if(MegaMod.devVersion)
+                this.drawString(fontRenderer, "! DEVELOPER VERSION !", 2, height - 20, 0xff7575);
+            this.drawString(fontRenderer, "MegaMod v" + MegaMod.version + "-Mixins", 2, height - 10, 0xFFFFFF);
+        }
     }
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", ordinal = 0))
@@ -241,8 +245,8 @@ public class MixinGuiMainMenu extends GuiScreen {
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawDefaultBackground()V"))
     public void drawDefaultBackground(GuiMainMenu mainMenu, int i, int j, float f) {
         int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
-        if(MegaMod.getInstance().failedToDrawBG || o == 1) {
-            if(MegaMod.getInstance().failedToDrawBG) {
+        if(MMUtil.failedToDrawBG || o == 1) {
+            if(MMUtil.failedToDrawBG) {
                 this.drawCenteredString(fontRenderer, "OpenGL errored drawing background", width/2, height/7, 0xf54242);
                 this.drawCenteredString(fontRenderer, "Could be a possible incompatibility with OptiFine", width/2, height/7+25, 0xf54242);
             }
@@ -253,7 +257,7 @@ public class MixinGuiMainMenu extends GuiScreen {
                 drawGradientRect(0, 0, width, height, 0xaaffffff, 0xffffff);
                 drawGradientRect(0, 0, width, height, 0, 0xaa000000);
             } catch(Exception openglException) {
-                MegaMod.getInstance().failedToDrawBG = true;
+                MMUtil.failedToDrawBG = true;
             }
         }
     }

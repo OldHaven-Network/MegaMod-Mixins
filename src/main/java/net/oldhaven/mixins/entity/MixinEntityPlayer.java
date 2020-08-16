@@ -3,7 +3,7 @@ package net.oldhaven.mixins.entity;
 import net.minecraft.src.EntityLiving;
 import net.minecraft.src.EntityPlayer;
 import net.minecraft.src.World;
-import net.oldhaven.SkinFix;
+import net.oldhaven.customs.util.SkinFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

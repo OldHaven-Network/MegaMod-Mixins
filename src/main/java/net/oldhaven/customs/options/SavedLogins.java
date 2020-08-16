@@ -1,6 +1,7 @@
 package net.oldhaven.customs.options;
 
 import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 
 import java.io.*;
 import java.util.HashMap;
@@ -97,7 +98,7 @@ public class SavedLogins {
         return savedLoginMap.size();
     }
     public void saveLogin(String username, String login) {
-        String ip = megaMod.getConnectedServer();
+        String ip = MMUtil.getPlayer().getConnectedServer();
         if(ip == null) {
             System.out.println("CAN'T SAVE LOGIN: Not connected to server");
             return;

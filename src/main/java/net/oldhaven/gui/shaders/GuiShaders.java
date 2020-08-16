@@ -10,7 +10,7 @@ import net.minecraft.src.FontRenderer;
 import net.minecraft.src.GuiButton;
 import net.minecraft.src.GuiScreen;
 import net.minecraft.src.StringTranslate;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.autologins.GuiAutoLoginsEdit;
 
 import java.io.File;
@@ -21,10 +21,8 @@ import java.io.File;
 
 public class GuiShaders extends GuiScreen
 {
-    private MegaMod megaMod;
     public GuiShaders(GuiScreen guiscreen)
     {
-        this.megaMod = MegaMod.getInstance();
         refreshTimer = -1;
         fileLocation = "";
         guiScreen = guiscreen;
@@ -58,9 +56,9 @@ public class GuiShaders extends GuiScreen
                 slotGui.selectIP(slotGui.selected);
         } else if(guibutton.id == 3) {
             if(!slotGui.viewingIP.equals(""))
-                megaMod.getAutoLogins().getSavedLoginsByIP(slotGui.viewingIP).remove(slotGui.selected);
+                MMUtil.getAutoLogins().getSavedLoginsByIP(slotGui.viewingIP).remove(slotGui.selected);
             else if(!slotGui.selected.equals(""))
-                megaMod.getAutoLogins().removeAllLogins(slotGui.selected);
+                MMUtil.getAutoLogins().removeAllLogins(slotGui.selected);
         } else if(guibutton.id == 6) {
             if(!slotGui.viewingIP.equals(""))
                 slotGui.selectIP("");

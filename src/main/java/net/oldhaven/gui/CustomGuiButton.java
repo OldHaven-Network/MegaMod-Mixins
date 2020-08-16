@@ -1,10 +1,14 @@
 package net.oldhaven.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.*;
+import net.minecraft.src.ChatAllowedCharacters;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.GuiButton;
+import net.minecraft.src.GuiScreen;
 import net.oldhaven.customs.options.CustomGameSettings;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.gui.modsettings.ModdedSettingsGui;
 import org.lwjgl.opengl.GL11;
 
 public class CustomGuiButton extends GuiButton {
@@ -23,9 +27,14 @@ public class CustomGuiButton extends GuiButton {
             super.mouseReleased(i, i1);
             if(mousePressed(null, i, i1)) {
                 String s = this.returnEnumOptions().getName();
-                Object option = MegaMod.getCustomGameSettings().getOption(s);
+                Object option = MMUtil.getCustomGameSettings().getOption(s);
                 boolean b = (option != null && String.valueOf(option).equals("1"));
-                MegaMod.getCustomGameSettings().setOption(s, b ? 0 : 1);
+                MMUtil.getCustomGameSettings().setOption(s, b ? 0 : 1);
+                GuiScreen current = MMUtil.getMinecraftInstance().currentScreen;
+                if(current instanceof ModdedSettingsGui) {
+                    ModdedSettingsGui modSettings = (ModdedSettingsGui) current;
+                    modSettings.setChanged();
+                }
             }
         }
 
@@ -36,7 +45,7 @@ public class CustomGuiButton extends GuiButton {
                 if(returnEnumOptions() != null) {
                     String s = this.returnEnumOptions().getName();
                     onOff = ": OFF";
-                    Object option = MegaMod.getCustomGameSettings().getOption(s);
+                    Object option = MMUtil.getCustomGameSettings().getOption(s);
                     if(option != null && String.valueOf(option).equals("1"))
                         onOff = ": ON";
                 }
@@ -46,7 +55,7 @@ public class CustomGuiButton extends GuiButton {
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 boolean var5 = i >= this.xPosition && j >= this.yPosition && i < this.xPosition + this.width && j < this.yPosition + this.height;
                 int var6 = this.getHoverState(var5);
-                CustomGameSettings gs = MegaMod.getCustomGameSettings();
+                CustomGameSettings gs = MMUtil.getCustomGameSettings();
                 String value = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
                 if(!value.isEmpty()) {
                     int color = Integer.decode(value);
@@ -208,7 +217,7 @@ public class CustomGuiButton extends GuiButton {
             super(var1, var2, var3, 150, 20, var5);
             this.sliderValue = var6;
             this.idFloat = var4;
-            CustomGameSettings gs = MegaMod.getCustomGameSettings();
+            CustomGameSettings gs = MMUtil.getCustomGameSettings();
             Object nullable = gs.getOption(var4.getName());
             if (nullable == null)
                 gs.setOption(var4.getName(), var4.getDefaultValue());
@@ -245,7 +254,7 @@ public class CustomGuiButton extends GuiButton {
                         this.sliderValue = 1.0F;
                     }
 
-                    MegaMod.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
+                    MMUtil.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
                     this.doDisplayString();
                 }
 
@@ -266,7 +275,12 @@ public class CustomGuiButton extends GuiButton {
                     this.sliderValue = 1.0F;
                 }
 
-                MegaMod.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
+                GuiScreen current = MMUtil.getMinecraftInstance().currentScreen;
+                if(current instanceof ModdedSettingsGui) {
+                    ModdedSettingsGui modSettings = (ModdedSettingsGui) current;
+                    modSettings.setChanged();
+                }
+                MMUtil.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
                 this.doDisplayString();
                 this.dragging = true;
                 return true;

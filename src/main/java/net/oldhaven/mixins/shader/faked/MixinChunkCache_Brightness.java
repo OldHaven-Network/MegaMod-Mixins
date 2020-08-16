@@ -3,6 +3,7 @@ package net.oldhaven.mixins.shader.faked;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,7 +23,7 @@ public abstract class MixinChunkCache_Brightness {
         int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
         if(shaders <= 1 || ModOptions.DYNAMIC_LIGHTING.getAsInt() != 1)
             return;
-        Object i = MegaMod.getFakeShaderThread().calculateLightRender(x, y, z, this.getLightValueExt(x, y, z, true));
+        Object i = MMUtil.getFakeShaderThread().calculateLightRender(x, y, z, this.getLightValueExt(x, y, z, true));
         if ((int) i != 0)
             cir.setReturnValue((int) i);
     }
@@ -32,10 +33,10 @@ public abstract class MixinChunkCache_Brightness {
         int f = (int)(ModOptions.SHADERS.getAsFloat()*4);
         if(f == 3) {
             float density = ModOptions.SHADOW_DENSITY.getAsFloat()/2;
-            long time = MegaMod.getMinecraftInstance().theWorld.getWorldTime();
+            long time = MMUtil.getMinecraftInstance().theWorld.getWorldTime();
             Vec3D curVec = Vec3D.createVector(x, y, z);
             if (time < 14000 || time > 22000) {
-                float angle = MegaMod.getMinecraftInstance().theWorld.getCelestialAngle(0.0F);
+                float angle = MMUtil.getMinecraftInstance().theWorld.getCelestialAngle(0.0F);
                 float toCos = MathHelper.cos(-angle * 3.141593F * 2.0F);
                 float zi = ((toCos - -0F) / 1) * 0.5F + 0.5F;
                 double toSin = 1.0F - (1.0F - Math.sin(zi * 3.141593F)) * 0.99F;
@@ -47,7 +48,7 @@ public abstract class MixinChunkCache_Brightness {
                     if (getBlockId(x, y + 1, z) != 0)
                         return;
                 }
-                MovingObjectPosition mOP = MegaMod.getMinecraftInstance().theWorld.rayTraceBlocks(curVec, toSun);
+                MovingObjectPosition mOP = MMUtil.getMinecraftInstance().theWorld.rayTraceBlocks(curVec, toSun);
                 if (mOP != null) {
                     float i = 0.5F-density;
                     if (i < min)

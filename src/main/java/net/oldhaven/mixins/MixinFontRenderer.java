@@ -2,8 +2,8 @@ package net.oldhaven.mixins;
 
 import net.minecraft.src.ChatAllowedCharacters;
 import net.minecraft.src.FontRenderer;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.IFontRenderer;
+import net.oldhaven.customs.util.MMUtil;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,7 +26,7 @@ public abstract class MixinFontRenderer implements IFontRenderer {
         //this.buffer = GLAllocation.createDirectIntBuffer(1024);
         //this.fontDisplayLists = GLAllocation.generateDisplayLists(288);
         //MegaMod.getInstance().BeginThread();
-        MegaMod.setFontRenderer(this);
+        MMUtil.setFontRenderer(this);
     }
 
     public void renderString(String var1, int var2, int var3, float[] var4, boolean var5) {

@@ -3,8 +3,9 @@ package net.oldhaven.mixins.entity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
 import net.oldhaven.customs.options.CustomGameSettings;
-import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.util.OnScreenText;
 import org.lwjgl.input.Keyboard;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,10 +32,10 @@ public class MixinEntityLiving extends Entity {
         return entity instanceof EntityPlayerSP;
     }
     private boolean isFlying(Entity entity) {
-        return MegaMod.getInstance().isFlying;
+        return MMUtil.isFlying;
     }
     private boolean isSprinting(Entity entity) {
-        return MegaMod.getInstance().isSprinting;
+        return MMUtil.isSprinting;
     }
 
     @Redirect(method = "moveEntityWithHeading",
@@ -57,14 +58,14 @@ public class MixinEntityLiving extends Entity {
             this.moveEntity(x, y, z);
             return;
         }
-        CustomGameSettings cgs = MegaMod.getCustomGameSettings();
-        GameSettings gs = MegaMod.getMinecraftInstance().gameSettings;
+        CustomGameSettings cgs = MMUtil.getCustomGameSettings();
+        GameSettings gs = MMUtil.getMinecraftInstance().gameSettings;
         float gsFlySpeed = (ModOptions.FLY_SPEED.getAsFloat() * 5) + 1;
         Boolean flyB = isFlying(this);
         Boolean sprintB = isSprinting(this);
         if(flyB) {
-            MegaMod.getInstance().showOnScreenText("flying", "Flying", 0xFFFFFF);
-            Minecraft mc = MegaMod.getMinecraftInstance();
+            OnScreenText.showOnScreenText("flying", "Flying", 0xFFFFFF);
+            Minecraft mc = MMUtil.getMinecraftInstance();
             if(mc.currentScreen == null) {
                 if(!wasLastFlying)
                     wasLastFlying = true;
@@ -120,7 +121,7 @@ public class MixinEntityLiving extends Entity {
                 }
             }
             this.flySpeed = 0.0F;
-            MegaMod.getInstance().hideOnScreenText("flying");
+            OnScreenText.hideOnScreenText("flying");
         }
         this.moveEntity(x, y, z);
     }
@@ -153,9 +154,9 @@ public class MixinEntityLiving extends Entity {
     public float editYValue(float f) {
         if(!isPlayer(this))
             return f;
-        if(MegaMod.getInstance().isSprinting) {
-            if(MegaMod.getPlayer().getPlayerSP().movementInput.moveForward == 0.0F) {
-                MegaMod.getInstance().isSprinting = false;
+        if(MMUtil.isSprinting) {
+            if(MMUtil.getPlayer().getPlayerSP().movementInput.moveForward == 0.0F) {
+                MMUtil.isSprinting = false;
             }
         }
         Integer blockId = null;
@@ -181,15 +182,15 @@ public class MixinEntityLiving extends Entity {
                     sprintTimeout = 0;
                 } else {
                     if (isCollidedHorizontally)
-                        MegaMod.getInstance().isSprinting = false;
+                        MMUtil.isSprinting = false;
                     if (!onGround)
                         sprintTimeout++;
                     if (sprintTimeout > 20)
-                        MegaMod.getInstance().isSprinting = false;
+                        MMUtil.isSprinting = false;
                 }
             } else {
                 if(isCollidedHorizontally)
-                    MegaMod.getInstance().isSprinting = false;
+                    MMUtil.isSprinting = false;
             }
         }
         return f;

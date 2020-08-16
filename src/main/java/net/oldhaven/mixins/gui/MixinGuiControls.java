@@ -1,7 +1,7 @@
 package net.oldhaven.mixins.gui;
 
 import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
+import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.controls.GuiControlsSlot;
 import net.oldhaven.gui.controls.IGuiControls;
 import org.lwjgl.input.Keyboard;
@@ -68,7 +68,7 @@ public abstract class MixinGuiControls extends GuiScreen implements IGuiControls
             if(clickedButtonIsNew == null) {
                 this.options.setKeyBinding(this.clickedButton.id, var2);
             } else
-                MegaMod.getCustomKeybinds().setKey(clickedButtonIsNew.getString(), var2);
+                MMUtil.getCustomKeybinds().setKey(clickedButtonIsNew.getString(), var2);
             clickedButton.displayString = Keyboard.getKeyName(var2);
             this.clickedButton = null;
             this.clickedButtonIsNew = null;

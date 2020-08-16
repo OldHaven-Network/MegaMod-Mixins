@@ -3,40 +3,31 @@
 // Decompiler options: packimports(3) braces deadcode 
 // Source File Name:   SourceFile
 
-package net.oldhaven.gui.changelog;
+package net.oldhaven.gui.itemkeep;
 
 import net.minecraft.src.FontRenderer;
+import net.minecraft.src.GuiSlot;
 import net.minecraft.src.Tessellator;
+import net.oldhaven.customs.ItemKeep;
 import net.oldhaven.customs.util.MMUtil;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 
 // Referenced classes of package net.minecraft.src:
 //            GuiSlot, GuiAutoLogins, TexturePackList, TexturePackBase, 
 //            RenderEngine, Tessellator
 
-class GuiChangelogSlot extends GuiSlotEdit
+class GuiItemKeepSlot extends GuiSlot
 {
-    private LinkedList<ChangeLog.TextField> textFields;
-    public GuiChangelogSlot(GuiChangelog gui)
-    {
+    private final HashMap<String, Integer> hashMap;
+    public GuiItemKeepSlot(GuiItemKeep gui) {
         super(gui.getMinecraft(gui), gui.width, gui.height, 32, (gui.height - 55) + 4, 36);
+        this.hashMap = ItemKeep.getFullMap();
         parGui = gui;
-        textFields = ChangeLog.getChangelog();
-    }
-
-    private void addString(String s, int color) {
-        /*int i = parGui.getFontRenderer().getStringWidth(s);
-        if(i > 20) {
-            addString(s.substring(0, 20), color);
-            addString(s.substring(20), color);
-            return;
-        }*/
-        //textFields.addLast(new TextField(s, color));
     }
 
     protected int getSize() {
-        return textFields.size();
+        return hashMap.size();
     }
 
     protected void elementClicked(int i, boolean flag) {
@@ -48,7 +39,7 @@ class GuiChangelogSlot extends GuiSlotEdit
 
     protected int getContentHeight()
     {
-        return getSize() * 12;
+        return getSize() * 36;
     }
 
     protected void drawBackground()
@@ -56,15 +47,14 @@ class GuiChangelogSlot extends GuiSlotEdit
         parGui.drawDefaultBackground();
     }
 
-    @Override
-    public void drawScreen(int i, int i1, float v) {
-        super.drawScreen(i, i1, v);
-    }
-
     protected void drawSlot(int i, int j, int k, int l, Tessellator tessellator) {
         FontRenderer fontRenderer = MMUtil.getMinecraftInstance().fontRenderer;
-        parGui.drawCenteredString(fontRenderer, textFields.get(i).string, parGui.width/2, k, textFields.get(i).color);
+        String name = (String) hashMap.keySet().toArray()[i];
+        int id = hashMap.get(name);
+        parGui.drawString(fontRenderer, name + ": " + id, j + 32 + 2, k + 6, 0xffffff);
     }
 
-    private final GuiChangelog parGui; /* synthetic field */
+    public String viewingIP = "";
+    protected String selected = "";
+    private final GuiItemKeep parGui; /* synthetic field */
 }
