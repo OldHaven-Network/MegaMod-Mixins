@@ -19,7 +19,6 @@ new Sign Text Shadow setting in Block Settings (kinda buggy with Black Color)
 Fixed "Animate Main Menu" setting being inverted
 The option "Alex Skins" in Skin Settings is now functional
 Fixed Steve Skins having the wrong outer arm placement
-Removed "Raise Selected Hotbar" setting from Pre4 as it caused a crash with MultiMC
 The new Item ID menu has been updated with Icons and prettiness
 New option for "Button Text Color" in UI Settings
 New option for "World Brightness" next to FoV
