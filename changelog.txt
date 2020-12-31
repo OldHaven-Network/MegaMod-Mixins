@@ -1,5 +1,38 @@
 # This file shows changes for each MegaMod version
 
+0.7.0
+Skins are now more more optimized and have had bugs fixed
+Many many performance and memory fixes
+MegaMod now has it's own debug mode, no more lazy left in debug code.
+Packets have been remade and reorginized
+New "Player Typing" packet that shows on a server who's typing (as long as they have MegaMod)
+You can now wear ears from http://minecraftcapes.net/
+ModOptions has been reworked to allow options to be retreived every frame (may cause bugs with options, but overall performance fixes)
+ChangeLog URL has been moved to github @OldHaven-Network/MegaMod-Mixins/
+Fixed first person hand bugging out when someone else crouches
+Fixed head model position when an object is on your head such as /hat
+Random Taller Grass feature is now more frequent, if you have it on
+say /unloadskins at any point in chat will instantly unload all skins and attempt a reload. May not work all the time
+New GLSL shaders option with built in shaders (Thanks mine_diver#0618!)
+Removed shader rendering when shaders are not enabled, hopefully bringing some performance back
+new Sign Text Shadow setting in Block Settings (kinda buggy with Black Color)
+Fixed "Animate Main Menu" setting being inverted
+The option "Alex Skins" in Skin Settings is now functional
+Fixed Steve Skins having the wrong outer arm placement
+Removed "Raise Selected Hotbar" setting from Pre4 as it caused a crash with MultiMC
+The new Item ID menu has been updated with Icons and prettiness
+New option for "Button Text Color" in UI Settings
+New option for "World Brightness" next to FoV
+New option for "Signs Text Shadow" in Block Settings
+New option "Button Text Shadow" in UI settings
+Some options have been renamed, they are:
+    Disable Ladders -> Ladders Climbable
+    Disable Water Animation -> Water Animation
+    Disable new MainMenu BG -> Animate Main Menu
+    Disable new MultiPlayer GUI -> New MultiPlayer GUI
+New /god command for SP Commands
+SP commands now has variants, so you can type /settime instead of /time for those used to Modern MC
+
 0.6.3
 Added new packet information for flying/not flying on a server
 Fixed skins crashing game if user doesn't have skin or is set wrongly
