@@ -1,36 +1,38 @@
 # This file shows changes for each MegaMod version
 
 0.7.0
-Skins are now more more optimized and have had bugs fixed
-Many many performance and memory fixes
-MegaMod now has it's own debug mode, no more lazy left in debug code.
-Packets have been remade and reorginized
-New "Player Typing" packet that shows on a server who's typing (as long as they have MegaMod)
-You can now wear ears from http://minecraftcapes.net/
-ModOptions has been reworked to allow options to be retreived every frame (may cause bugs with options, but overall performance fixes)
-ChangeLog URL has been moved to github @OldHaven-Network/MegaMod-Mixins/
-Fixed first person hand bugging out when someone else crouches
-Fixed head model position when an object is on your head such as /hat
-Random Taller Grass feature is now more frequent, if you have it on
-say /unloadskins at any point in chat will instantly unload all skins and attempt a reload. May not work all the time
+Many many performance and memory fixes, you should get better FPS anywhere
+New "Ears" option in "Skin Settings" ( from minecraftcapes.net/ )
 New GLSL shaders option with built in shaders (Thanks mine_diver#0618!)
-Removed shader rendering when shaders are not enabled, hopefully bringing some performance back
-new Sign Text Shadow setting in Block Settings (kinda buggy with Black Color)
-Fixed "Animate Main Menu" setting being inverted
-The option "Alex Skins" in Skin Settings is now functional
-Fixed Steve Skins having the wrong outer arm placement
-The new Item ID menu has been updated with Icons and prettiness
+new "OnScreenText" packet that will show text on screen from the server
+New "Player Typing" packet that shows on a server who's typing
+New "Item IDs" GUI under AutoLogins button that will show you all the items in the game
+New command /unloadskins that will try to hot reload all loaded skins/entities
+New command /god in Single Player Commands
+New option for "Sign Text Shadow" in Block Settings
 New option for "Button Text Color" in UI Settings
 New option for "World Brightness" next to FoV
 New option for "Signs Text Shadow" in Block Settings
-New option "Button Text Shadow" in UI settings
-Some options have been renamed, they are:
+New option for "Button Text Shadow" in UI settings
+Updated Single Player Commands to have variants and be more reliable
+Updated shaders to not render when not in use
+Updated ModOptions for reworks/optimizations allowing option values to be retreived every frame
+Updated player skins for more optimized load times
+Updated "Fancy Trees" option to allow for a "Fast" option
+Updated and optimized MegaMod Custom Packets
+Fixed first person hand bugging out when someone else crouches
+Fixed head model position when an object is on your head such as /hat
+Fixed "Animate Main Menu" setting being inverted
+Fixed Steve Skins having the wrong outer arm placement
+Fixed the option "Alex Skins" in Skin Settings not being functional
+MegaMod now has it's own debug mode, no more lazy left in debug code.
+ChangeLog URL has been moved to github @OldHaven-Network/MegaMod-Mixins/
+Random Taller Grass feature is now more frequent, if you have it on
+Some options have been renamed, they are the following:
     Disable Ladders -> Ladders Climbable
     Disable Water Animation -> Water Animation
     Disable new MainMenu BG -> Animate Main Menu
     Disable new MultiPlayer GUI -> New MultiPlayer GUI
-New /god command for SP Commands
-SP commands now has variants, so you can type /settime instead of /time for those used to Modern MC
 
 0.6.3
 Added new packet information for flying/not flying on a server
