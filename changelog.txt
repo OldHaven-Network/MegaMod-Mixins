@@ -2,12 +2,12 @@
 
 0.7.0
 Many many performance and memory fixes, you should get better FPS anywhere
-New "Ears" option in "Skin Settings" ( from minecraftcapes.net/ )
 New GLSL shaders option with built in shaders (Thanks mine_diver#0618!)
-new "OnScreenText" packet that will show text on screen from the server
+New "OnScreenText" packet that will show text on screen from the server
 New "Player Typing" packet that shows on a server who's typing
 New "Item IDs" GUI under AutoLogins button that will show you all the items in the game
 New command /unloadskins that will try to hot reload all loaded skins/entities
+New option "Ears" in "Skin Settings" ( from minecraftcapes.net/ )
 New command /god in Single Player Commands
 New option for "Sign Text Shadow" in Block Settings
 New option for "Button Text Color" in UI Settings
