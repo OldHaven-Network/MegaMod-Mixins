@@ -1,0 +1,179 @@
+# This file shows changes for each MegaMod version
+
+0.7.0
+Many many performance and memory fixes, you should get better FPS anywhere
+New GLSL shaders option with built in shaders (Thanks mine_diver#0618!)
+New Discord Rich Presence support with new GUI "Discord Settings" in Mod Settings
+New "OnScreenText" packet that will show text on screen from the server
+New "Player Typing" packet that shows on a server who's typing
+New "Item IDs" GUI under AutoLogins button that will show you all the items in the game
+New command /unloadskins that will try to hot reload all loaded skins/entities
+New option "Ears" in "Skin Settings" ( from minecraftcapes.net/ )
+New command /god in Single Player Commands
+New option for "Sign Text Shadow" in Block Settings
+New option for "Modern Tooltips" in UI Settings
+New option for "Button Text Color" in UI Settings
+New option for "World Brightness" next to FoV
+New option for "Signs Text Shadow" in Block Settings
+New option for "Button Text Shadow" in UI settings
+Updated Single Player Commands to have variants and be more reliable
+Updated shaders to not render when not in use
+Updated ModOptions for reworks/optimizations allowing option values to be retreived every frame
+Updated player skins for more optimized load times
+Updated "Fancy Trees" option to allow for a "Fast" option
+Updated and optimized MegaMod Custom Packets
+Fixed first person hand bugging out when someone else crouches
+Fixed head model position when an object is on your head such as /hat
+Fixed "Animate Main Menu" setting being inverted
+Fixed Steve Skins having the wrong outer arm placement
+Fixed the option "Alex Skins" in Skin Settings not being functional
+MegaMod now has it's own debug mode, no more lazy left in debug code.
+ChangeLog URL has been moved to github @OldHaven-Network/MegaMod-Mixins/
+Random Taller Grass feature is now more frequent, if you have it on
+Discord settings current supports two servers and SP
+Some options have been renamed, they are the following:
+    Disable Ladders -> Ladders Climbable
+    Disable Water Animation -> Water Animation
+    Disable new MainMenu BG -> Animate Main Menu
+    Disable new MultiPlayer GUI -> New MultiPlayer GUI
+
+0.6.3
+Added new packet information for flying/not flying on a server
+Fixed skins crashing game if user doesn't have skin or is set wrongly
+Added a new feature to stop 3d main menu background from being used if it's causing errors
+
+0.6.2
+Fixed third person camera xray bug
+Created new "RGBGui" for easy creation of RGB colors
+Changed "Water Color" into "Water Color Hex"
+Changed "Lava Color" into "Lava Color Hex"
+Added new buttons for Water Color and Lava Color in ShaderSettings
+Updated ModOptions to account for disabled options better
+Fixed all alex skins, now using official Mojang servers.
+
+0.6.1
+Fixed a bug where Faked-Real shaders would always render
+Fixed a bug that caused Minecraft to crash when loading a world
+Changed "Shadow Density" to a more appropriate number in ShaderSettings
+
+0.6.0
+Redid ModSettings on how it captures values from settings
+Created new SkinSettingsGui
+Added all body parts to skin settings
+Fixed alex skin lag
+Created ShadersGui, a ModdedGui
+Started work on GLSL shading (not working yet)
+Created 3 built-in non-GLSL shaders
+    Checkerboard
+    Faked-Real
+    Outline
+Created a dynamic lighting shader
+Renamed CustomEnumOptions to ModSettings
+Created classes to custom add/remove lava/water colors whenever
+Moved Water Color ModOption setting to ShadersGui
+Created Lava Color ModOption in ShadersGui
+Added new folder named "/shaders/" that contains GLSL shaders
+Better optimized SkinFix to realize alex skins better
+Moved all Modded Guis to extend ModdedSettingGui
+All Modded Guis now auto-add all the buttons they need
+Fixed option to enable/disable rain or snow
+Started on a "SavedShaders" class to get all your shaders from /shaders/
+Moved around some mixins to better orginize the mod
+Deprecated ShaderedBlock and GuiEXP as they're not needed anymore
+Deprecated MegaMod::tryFullscreen as it's not ever going to work
+The Minecraft class will now auto-setup GLSL shading
+Created a new Gui for Yes/No activities to easily orginize things
+
+0.5.3
+Added new water color settings
+Completely remade CustomGameSettings and CustomEnumSettings
+Temporarily disabled better skins for less lag
+Temporarily made leaves always render
+
+0.5.2
+Fixes crashes with UUID detection with skins
+
+0.5.1
+Fixed skins crashing
+Fixed outer clothing not aligning correctly
+Fixed bug with skins mis-aligning when looking at other players
+Fixed bed crashing bug
+
+0.5.0
+Added outer clothing & alex skins
+Fixed chat & bed bugs (Haha)
+Added capes to players
+Added secondary third person front view
+Started work on new custom packets with EXP for OldHaven
+Added player count to player-list GUI
+Added a new zoom key (default C)
+Started on a new packet for opening custom GUIs
+Added a toggle for disable zoom
+Fixed a crash on signs
+
+0.4.2
+Fixed crashing while in a bed... again.
+Fixed AutoLogins not working & crashing
+Fixed compatibility with AetherMP
+Added new buttons to GuiChangeLog for MegaMod Socials
+Fixed crashing when placing a sign
+
+0.4.1
+Fixed not being able to toggle WAILA in GuiGuiOptions
+Fixed sleeping crashing the game
+Fixed Button Outline Slider crashing the game
+Fixed MultiplayerGUI crashing the game
+Fixed stepping sounds being messed up when flying or running down stairs
+
+0.4.0
+Keybinds for MegaMod are now automated on launch
+New PlayerList keybind for specific servers
+New onPlayerJoin and onPlayerLeave packets for new PlayerList
+Button custom RGB coloring was added (advanced mode)
+MegaMod update check fixed
+New MegaMod text field for additional options
+Now printing chat to console
+
+0.3.0
+Fixed Capes
+Fixed Water-Flying
+Fixed a bug with AutoLogin's preventing a jar from being built
+Updated player animations thus fixing arm movements
+Fixed cloud height settings when starting the game
+Adding a fly-speed modifier in Mod-Settings
+Made cloud height disable if you set it to the lowest
+Fixed default steve skin: No more weird steves!
+Added a number to the fly counter in the corner
+Added an option to Mod-Settings for an outline around buttons
+Fixed MultiplayerGUI not being able to add a server
+Fixed the entire AutoLogin GUI: Logins can now be created
+Added new packets for beta.oldhaven.net when joining/leaving
+EditSignGUI now has a cursor, use arrow keys to move it
+ChatGUI now has a cursor, use arrow keys to move it
+Pressing arrow key up or down shows your last&new messages.
+JavaScript engine has been implemented.
+Removed "Farther" distance (Also fixing "Tiny" distance)
+
+0.2.2
+Started on new AutoLogin GUI
+Updated player character & fixed memory leak
+Added Force-Time to SkySettingsGUI
+Fixed Cloud Height in SkySettingsGUI
+Chat scroll with Page Up & Page Down
+
+0.2.0
+Added Sky Settings GUI
+Added front view from pressing view button 3 times (default F5)
+Added zoom & scroll wheel to zoom farther (default C)
+Added alex skins
+Redid the way all entities are rendered for outer clothing on players
+Started on fixing sounds back to old sounds
+Added new Music & Sounds GUI, unfinished
+Added MultiplayerGUI, unfinished
+
+0.1.0
+Added ModOptionsGUI
+Added Field of View modifier in options
+Added panorama image to MainMenuGUI
+Added a sprint keybind (default left-ctrl)
+Added bit-depth-fix to fix AMD GPUs having glitchy terrain
