@@ -3,14 +3,13 @@ package net.oldhaven.mixins.gui;
 import net.minecraft.src.*;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.customs.packets.Packets;
+import net.oldhaven.customs.packets.util.Packets;
 import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.gui.GuiYesNo;
 import net.oldhaven.gui.changelog.GuiChangelog;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -18,8 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiMainMenu.class)
 public class MixinGuiMainMenu extends GuiScreen {
-    @Shadow private String splashText;
-
     private GuiButton MM_CL;
     private boolean aetherEnabled = false;
 
@@ -38,7 +35,7 @@ public class MixinGuiMainMenu extends GuiScreen {
             ci.cancel();
             return;
         }
-        mc.hideQuitButton = ModOptions.SHOW_MAIN_MENU_QUIT_BUTTON.getAsInt() != 1;
+        mc.hideQuitButton = !ModOptions.MAIN_MENU_QUIT_BUTTON.getAsBool();
     }
 
     @Inject(method = "initGui", at = @At("RETURN"), cancellable = true)
@@ -233,8 +230,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawString(Lnet/minecraft/src/FontRenderer;Ljava/lang/String;III)V", ordinal = 0))
     public void drawMCString(GuiMainMenu mainMenu, FontRenderer fontRenderer, String s, int i, int i1, int i2) {
-        int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
-        if(o != 1) {
+        if(ModOptions.ANIMATE_MAIN_MENU.getAsBool()) {
             mainMenu.drawString(fontRenderer, "Minecraft Beta 1.7.3", i, i1, 0xffffff);
         } else {
             mainMenu.drawString(fontRenderer, "Minecraft Beta 1.7.3", i, i1, i2);
@@ -244,8 +240,7 @@ public class MixinGuiMainMenu extends GuiScreen {
 
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiMainMenu;drawDefaultBackground()V"))
     public void drawDefaultBackground(GuiMainMenu mainMenu, int i, int j, float f) {
-        int o = ModOptions.DEFAULT_MAIN_MENU_BG.getAsInt();
-        if(MMUtil.failedToDrawBG || o == 1) {
+        if(MMUtil.failedToDrawBG || !ModOptions.ANIMATE_MAIN_MENU.getAsBool()) {
             if(MMUtil.failedToDrawBG) {
                 this.drawCenteredString(fontRenderer, "OpenGL errored drawing background", width/2, height/7, 0xf54242);
                 this.drawCenteredString(fontRenderer, "Could be a possible incompatibility with OptiFine", width/2, height/7+25, 0xf54242);

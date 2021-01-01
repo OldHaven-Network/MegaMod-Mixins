@@ -17,6 +17,8 @@ public class MixinWorldRenderer {
 
     @Redirect(method = "updateRenderer", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/RenderBlocks;renderBlockByRenderType(Lnet/minecraft/src/Block;III)Z"))
     private boolean onRenderBlockByRenderType(RenderBlocks renderBlocks, Block var24, int var17, int var15, int var16) {
+        if(!Shaders.isShaderEnabled())
+            return renderBlocks.renderBlockByRenderType(var24, var17, var15, var16);;
         if (Shaders.entityAttrib >= 0)
             ((TessellatorShaders) Tessellator.instance).setEntity(var24.blockID);
         return renderBlocks.renderBlockByRenderType(var24, var17, var15, var16);
@@ -24,6 +26,8 @@ public class MixinWorldRenderer {
 
     @Inject(method = "updateRenderer", at = @At(value = "RETURN"))
     private void onUpdateRenderer(CallbackInfo ci) {
+        if(!Shaders.isShaderEnabled())
+            return;
         if (Shaders.entityAttrib >= 0)
             ((TessellatorShaders) Tessellator.instance).setEntity(-1);
     }

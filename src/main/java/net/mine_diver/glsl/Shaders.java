@@ -47,13 +47,12 @@ public class Shaders {
     public static String vendor;
     public static String version;
     public static String extension;
-    private static boolean isShaderEnabled() {
-        int shadered = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
-        if(shadered != 1)
-            return false;
-        return true;
+    public static boolean isShaderEnabled() {
+        return (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes()) == 1;
     }
     public static void init() {
+        if(!isShaderEnabled())
+            return;
         int maxDrawBuffers = glGetInteger(GL_MAX_DRAW_BUFFERS);
         renderer = glGetString(GL11.GL_RENDERER);
         vendor = glGetString(GL11.GL_VENDOR);
@@ -110,6 +109,8 @@ public class Shaders {
     }
 
     public static void glEnableWrapper(int cap) {
+        if(!isShaderEnabled())
+            return;
         glEnable(cap);
         if (cap == GL_TEXTURE_2D) {
             if (activeProgram == ProgramBasic) {
@@ -122,6 +123,8 @@ public class Shaders {
     }
 
     public static void glDisableWrapper(int cap) {
+        if(!isShaderEnabled())
+            return;
         glDisable(cap);
         if (cap == GL_TEXTURE_2D) {
             if (activeProgram == ProgramTextured || activeProgram == ProgramTexturedLit) {

@@ -28,9 +28,14 @@ public class FakeShaderThread implements Runnable {
         //new Thread(this, "renderShaders").start();
     }
 
+    boolean isShaderEnabled() {
+        return false;
+    }
+
     @Override
     public synchronized void run() {
         while(MMUtil.getMinecraftInstance().running) {
+            break;
             /*try {
                 Thread.sleep(5);
             } catch (InterruptedException e) {
@@ -71,6 +76,8 @@ public class FakeShaderThread implements Runnable {
     }
 
     public void updateLightingAt(ItemStack heldItem, Vec3D pVec) {
+        if(!isShaderEnabled())
+            return;
         if(heldItem == null || !torchIDs.containsKey(heldItem.itemID)) {
             if (lastLightVec != null) {
                 if(lightingTick > 5) {
@@ -86,6 +93,8 @@ public class FakeShaderThread implements Runnable {
 
     private int lastYLight = 0;
     private void markExtLightUpdate(Vec3D lVec) {
+        if(!isShaderEnabled())
+            return;
         int x = (int) (lVec.xCoord);
         int y = (int) (lVec.yCoord);
         int z = (int) (lVec.zCoord);
@@ -104,10 +113,14 @@ public class FakeShaderThread implements Runnable {
     }
 
     public void cleanup() {
+        if(!isShaderEnabled())
+            return;
         this.blocksToRender.clear();
     }
 
     public void addBlockToRender(int x, int y, int z) {
+        if(!isShaderEnabled())
+            return;
         Vec3D vec3D = Vec3D.createVector(x, y, z);
         this.blocksToRender.add(vec3D);
     }
@@ -121,6 +134,8 @@ public class FakeShaderThread implements Runnable {
         }
     }
     private float isHoldingTorch() {
+        if(!isShaderEnabled())
+            return -1;
         EntityPlayerSP player = MMUtil.getMinecraftInstance().thePlayer;
         ItemStack stack = player.getCurrentEquippedItem();
         if(stack != null && torchIDs.containsKey(stack.itemID))
@@ -172,7 +187,6 @@ public class FakeShaderThread implements Runnable {
         return f;
     }
     public Object calculateLightRender(int x, int y, int z, Object lightSource) {
-        System.out.println("Calculate lights");
         boolean isFloat = (lightSource instanceof Float);
         Vec3D vec3D = Vec3D.createVector(x, y, z);
         if(isFloat) {

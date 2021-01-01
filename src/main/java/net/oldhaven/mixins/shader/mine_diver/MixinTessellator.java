@@ -19,17 +19,11 @@ import java.nio.ShortBuffer;
 
 @Mixin(Tessellator.class)
 public class MixinTessellator implements TessellatorShaders {
-
     @Shadow private int drawMode;
-
     @Shadow private static boolean convertQuadsToTriangles;
-
     @Shadow private int addedVertices;
-
     @Shadow private boolean hasNormals;
-
     @Shadow private int[] rawBuffer;
-
     @Shadow private int rawBufferIndex;
 
     @Inject(method = "<init>(I)V", at = @At("RETURN"))
@@ -41,6 +35,10 @@ public class MixinTessellator implements TessellatorShaders {
 
     @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glDrawArrays(III)V"))
     private void onDraw(int mode, int first, int vertexCount) {
+        if(!Shaders.isShaderEnabled()) {
+            GL11.glDrawArrays(mode, first, vertexCount);
+            return;
+        }
         if (Shaders.entityAttrib >= 0) {
             ARBVertexProgram.glEnableVertexAttribArrayARB(Shaders.entityAttrib);
             ARBVertexProgram.glVertexAttribPointerARB(Shaders.entityAttrib, 2, false, false, 4, (ShortBuffer)((Buffer)shadersShortBuffer).position(0));
@@ -52,11 +50,15 @@ public class MixinTessellator implements TessellatorShaders {
 
     @Inject(method = "reset", at = @At(value = "RETURN"))
     private void onReset(CallbackInfo ci) {
+        if(!Shaders.isShaderEnabled())
+            return;
         ((Buffer)shadersBuffer).clear();
     }
 
     @Inject(method = "addVertex(DDD)V", at = @At(value = "HEAD"))
     private void onAddVertex(CallbackInfo ci) {
+        if(!Shaders.isShaderEnabled())
+            return;
         if (drawMode == 7 && convertQuadsToTriangles && (addedVertices + 1) % 4 == 0 && hasNormals) {
             rawBuffer[rawBufferIndex + 6] = rawBuffer[(rawBufferIndex - 24) + 6];
             shadersBuffer.putShort(shadersData[0]).putShort(shadersData[1]);
@@ -67,6 +69,8 @@ public class MixinTessellator implements TessellatorShaders {
 
     @Override
     public void setEntity(int id) {
+        if(!Shaders.isShaderEnabled())
+            return;
         shadersData[0] = (short) id;
     }
 

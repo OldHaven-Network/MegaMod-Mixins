@@ -6,8 +6,9 @@
 package net.oldhaven.gui.changelog;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.src.*;
-import net.oldhaven.MegaMod;
+import net.minecraft.src.FontRenderer;
+import net.minecraft.src.GuiButton;
+import net.minecraft.src.GuiScreen;
 
 import java.awt.*;
 import java.io.File;

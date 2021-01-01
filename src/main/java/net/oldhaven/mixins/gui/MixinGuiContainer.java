@@ -37,7 +37,7 @@ public class MixinGuiContainer extends GuiScreen {
      */
     @Redirect(method = "drawScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/ItemStack;getItemName()Ljava/lang/String;"))
     private String drawGradientRect(ItemStack itemStack) {
-        if(ModOptions.MODERN_TOOLTIPS.getAsInt() != 1)
+        if(!ModOptions.MODERN_TOOLTIPS.getAsBool())
             return itemStack.getItemName();
         String var13 = ("" + StringTranslate.getInstance().translateNamedKey(itemStack.getItemName())).trim();
         int var4 = (this.width - this.xSize) / 2;

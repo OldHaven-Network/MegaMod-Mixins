@@ -68,7 +68,7 @@ public class CustomKeybinds {
     private boolean didLastJump = false;
     private void onKey_Jump(boolean b) {
         if(     MMUtil.getServerPacketInformation().canFly() &&
-                ModOptions.DOUBLE_JUMP_TO_FLY.getAsInt() == 1) {
+                ModOptions.DOUBLE_JUMP_TO_FLY.getAsBool()) {
             long jump = MegaMod.getSystemTime();
             if (jump < (lastJump + 1000)) {
                 if (didLastJump) {
@@ -81,11 +81,10 @@ public class CustomKeybinds {
             lastJump = jump;
         }
     }
+    
     private void onKey_Sprint(boolean b) {
-        if(!b) {
-            if(ModOptions.HOLD_SPRINT.getAsInt() != 1)
-                return;
-        }
+        if(!b || ModOptions.HOLD_SPRINT.getAsBool())
+            return;
         MMUtil.isSprinting = b;
     }
     private void onKey_Fly(boolean b) {
@@ -136,21 +135,21 @@ public class CustomKeybinds {
     }
 
     public void keyCheck() {
-        if(ModOptions.DISABLE_PLAYERLIST.getAsInt() != 1)
+        if(!ModOptions.DISABLE_PLAYERLIST.getAsBool())
             keyActions.put("PlayerList", this::onKey_PlayerList);
         else
             keyActions.remove("PlayerList");
         savedKeysMap.put("PlayerList", new SavedKey(1, Keyboard.KEY_TAB, "PlayerList"));
-        if(ModOptions.DISABLE_FLY.getAsInt() != 1)
+        if(!ModOptions.DISABLE_FLY.getAsBool())
             keyActions.put("Fly", this::onKey_Fly);
         else
             keyActions.remove("Fly");
         savedKeysMap.put("Fly", new SavedKey(0, Keyboard.KEY_R, "Fly"));
-        if(ModOptions.DISABLE_SPRINT.getAsInt() != 1)
+        if(!ModOptions.DISABLE_SPRINT.getAsBool())
             keyActions.put("Sprint", this::onKey_Sprint);
         else
             keyActions.remove("Sprint");
-        if(ModOptions.DISABLE_ZOOM.getAsInt() != 1)
+        if(!ModOptions.DISABLE_ZOOM.getAsBool())
             keyActions.put("Zoom", this::onKey_Zoom);
         else
             keyActions.remove("Zoom");

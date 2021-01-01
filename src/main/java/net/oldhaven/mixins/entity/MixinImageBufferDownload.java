@@ -2,6 +2,7 @@ package net.oldhaven.mixins.entity;
 
 import net.minecraft.src.ImageBuffer;
 import net.minecraft.src.ImageBufferDownload;
+import net.oldhaven.MMDebug;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +23,7 @@ public class MixinImageBufferDownload implements ImageBuffer {
 
     /**
      * @author cutezyash
+     * @reason 64x64 skins
      * @param image Image to parse
      * @return edited image
      */
@@ -73,7 +75,8 @@ public class MixinImageBufferDownload implements ImageBuffer {
             this.setAreaTransparent(0, 48 * k, 16 * k, 64 * k);
             this.setAreaOpaque(16 * k, 48 * k, 48 * k, 64 * k);
             this.setAreaTransparent(48 * k, 48 * k, 64 * k, 64 * k);
-            System.out.println("finished parsing in " + (System.currentTimeMillis() - time) + "ms");
+            if(MMDebug.enabled)
+                System.out.println("finished parsing in " + (System.currentTimeMillis() - time) + "ms");
             return bufferedimage;
         }
     }

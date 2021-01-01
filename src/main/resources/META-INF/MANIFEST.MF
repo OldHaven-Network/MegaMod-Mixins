@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Implementation-Version: 2.0.1
+Target-Platforms: win32-x86-64, win32-x86, linux-x86-64, darwin
+

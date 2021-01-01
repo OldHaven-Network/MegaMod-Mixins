@@ -31,10 +31,8 @@ public class MixinGuiMultiplayer extends GuiScreen {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void GuiMultiplayer(GuiScreen guiScreen, CallbackInfo ci) {
-        noNew = ModOptions.DISABLE_MULTIPLAYER_GUI.getAsInt() == 1;
-        if(noNew)
-            this.parentScreen = guiScreen;
-        System.out.println(noNew);
+        if(!ModOptions.NEW_MULTIPLAYER_GUI.getAsBool())
+            this.noNew = true;
     }
 
     /**
@@ -47,7 +45,6 @@ public class MixinGuiMultiplayer extends GuiScreen {
             Keyboard.enableRepeatEvents(true);
             controlList.clear();
             createButtons();
-            String s = mc.gameSettings.lastServer.replaceAll("_", ":");
             slotGui = new GuiMultiplayerSlot(this);
             slotGui.registerScrollButtons(controlList, 7, 8);
         } else {

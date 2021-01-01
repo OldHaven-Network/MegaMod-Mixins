@@ -63,7 +63,9 @@ class GuiChangelogSlot extends GuiSlotEdit
 
     protected void drawSlot(int i, int j, int k, int l, Tessellator tessellator) {
         FontRenderer fontRenderer = MMUtil.getMinecraftInstance().fontRenderer;
-        parGui.drawCenteredString(fontRenderer, textFields.get(i).string, parGui.width/2, k, textFields.get(i).color);
+        String str = textFields.get(i).string;
+        int color = textFields.get(i).color;
+        parGui.drawString(fontRenderer, str, 10, k, color);
     }
 
     private final GuiChangelog parGui; /* synthetic field */

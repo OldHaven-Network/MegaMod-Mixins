@@ -37,8 +37,8 @@ public class MegaModDiscord {
     public enum Images {
         MainMenu("minecraft-icon", "Minecraft", null, null),
         SinglePlayer("singleplayer", "Singleplayer", "minecraft-icon", "Minecraft"),
-        betaoldhavennet("betaoldhavennet", "OldHaven-Network", "minecraft-icon", "Minecraft"),
-        beytaoldhavennet("betaoldhavennet", "OldHaven-Network", "minecraft-icon", "Minecraft"),
+        betaoldhavennet("betaoldhavennet", "Beyta MC", "minecraft-icon", "Minecraft"),
+        beytaoldhavennet("betaoldhavennet", "Beyta MC", "minecraft-icon", "Minecraft"),
         oldschoolminecraftcom("osm", "OldSchoolMinecraft", "minecraft-icon", "Minecraft");
 
         private String largeID;

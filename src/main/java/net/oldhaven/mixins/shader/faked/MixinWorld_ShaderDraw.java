@@ -21,9 +21,9 @@ public abstract class MixinWorld_ShaderDraw implements IWorld {
     float tick2 = 0;
     @Inject(method = "randomDisplayUpdates", at=@At("INVOKE"))
     private void tickInject(CallbackInfo ci) {
-        if(tick > 2000) {
-            MMUtil.getFakeShaderThread().setWorld(this);
-            if (((int) ModOptions.SHADERS.getAsFloat() * 4) > 1) {
+        if (((int) ModOptions.SHADERS.getAsFloat() * 4) > 1) {
+            if (tick > 2000) {
+                MMUtil.getFakeShaderThread().setWorld(this);
                 MMUtil.getFakeShaderThread().cleanup();
                 if (MMUtil.getMinecraftInstance().thePlayer != null) {
                     Vec3D pos = MMUtil.getMinecraftInstance().thePlayer.getPosition(1.0F);
@@ -39,14 +39,14 @@ public abstract class MixinWorld_ShaderDraw implements IWorld {
                                 continue;
                             // This is simply for optimization sake
                             MMUtil.getFakeShaderThread().addBlockToRender(x, pY, z);
-                            p+=10;
+                            p += 10;
                         }
-                        i+=10;
+                        i += 10;
                     }
                 }
+                tick = 0;
             }
-            tick = 0;
+            tick += 0.01F;
         }
-        tick += 0.01F;
     }
 }

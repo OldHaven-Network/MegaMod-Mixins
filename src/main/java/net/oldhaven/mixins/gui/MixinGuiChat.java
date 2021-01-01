@@ -5,7 +5,9 @@ import net.minecraft.src.GuiChat;
 import net.minecraft.src.GuiScreen;
 import net.oldhaven.customs.SinglePlayerCommands;
 import net.oldhaven.customs.options.ModOptions;
+import net.oldhaven.customs.packets.util.PacketList;
 import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.util.SkinFix;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -24,6 +26,7 @@ public class MixinGuiChat extends GuiScreen {
     @Shadow private int updateCounter;
     private static LinkedList<String> enteredChats = new LinkedList<>();
     private int currentUp = -1;
+    private boolean isTyping = false;
 
     @Inject(method = "initGui", at = @At("RETURN"))
     private void init(CallbackInfo ci) {
@@ -32,11 +35,17 @@ public class MixinGuiChat extends GuiScreen {
 
     @Inject(method = "onGuiClosed", at = @At("RETURN"))
     private void onGuiClosed(CallbackInfo ci) {
+        isTyping = false;
         MMUtil.chatCursorLoc = 0;
+        PacketList.PLAYERTYPING.send("STOPTYPING");
     }
 
     @Redirect(method = "keyTyped", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityPlayerSP;sendChatMessage(Ljava/lang/String;)V"))
     private void sendMessage(EntityPlayerSP entityPlayerSP, String s) {
+        if(s.equalsIgnoreCase("/unloadskins")) {
+            SkinFix.unload();
+            return;
+        }
         entityPlayerSP.sendChatMessage(s);
         if(ModOptions.SP_CHEATS.getAsBool() && !mc.isMultiplayerWorld()) {
             if(s.startsWith("/")) {
@@ -51,6 +60,16 @@ public class MixinGuiChat extends GuiScreen {
         }
     }
 
+    private void startTyping(Character c) {
+        if(message.isEmpty() && c != null && c != '/'
+        ||!message.isEmpty() && message.charAt(0) != '/') {
+            if(!isTyping) {
+                isTyping = true;
+                PacketList.PLAYERTYPING.send("STARTTYPING");
+            }
+        }
+    }
+
     @Inject(method = "keyTyped", at = @At("HEAD"))
     private void keyTyped(char c, int i, CallbackInfo ci) {
         int cursorLoc = MMUtil.chatCursorLoc;
@@ -58,15 +77,14 @@ public class MixinGuiChat extends GuiScreen {
             cursorLoc -= 1;
         } else if(i == 205 && cursorLoc < this.message.length()) { /* RIGHT key */
             cursorLoc += 1;
-        }
-        if(i == 200) {
+        } else if(i == 200) {
             if(enteredChats.size() > 0 && (currentUp+1) < enteredChats.size()) {
                 currentUp += 1;
                 message = enteredChats.get(currentUp);
                 cursorLoc = message.length();
+                startTyping(null);
             }
-        }
-        if(i == 208) {
+        } else if(i == 208) {
             if((currentUp-1) <= -1) {
                 message = "";
                 cursorLoc = 0;
@@ -75,12 +93,15 @@ public class MixinGuiChat extends GuiScreen {
                 currentUp -= 1;
                 message = enteredChats.get(currentUp);
                 cursorLoc = message.length();
+                startTyping(null);
             }
-        }
-        if(i == 199 || i == 28) /* HOME key, ENTER key */
+        } else if(i == 199 || i == 28) /* HOME key, ENTER key */
             cursorLoc = 0;
         else if(i == 207) /* END key */
             cursorLoc = message.length();
+        else {
+            startTyping(c);
+        }
         MMUtil.chatCursorLoc = cursorLoc;
     }
 

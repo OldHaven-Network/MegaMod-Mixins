@@ -3,6 +3,7 @@ package net.oldhaven.customs;
 import net.minecraft.src.EntityPlayerSP;
 import net.minecraft.src.ItemStack;
 import net.minecraft.src.Vec3D;
+import net.oldhaven.MMDebug;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,18 @@ public class SinglePlayerCommands {
         void run(String[] args, EntityPlayerSP player);
     }
 
+    public static boolean isGodded = false;
+
+    private static void dupeCmd(String cmd, String... names) {
+        if(runnableMap.containsKey(cmd)) {
+            for(String name : names)
+                runnableMap.put(name, runnableMap.get(cmd));
+        }
+    }
+
     static void msgPlayer(EntityPlayerSP player, String s) {
+        if(MMDebug.enabled)
+            System.out.println(s);
         player.addChatMessage(s);
     }
     public static Map<String, Runnable> runnableMap = new HashMap<String, Runnable>(){
@@ -28,7 +40,7 @@ public class SinglePlayerCommands {
                 }
                 msgPlayer(player, "SP-Commands you can use:");
                 msgPlayer(player, " - setspawn, kill, heal");
-                msgPlayer(player, " - give, time, weather");
+                msgPlayer(player, " - god, give, time, weather");
             }));
             put("setspawn", (args, player) -> {
                 if(args.length > 0 && args[0].toLowerCase().equals("help")) {
@@ -49,6 +61,10 @@ public class SinglePlayerCommands {
                 msgPlayer(player, "F");
                 player.setHealth(0);
             });
+            put("god", ((args, player) -> {
+                isGodded = !isGodded;
+                msgPlayer(player, "You are no" + (isGodded ? "w in GodMode" : " longer in GodMode"));
+            }));
             put("heal", (args, player) -> {
                 if(args.length > 0 && args[0].toLowerCase().equals("help")) {
                     msgPlayer(player, "Heal: Gives you all your health back");
@@ -141,4 +157,12 @@ public class SinglePlayerCommands {
             });
         }
     };
+    static {
+        dupeCmd("heal", "health", "heals");
+        dupeCmd("setspawn", "spawnpoint");
+        dupeCmd("god", "godmode");
+        dupeCmd("time", "settime");
+        dupeCmd("help", "?");
+        System.out.println("Created " + runnableMap.size() + " SinglePlayer Cmds\n");
+    }
 }

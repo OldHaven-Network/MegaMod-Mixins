@@ -1,5 +1,6 @@
 package net.oldhaven.customs;
 
+import net.oldhaven.MMDebug;
 import net.oldhaven.MegaMod;
 
 public class ServerPacketInformation {
@@ -14,7 +15,8 @@ public class ServerPacketInformation {
     }
 
     public void setCanFly(boolean canFly) {
-        System.out.println("You can now "+(canFly?"":"not")+" fly");
+        if(MMDebug.enabled)
+            System.out.println("You can now "+(canFly?"":"not")+" fly");
         this.canFly = true;
         //if(!canFly)
             //MegaMod.getInstance().isFlying = false;

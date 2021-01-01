@@ -22,7 +22,7 @@ public abstract class MixinEntityPlayer extends EntityLiving {
 
     @Inject(method = "onUpdate", at=@At("INVOKE"))
     public void onUpdate(CallbackInfo ci) {
-        if(ModOptions.DYNAMIC_LIGHTING.getAsInt() == 1) {
+        if(ModOptions.DYNAMIC_LIGHTING.getAsBool()) {
             int i = MMUtil.getFakeShaderThread().lightingTick;
             if(i > 5) {
                 MMUtil.getFakeShaderThread().updateLightingAt(this.getCurrentEquippedItem(), this.getPosition(1.0F));

@@ -22,7 +22,7 @@ public class GuiItemKeep extends GuiScreen
 
     public void initGui() {
         StringTranslate st = StringTranslate.getInstance();
-        this.controlList.add(new GuiButton(6, this.width / 2 - 100, this.height / 6 + 168, st.translateKey("gui.done")));
+        this.controlList.add(new GuiButton(6, this.width / 2 - 100, this.height - 42, st.translateKey("gui.done")));
         mc.texturePackList.updateAvaliableTexturePacks();
         slotGui = new GuiItemKeepSlot(this);
         slotGui.registerScrollButtons(controlList, 7, 8);

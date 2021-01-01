@@ -25,7 +25,7 @@ public class MixinTextureWaterFX extends TextureFX {
             ci.cancel();
             return;
         }*/
-        if(ModOptions.DISABLE_WATER_ANIMATION.getAsInt() == 1) {
+        if(!ModOptions.WATER_ANIMATION.getAsBool()) {
             float[] af = field_1157_h;
             field_1157_h = field_1158_g;
             field_1158_g = af;

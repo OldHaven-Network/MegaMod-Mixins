@@ -2,8 +2,13 @@ package net.oldhaven.customs.util;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.src.EntityPlayerSP;
+import net.oldhaven.customs.options.ModOptions;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,7 +38,18 @@ public class SkinFix {
     }
 
     private static Map<String, UserSkin> savedSkins = new HashMap<>();
+    public static void unload() {
+        EntityPlayerSP sp = MMUtil.getMinecraftInstance().thePlayer;
+        if(sp != null) {
+            SkinFix.UserSkin userSkin = SkinFix.getUserSkin(sp.username);
+            if(userSkin != null)
+                sp.skinUrl = userSkin.skinUrl;
+        }
+        savedSkins.clear();
+    }
     public static Boolean isSkinAlex(String name) {
+        if(!ModOptions.ALEX_SKINS.getAsBool())
+            return false;
         UserSkin userSkin = getUserSkin(name);
         if(userSkin == null)
             return false;
@@ -47,7 +63,7 @@ public class SkinFix {
             return savedSkins.get(playerName);
         String uuid = getUuidStringFromName(playerName);
         if(uuid == null) {
-            savedSkins.put(playerName, new UserSkin(null, null, false));
+            savedSkins.put(playerName, new UserSkin(null, null, null,false));
             return null;
         }
         String s = "https://sessionserver.mojang.com/session/minecraft/profile/"+uuid+"?unsigned=false";
@@ -78,7 +94,7 @@ public class SkinFix {
     };
     private static String capeListing = "0|1|2";
     public static String getCapeUrl(String playerName) {
-        if(!connected)
+        if(!connected || !ModOptions.SKIN_CAPE.getAsBool())
             return null;
         String uuid = getUuidStringFromName(playerName);
         UserSkin userSkin = getUserSkin(playerName);
@@ -92,10 +108,62 @@ public class SkinFix {
         toSend = playerName + ".png";
         if(tryConnect(urlBase + toSend))
             return urlBase + toSend;
-         urlBase = "https://minecraftcapes.co.uk/getCape/";
-        toSend = uuid;
-        if(tryConnect(urlBase + toSend))
-            return urlBase + toSend;
+        urlBase = "https://minecraftcapes.net/profile/"+uuid+"/cape/map.png";
+        if(tryConnect(urlBase))
+            return urlBase;
+        return null;
+    }
+
+    public static BufferedImage getEarsImage(String playerName) {
+        if(!connected || !ModOptions.SKIN_EARS.getAsBool())
+            return null;
+        UserSkin userSkin = getUserSkin(playerName);
+        if(userSkin.earsFailed)
+            return null;
+        if(userSkin.earsImage != null)
+            return userSkin.earsImage;
+        String uuid = getUuidStringFromName(playerName);
+        String urlBase;
+        urlBase = "https://minecraftcapes.net/profile/"+uuid;
+        if(tryConnect(urlBase)) {
+            JsonObject jsonObject = readJsonFromURL(urlBase);
+            JsonElement texturesElement = jsonObject.get("textures");
+            if(texturesElement == null || texturesElement.isJsonNull()) {
+                userSkin.earsFailed = true;
+                return null;
+            }
+            JsonObject textures = texturesElement.getAsJsonObject();
+            if(textures.get("ears").isJsonNull()) {
+                userSkin.earsFailed = true;
+                return null;
+            }
+            String base64 = textures.get("ears").getAsString();
+
+            BufferedImage original;
+            byte[] imageByte;
+            try {
+                imageByte = Base64.getDecoder().decode(base64);
+                ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+                BufferedImage bufferIn = ImageIO.read(bis);
+                int w = 16;
+                int h = 7;
+                /*Image scaled = bufferIn.getScaledInstance(w, h, Image.SCALE_FAST);
+                original = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+                Graphics2D g2d = original.createGraphics();
+                g2d.drawImage(scaled, 0, 0, null);
+                g2d.dispose();*/
+                original = bufferIn;
+                bis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                userSkin.earsFailed = true;
+                return null;
+            }
+
+            userSkin.earsImage = original;
+            return original;
+        }
+        userSkin.earsFailed = true;
         return null;
     }
 
@@ -136,30 +204,42 @@ public class SkinFix {
 
     public static class UserSkin {
         public final boolean slim;
+        public BufferedImage earsImage;
+        public boolean earsFailed = false;
         public final String skinUrl;
         private final String capeUrl;
-        UserSkin(String skinUrl, String capeUrl, boolean slim) {
+        UserSkin(String skinUrl, String capeUrl, String earsUrl, boolean slim) {
             this.slim = slim;
             this.skinUrl = skinUrl;
             this.capeUrl = capeUrl;
         }
     }
-    private static Gson gson = new Gson();
-    private static UserSkin getSkinFromUrl(String ur) {
+
+    private static JsonObject readJsonFromURL(String ur) {
         try {
             URL url = new URL(ur);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 
             StringBuilder lines = new StringBuilder();
             String line;
-            while((line = in.readLine()) != null) {
+            while ((line = in.readLine()) != null) {
                 if (!line.isEmpty()) {
                     lines.append(line);
                 }
             }
             in.close();
-
-            JsonObject json = gson.fromJson(lines.toString(), JsonObject.class);
+            return gson.fromJson(lines.toString(), JsonObject.class);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static Gson gson = new Gson();
+    private static UserSkin getSkinFromUrl(String ur) {
+        try {
+            JsonObject json = readJsonFromURL(ur);
+            if(json == null)
+                return new UserSkin(null, null, null,false);
             Signature sig = Signature.getInstance("SHA1withRSA");
             sig.initVerify(SIGNATURE_KEY);
             if(json.get("properties") != null) {
@@ -175,26 +255,28 @@ public class SkinFix {
                     JsonObject user = gson.fromJson(toJson, JsonObject.class);
                     JsonObject textures = user.get("textures").getAsJsonObject();
                     if(textures == null || textures.get("SKIN") == null)
-                        return new UserSkin(null, null, false);
+                        return new UserSkin(null, null, null, false);
                     JsonObject skin = textures.get("SKIN").getAsJsonObject();
                     String capeUrl = null;
-                    if(textures.get("CAPE") != null) {
+                    if(textures.get("CAPE") != null)
                         capeUrl = textures.get("CAPE").getAsJsonObject().get("url").getAsString();
-                    }
+                    String earsUrl = null;
+                    if(textures.get("EARS") != null)
+                        capeUrl = textures.get("EARS").getAsJsonObject().get("url").getAsString();
                     String skinUrl = skin.get("url").getAsString();
                     if(skin.get("metadata") != null) {
                         String alex = skin.get("metadata").getAsJsonObject().get("model").getAsString();
                         if(alex.equalsIgnoreCase("slim")) {
-                            return new UserSkin(skinUrl, capeUrl,true);
+                            return new UserSkin(skinUrl, capeUrl, earsUrl, true);
                         }
                     }
-                    return new UserSkin(skinUrl, capeUrl, false);
+                    return new UserSkin(skinUrl, capeUrl, earsUrl, false);
                 }
             }
-        } catch (NullPointerException | IOException | NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+        } catch (NullPointerException | NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
         }
-        return new UserSkin(null, null, false);
+        return new UserSkin(null, null, null,false);
     }
     private static String getUuidFromMojang(String playerName) {
         try {

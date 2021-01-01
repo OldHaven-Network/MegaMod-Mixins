@@ -6,19 +6,20 @@ import net.minecraft.src.ModelRenderer;
 import net.oldhaven.customs.options.ModOptions;
 
 public class CustomModelBiped extends ModelBiped {
-    public CustomModelRenderer bipedLeftLeg;
-    public CustomModelRenderer bipedRightLeg;
-    public CustomModelAlexArms bipedLeftArm;
-    public CustomModelAlexArms bipedRightArm;
-    public CustomModelRenderer bipedBody;
-    public CustomModelRenderer bipedHead;
-    public CustomModelRenderer bipedHeadwear;
-    public CustomModelRenderer bipedCloak;
-    public CustomModelAlexArms bipedLeftArmwear;
-    public CustomModelAlexArms bipedRightArmwear;
-    public CustomModelRenderer bipedLeftLegwear;
-    public CustomModelRenderer bipedRightLegwear;
-    public CustomModelRenderer bipedBodyWear;
+    public final CustomModelRenderer bipedLeftLeg;
+    public final CustomModelRenderer bipedRightLeg;
+    public final CustomModelAlexArms bipedLeftArm;
+    public final CustomModelAlexArms bipedRightArm;
+    public final CustomModelRenderer bipedBody;
+    public final CustomModelRenderer bipedHead;
+    public final CustomModelRenderer bipedEars;
+    public final CustomModelRenderer bipedHeadwear;
+    public final CustomModelRenderer bipedCloak;
+    public final CustomModelAlexArms bipedLeftArmwear;
+    public final CustomModelAlexArms bipedRightArmwear;
+    public final CustomModelRenderer bipedLeftLegwear;
+    public final CustomModelRenderer bipedRightLegwear;
+    public final CustomModelRenderer bipedBodyWear;
     public boolean isSneak = false;
     public float scale;
 
@@ -26,6 +27,9 @@ public class CustomModelBiped extends ModelBiped {
         this.scale = scale;
         this.bipedCloak = new CustomModelRenderer(0, 0);
         this.bipedCloak.addBox(-5.0F, 0.0F, -1.0F, 10, 16, 1, scale, 64, 64);
+
+        this.bipedEars = new CustomModelRenderer(0, 0);
+        this.bipedEars.addBox(-3.0F, -6.0F, -1.0F, 6, 6, 1, scale, 14, 7);
 
         this.bipedHead = new CustomModelRenderer(0, 0);
         this.bipedHead.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8, scale, 64, 64);
@@ -47,12 +51,12 @@ public class CustomModelBiped extends ModelBiped {
         this.bipedLeftLeg.mirror = true;
         this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
         this.bipedLeftLeg.setRotationPoint(2.0F, 12.0F + f, 0.0F);
-        this.bipedLeftLeg = new CustomModelRenderer(16, 48);
+        /*this.bipedLeftLeg = new CustomModelRenderer(16, 48);
         this.bipedLeftLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
         this.bipedLeftLeg.setRotationPoint(1.9F, 12.0F, 0.0F);
         this.bipedRightLeg = new CustomModelRenderer(0, 16);
         this.bipedRightLeg.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4, scale, 64, 64);
-        this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F + f, 0.0F);
+        this.bipedRightLeg.setRotationPoint(-1.9F, 12.0F + f, 0.0F);*/
 
         this.bipedLeftArmwear = new CustomModelAlexArms(48, 48, scale, f, true);
         this.bipedRightArmwear = new CustomModelAlexArms(40, 32, scale, f, true);
@@ -217,7 +221,7 @@ public class CustomModelBiped extends ModelBiped {
     }
 
     public void renderCloak(float var1) {
-        if(ModOptions.SKIN_CAPE.getAsInt() == 1)
+        if(ModOptions.SKIN_CAPE.getAsBool())
             this.bipedCloak.render(var1);
     }
 }

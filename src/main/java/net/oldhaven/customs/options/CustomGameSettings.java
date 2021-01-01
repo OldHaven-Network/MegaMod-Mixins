@@ -1,5 +1,6 @@
 package net.oldhaven.customs.options;
 
+import net.oldhaven.MMDebug;
 import net.oldhaven.MegaMod;
 
 import java.io.*;
@@ -12,10 +13,16 @@ public class CustomGameSettings {
         map = new LinkedHashMap<>();
     }
 
+//region SETTERS
     public void setOptionBtn(String name) {
         int newValue = 1;
         if(map.containsKey(name)) {
-            newValue = Integer.parseInt(map.get(name).toString()) == 1 ? 0 : 1;
+            String obj = map.get(name).toString();
+            try {
+                newValue = Integer.parseInt(obj) == 1 ? 0 : 1;
+            } catch(NumberFormatException e) {
+                newValue = Boolean.parseBoolean(obj) ? 1 : 0;
+            }
         }
         ModOptions option = ModOptions.getOptionByName(name);
         if(option != null)
@@ -29,6 +36,12 @@ public class CustomGameSettings {
         map.remove(name);
         map.put(name, obj);
     }
+    public void removeOption(String name) {
+        map.remove(name);
+    }
+//endregion
+
+//region GETTERS
     public String getOptionS(String name) {
         Object obj = getOption(name);
         if(obj != null)
@@ -52,10 +65,9 @@ public class CustomGameSettings {
             return null;
         return map.get(name);
     }
-    public void removeOption(String name) {
-        map.remove(name);
-    }
+//endregion
 
+//region READ_WRITE
     public void saveSettings() {
         try {
             PrintWriter printwriter = new PrintWriter(new FileWriter(optionsFile));
@@ -63,19 +75,23 @@ public class CustomGameSettings {
             Map<String, Object> disabled = new HashMap<>();
             int i = 0;
             for(ModOptions.Section section : ModOptions.getAllSections()) {
-                for(ModOptions enumOption : section.getList()) {
-                    if (enumOption != null) {
-                        if (enumOption.isDisabled) {
-                            disabled.put(enumOption.getName(), enumOption.getCurrentValue());
+                for(ModOptions setting : section.getList()) {
+                    if (setting != null) {
+                        if (setting.isDisabled) {
+                            disabled.put(setting.getName(), setting.getCurrentValue());
                             continue;
                         }
-                        if (section != null && currentSection != section) {
+                        if (currentSection != section) {
                             if (i != 0)
                                 printwriter.println(" ");
                             printwriter.println("[" + section.getName() + "]");
                             currentSection = section;
                         }
-                        printwriter.println(enumOption.getName() + ":" + enumOption.getCurrentValue());
+                        if(!setting.getDescription().isEmpty())
+                            printwriter.println("# " + setting.getDescription());
+                        else
+                            printwriter.println("# No description for " + setting.getName());
+                        printwriter.println(setting.getName() + ":" + setting.getCurrentValue());
                         i++;
                     }
                 }
@@ -96,7 +112,7 @@ public class CustomGameSettings {
                 BufferedReader reader = new BufferedReader(new FileReader(optionsFile));
                 for (String s; (s = reader.readLine()) != null; ) {
                     s = s.trim();
-                    if (s.startsWith("SECTION"))
+                    if(s.startsWith("#") || s.startsWith("SECTION"))
                         continue;
                     String[] as = s.split(":");
                     if (as.length > 1) {
@@ -113,26 +129,15 @@ public class CustomGameSettings {
             MegaMod.hasUpdated = true;
         } else {
             if(!String.valueOf(map.get("MM Version")).equals(MegaMod.version)) {
-                System.out.println(map.get("MM Version"));
                 MegaMod.hasUpdated = true;
-                map.replace("MM Version", ModOptions.getOptionByName("MM Version").getDefaultValueString());
+                map.replace("MM Version", ModOptions.getOptionByName("MM Version").getDefaultValue());
                 save = true;
             }
         }
-        ModOptions.Section currentSection = null;
-        for(ModOptions enu : ModOptions.getList()) {
-            String name = enu.getName();
-            float f = enu.getDefaultValue();
-            if(f != -1.0158F && !map.containsKey(name)) {
-                switch(enu.getStyle()) {
-                    case BOOL:
-                    case INTEGER:
-                        map.put(name, (int) f);break;
-                    case FLOAT:
-                        map.put(name, f);break;
-                    default:
-                        map.put(name, enu.getDefaultValueString());break;
-                }
+        for(ModOptions opt : ModOptions.getList()) {
+            String name = opt.getName();
+            if(!map.containsKey(name)) {
+                map.put(name, opt.getDefaultValue());
                 save = true;
             }
         }
@@ -147,13 +152,41 @@ public class CustomGameSettings {
             save = true;
         }
         /* end 0.4.0 fixes */
+        if(MMDebug.enabled)
+            System.out.println(" --- SETTINGS READ --- ");
         for(Map.Entry<String, Object> entry : map.entrySet()) {
             String name = entry.getKey();
             ModOptions option = ModOptions.getOptionByName(name);
-            if(option != null)
-                option.setCurrentValue(entry.getValue());
+            if(option != null) {
+                String value = entry.getValue().toString();
+                if(MMDebug.enabled)
+                    System.out.println(option.getName() + " : " + value);
+                switch (option.getStyle()) {
+                    case BOOL:
+                        try {
+                            int i = Integer.parseInt(value);
+                            option.setCurrentValue(i == 1);
+                        } catch(NumberFormatException e) {
+                            option.setCurrentValue(Boolean.valueOf(value));
+                        }
+                        break;
+                    case FLOAT:
+                        option.setCurrentValue(Float.valueOf(value));
+                        break;
+                    case INTEGER:
+                        option.setCurrentValue(Integer.valueOf(value));
+                        break;
+                    default:
+                        option.setCurrentValue(entry.getValue());
+                        break;
+                }
+            }
         }
+        if(MMDebug.enabled)
+            System.out.println(" --- SETTINGS END --- ");
         if(save)
             this.saveSettings();
     }
+//endregion
+
 }

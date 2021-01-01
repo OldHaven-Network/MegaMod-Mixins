@@ -46,17 +46,22 @@ public abstract class ModdedSettingsGui extends GuiScreen {
                 controlList.add(new CustomGuiButton.GuiSlider(
                         enumOption.getOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumOption, option, value == null ? 0F : value));
+                        enumOption, option, value == null ? 0F : value).setModdedGui(this));
             } else {
                 controlList.add(new CustomGuiButton.GuiSmallButton(
                         enumOption.getOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumOption, option));
+                        enumOption, option).setModdedGui(this));
             }
             i++;
         }
         super.controlList = controlList;
         return i;
+    }
+
+    private ModOptions lastHovering = null;
+    public final void onButtonHover(ModOptions modOptions) {
+        this.lastHovering = modOptions;
     }
 
     final void addDone() {
@@ -67,6 +72,13 @@ public abstract class ModdedSettingsGui extends GuiScreen {
     @Override
     public void drawScreen(int i, int i1, float v) {
         super.drawScreen(i, i1, v);
-        drawCenteredString(fontRenderer, getTitle(), width / 2, 20, 0xffffff);
+        if(lastHovering != null) {
+            String desc = lastHovering.getDescription();
+            if(desc.isEmpty())
+                desc = "No desc for " + lastHovering.getName();
+            drawCenteredString(fontRenderer, desc, width / 2, 25, 0xffffff);
+            lastHovering = null;
+        }
+        drawCenteredString(fontRenderer, getTitle(), width / 2, 10, 0xffffff);
     }
 }

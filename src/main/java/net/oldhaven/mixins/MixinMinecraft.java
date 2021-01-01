@@ -1,12 +1,13 @@
 package net.oldhaven.mixins;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftApplet;
 import net.minecraft.src.*;
+import net.oldhaven.MMDebug;
 import net.oldhaven.MegaMod;
-import net.oldhaven.customs.util.SkinFix;
 import net.oldhaven.customs.options.CustomKeybinds;
-import net.oldhaven.customs.shaders.Shader;
 import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.util.SkinFix;
 import net.oldhaven.gui.changelog.ChangeLog;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -19,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.awt.*;
 import java.util.Map;
 
 @Mixin(Minecraft.class)
@@ -28,6 +30,27 @@ public class MixinMinecraft {
 	@Shadow public EntityPlayerSP thePlayer;
 	@Shadow private static Minecraft theMinecraft;
 	@Shadow public RenderGlobal renderGlobal;
+
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void init(Component component, Canvas canvas, MinecraftApplet minecraftApplet, int i, int i1, boolean b, CallbackInfo ci) {
+		try {
+			String env = System.getenv("MMDebug");
+			if(!env.isEmpty()) {
+				MMDebug.enabled = true;
+				MMDebug.debugUserName = env;
+				System.out.println("Debug mode is " + MMDebug.enabled);
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			MMDebug.enabled = false;
+		}
+		if(MMDebug.enabled) {
+			System.out.println("-----------------");
+			System.out.println("!!MegaMod IS IN DEBUG MODE!!");
+			System.out.println("THIS MODE IS ONLY FOR EDITING AND RESOLVING MegaMod ISSUES!");
+			System.out.println("-----------------");
+		}
+	}
 
 	/**
 	 * Before MC starts, initiate MegaMod
@@ -58,8 +81,6 @@ public class MixinMinecraft {
 			PixelFormat pixelformat = new PixelFormat();
 			pixelformat = pixelformat.withDepthBits(24);
 			Display.create(pixelformat);
-			Shader.mc = theMinecraft;
-			Shader.setUpBuffers();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

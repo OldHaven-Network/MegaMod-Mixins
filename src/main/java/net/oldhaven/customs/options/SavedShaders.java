@@ -1,20 +1,52 @@
 package net.oldhaven.customs.options;
 
-import org.apache.commons.io.FileUtils;
+import net.oldhaven.MegaMod;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavedShaders {
     public File shaderFolder;
+
+    private static List<String> shadersLoc = new ArrayList<String>() {
+        {
+            add("default/base");
+            add("default/base");
+            add("default/composite");
+            add("default/final");
+            add("default/gbuffers_basic");
+            add("default/gbuffers_hand");
+            add("default/gbuffers_terrain");
+            add("default/gbuffers_textured");
+            add("default/gbuffers_textured_lit");
+            add("default/gbuffers_water");
+            add("default/gbuffers_weather");
+
+        }
+    };
+    private static List<String> shaderTypes = new ArrayList<String>() {
+        {
+            add(".fsh");
+            add(".vsh");
+        }
+    };
+
     public void loadShaders() {
-        URL folderToURL = getClass().getResource("/shaders/");
+        Class<MegaMod> mm = MegaMod.class;
+        URL folderToURL = mm.getResource("/shaders/");
         if (folderToURL == null || folderToURL.getFile() == null) {
             System.err.println("Can't find /shaders/ in MegaMod jar");
             return;
         }
-        File newShaderFolder = new File(folderToURL.getFile());
         if(!shaderFolder.exists()) {
             boolean b = shaderFolder.mkdir();
             if (!b) {
@@ -22,21 +54,39 @@ public class SavedShaders {
                 return;
             }
         }
-        File[] files = newShaderFolder.listFiles();
-        if(files == null) {
-            System.err.println("/shaders/ in MegaMod jar is empty");
-            return;
-        }
-        for (File file : files) {
-            if(file.isFile())
+        // TODO: Optimize this into a List<Map<?,?>>
+        for(String shader : shadersLoc) {
+            String[] split = shader.split("/");
+            String folder = split[0];
+            String fileName = split[1];
+            File selfFolder = new File(shaderFolder, folder);
+            if(!selfFolder.exists()) {
+                boolean b = selfFolder.mkdirs();
+                if(!b)
+                    continue;
+            } else
                 continue;
-            File toCopy = new File(shaderFolder, file.getName() +"\\");
-            if(toCopy.exists())
-                continue;
-            try {
-                FileUtils.copyDirectory(file, toCopy);
-            } catch (IOException e) {
-                e.printStackTrace();
+            for(String type : shaderTypes) {
+                URL url = mm.getResource("/shaders/"+shader+type);
+                Path path;
+                try {
+                    path = Paths.get(url.toURI());
+                    List<String> lines = Files.readAllLines(path);
+                    File self = new File(selfFolder, fileName+type);
+                    if(!self.exists()) {
+                        boolean b = self.createNewFile();
+                        if(!b)
+                            continue;
+                    }
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(self));
+                    for(String line : lines) {
+                        writer.write(line);
+                        writer.newLine();
+                    }
+                    writer.close();
+                } catch (URISyntaxException | IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

@@ -4,19 +4,23 @@ import net.minecraft.src.EntityClientPlayerMP;
 import net.minecraft.src.EntityPlayerSP;
 import net.oldhaven.customs.util.MMUtil;
 
-public abstract class PacketRunnable {
-    public abstract void run(String[] args);
-    public void sendOut(String packet, String... args) {
-        StringBuilder utfBuild = new StringBuilder();
-        for(int i=0;i < args.length;i++) {
-            if(i >= args.length-1) {
-                utfBuild.append(args[i]);
-            } else
-                utfBuild.append(args[i]).append(";");
-        }
-        String utf = utfBuild.toString();
+public abstract class PacketRunnable implements IPacket {
+    private String argOut(String... args) {
+        StringBuilder bytesBuild = new StringBuilder();
+        for(String arg : args)
+            bytesBuild.append(arg).append(";");
+        return bytesBuild.toString();
+    }
+
+    public void sendOut(String... args) {
         EntityPlayerSP thePlayer = MMUtil.getMinecraftInstance().thePlayer;
-        ((EntityClientPlayerMP)thePlayer).sendQueue.addToSendQueue(new Packet195Custom(thePlayer.username, packet+";"+utf));
+        EntityClientPlayerMP clientPlayerMP = (EntityClientPlayerMP) thePlayer;
+
+        String playerName = thePlayer.username;
+        String bytes = argOut(getName(), argOut(args));
+
+        Packet195Custom packet = new Packet195Custom(playerName, bytes);
+        clientPlayerMP.sendQueue.addToSendQueue(packet);
     }
 
     public abstract CustomPacketType getType();

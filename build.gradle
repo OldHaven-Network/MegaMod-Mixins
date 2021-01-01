@@ -49,13 +49,15 @@ dependencies {
     mappings loom.mcp(loom.BETA, "${project.minecraft_version}.1", loom.mediafire("http://www.mediafire.com/file/03d94f13c9ulj5a/mcp43.zip/file"))
     modImplementation "com.github.modmuss50:fabric-loader:${project.loader_version}"
 
-    implementation 'club.minnced:java-discord-rpc:2.0.2'
+    modCompile 'club.minnced:java-discord-rpc:2.0.2'
+    include 'club.minnced:java-discord-rpc:2.0.2'
     compile 'com.google.code.gson:gson:2.8.6'
     compile 'com.google.guava:guava:28.2-jre'
     compile 'commons-io:commons-io:2.5'
     compile 'org.apache.commons:commons-lang3:3.9'
     compile 'org.apache.logging.log4j:log4j-api:2.13.0'
     compile 'org.apache.logging.log4j:log4j-core:2.13.0'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
 }
 
@@ -93,7 +95,6 @@ jar {
 
 remapJar {
     toMappings = 'official'
-
 }
 
 // configure the maven publication

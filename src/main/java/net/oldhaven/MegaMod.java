@@ -10,11 +10,12 @@ import org.lwjgl.Sys;
 public class MegaMod {
     private static MegaMod instance;
 
-    public static String version =              "0.7.0-pre3-SKIN";
-    public static boolean devVersion =          true;
-    public static String requiresUpdate =       null;
+    public static String version =
+            "0.7.0-pre9";
+    public static String requiresUpdate = null;
 
-    public static boolean hasUpdated, debug =   false;
+    public static boolean devVersion = true;
+    public static boolean hasUpdated = false;
 
     public static MegaMod getInstance() {
         return instance;

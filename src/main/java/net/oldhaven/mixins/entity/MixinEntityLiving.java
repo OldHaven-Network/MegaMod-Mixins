@@ -201,9 +201,8 @@ public class MixinEntityLiving extends Entity {
     @Inject(method = "isOnLadder", at = @At("HEAD"), cancellable = true)
     private void isOnLadder(CallbackInfoReturnable<Boolean> ci) {
         if(isPlayer(this)) {
-            int i = ModOptions.DISABLE_LADDERS.getAsInt();
             boolean flyB = isFlying(this);
-            if (i == 1 || flyB)
+            if (!ModOptions.LADDERS_CLIMBABLE.getAsBool() || flyB)
                 ci.setReturnValue(false);
         }
     }

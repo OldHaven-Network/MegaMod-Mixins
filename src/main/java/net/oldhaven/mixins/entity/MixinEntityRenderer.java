@@ -120,6 +120,7 @@ public abstract class MixinEntityRenderer {
 
     /**
      * @author cutezyash
+     * @reason Third person camera rewrite
      * @param partialTick
      */
     @Overwrite
@@ -216,8 +217,7 @@ public abstract class MixinEntityRenderer {
 
     @Inject(method = "renderRainSnow", at = @At("HEAD"), cancellable = true)
     private void renderRainSnow(float v, CallbackInfo ci) {
-        int value = ModOptions.TOGGLE_RAINSNOW.getAsInt();
-        if(value != 1)
+        if(!ModOptions.TOGGLE_RAINSNOW.getAsBool())
             ci.cancel();
     }
 

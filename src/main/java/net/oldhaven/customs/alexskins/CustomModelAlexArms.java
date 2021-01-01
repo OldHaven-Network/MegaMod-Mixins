@@ -1,18 +1,18 @@
 package net.oldhaven.customs.alexskins;
 
 public class CustomModelAlexArms {
+    private final CustomModelRenderer alexArms;
+    private final CustomModelRenderer steveArms;
     public float rotationPointX;
     public float rotationPointY;
     public float rotationPointZ;
     public float rotateAngleX;
     public float rotateAngleY;
     public float rotateAngleZ;
-    private CustomModelRenderer alexArms;
-    private CustomModelRenderer steveArms;
     public boolean isAlex = false;
     public boolean mirror = false;
     private boolean outer;
-    private float f;
+    private final float f;
 
     public CustomModelAlexArms(int i, int i2, float scale, float f, boolean outer) {
         this.outer = outer;
@@ -61,6 +61,8 @@ public class CustomModelAlexArms {
         } else {
             this.steveArms.showModel = true;
             if(mirror && !this.outer)
+                this.rotationPointX += 2F;
+            if(!mirror && this.outer)
                 this.rotationPointX += 2F;
             //if(!mirror && this.outer)
                 //this.rotationPointX += 0.5F;

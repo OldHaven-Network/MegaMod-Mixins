@@ -13,11 +13,17 @@ import org.lwjgl.opengl.GL11;
 
 public class CustomGuiButton extends GuiButton {
     public static class GuiSmallButton extends CustomGuiButton {
-        private final ModOptions enumOptions;
+        private ModdedSettingsGui moddedGui;
+        private final ModOptions option;
 
         public GuiSmallButton(int var1, int var2, int var3, ModOptions var4, String var5) {
             super(var1, var2, var3, 150, 20, var5);
-            this.enumOptions = var4;
+            this.option = var4;
+        }
+
+        public GuiButton setModdedGui(ModdedSettingsGui moddedGui) {
+            this.moddedGui = moddedGui;
+            return this;
         }
 
         public void keyTyped(char var1, int var2) { }
@@ -41,6 +47,8 @@ public class CustomGuiButton extends GuiButton {
         @Override
         public void drawButton(Minecraft var1, int i, int j) {
             if (this.enabled2) {
+                if(super.mousePressed(var1, i, j))
+                    moddedGui.onButtonHover(this.option);
                 String onOff = "";
                 if(returnEnumOptions() != null) {
                     String s = this.returnEnumOptions().getName();
@@ -84,14 +92,20 @@ public class CustomGuiButton extends GuiButton {
                 } else if (var5) {
                     this.drawCenteredString(var4, this.displayString + onOff, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 16777120);
                 } else {
-                    this.drawCenteredString(var4, this.displayString + onOff, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, 14737632);
+                    int i2 = 14737632;
+                    String f = ModOptions.BUTTON_TEXT_HEX.getAsString();
+                    if(!f.isEmpty()) {
+                        int color = Integer.decode(f);
+                        i2 = adjustAlpha(color, 255);
+                    }
+                    this.drawCenteredString(var4, this.displayString + onOff, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, i2);
                 }
 
             }
         }
 
         public ModOptions returnEnumOptions() {
-            return this.enumOptions;
+            return this.option;
         }
     }
 
@@ -113,11 +127,11 @@ public class CustomGuiButton extends GuiButton {
         private int width;
         private int height;
         private FontRenderer fontRenderer;
-        private final ModOptions enumOption;
+        private final ModOptions option;
 
         public GuiTextField(GuiScreen screen, FontRenderer var1, int oridnal, int x, int y, ModOptions enumOptions, String var7) {
             super(oridnal, x, y, 150, 20, var7);
-            this.enumOption = enumOptions;
+            this.option = enumOptions;
             this.text = var7;
             this.xPos = x;
             this.yPos = y;
@@ -169,9 +183,9 @@ public class CustomGuiButton extends GuiButton {
                 if (ChatAllowedCharacters.allowedCharacters.indexOf(var1) >= 0 && (this.text.length() < this.maxStringLength || this.maxStringLength == 0)) {
                     this.text = this.text + var1;
                 }
-                if(this.text.length() < enumOption.getMinString())
+                if(this.text.length() < option.getMinString())
                     this.text = theSacredText;
-                if(this.text.length() > enumOption.getMaxString())
+                if(this.text.length() > option.getMaxString())
                     this.text = theSacredText;
             }
         }
@@ -191,9 +205,8 @@ public class CustomGuiButton extends GuiButton {
         }
 
         public void drawButton(Minecraft var1, int i, int j) {
-            if(this.enabled) {
+            if(this.enabled)
                 this.updateCursorCounter();
-            }
             this.drawRect(this.xPos - 1, this.yPos - 1, this.xPos + this.width + 1, this.yPos + this.height + 1, -6250336);
             this.drawRect(this.xPos, this.yPos, this.xPos + this.width, this.yPos + this.height, -16777216);
             if (this.enabled) {
@@ -210,13 +223,16 @@ public class CustomGuiButton extends GuiButton {
     }
 
     public static class GuiSlider extends GuiButton {
-        private final ModOptions idFloat;
+        private ModdedSettingsGui moddedGui;
+        private CustomGameSettings gameSettings;
+        private final ModOptions option;
         public float sliderValue;
         public boolean dragging = false;
         public GuiSlider(final int var1, final int var2, final int var3, final ModOptions var4, final String var5, final float var6) {
             super(var1, var2, var3, 150, 20, var5);
+            this.gameSettings = MMUtil.getCustomGameSettings();
             this.sliderValue = var6;
-            this.idFloat = var4;
+            this.option = var4;
             CustomGameSettings gs = MMUtil.getCustomGameSettings();
             Object nullable = gs.getOption(var4.getName());
             if (nullable == null)
@@ -224,15 +240,20 @@ public class CustomGuiButton extends GuiButton {
             this.doDisplayString();
         }
 
+        public GuiSlider setModdedGui(ModdedSettingsGui moddedGui) {
+            this.moddedGui = moddedGui;
+            return this;
+        }
+
         private void doDisplayString() {
-            String option = this.idFloat.getName();
-            String end = this.idFloat.getSlideEnd();
-            float add = this.idFloat.getAdd();
-            float times = this.idFloat.getTimes();
-            String startString = this.idFloat.getStartString();
+            String option = this.option.getName();
+            String end = this.option.getSlideEnd();
+            float add = this.option.getAdd();
+            float times = this.option.getTimes();
+            String startString = this.option.getStartString();
             int i = (int) ((this.sliderValue * times) + add);
-            if (this.idFloat.getValues() != null) {
-                this.displayString = this.sliderValue == 0.0 ? option + ": " + startString : option + ": " + this.idFloat.getValues()[i] + end;
+            if (this.option.getValues() != null) {
+                this.displayString = this.sliderValue == 0.0 ? option + ": " + startString : option + ": " + this.option.getValues()[i] + end;
             } else
                 this.displayString = this.sliderValue == 0.0 ? option + ": " + startString : option + ": " + i + end;
         }
@@ -254,7 +275,7 @@ public class CustomGuiButton extends GuiButton {
                         this.sliderValue = 1.0F;
                     }
 
-                    MMUtil.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
+                    this.gameSettings.setOption(this.option.getName(), this.sliderValue);
                     this.doDisplayString();
                 }
 
@@ -280,7 +301,7 @@ public class CustomGuiButton extends GuiButton {
                     ModdedSettingsGui modSettings = (ModdedSettingsGui) current;
                     modSettings.setChanged();
                 }
-                MMUtil.getCustomGameSettings().setOption(this.idFloat.getName(), this.sliderValue);
+                this.gameSettings.setOption(this.option.getName(), this.sliderValue);
                 this.doDisplayString();
                 this.dragging = true;
                 return true;
@@ -290,11 +311,21 @@ public class CustomGuiButton extends GuiButton {
         public void mouseReleased(int var1, int var2) {
             this.dragging = false;
         }
+
+        @Override
+        public void drawButton(Minecraft minecraft, int i, int i1) {
+            super.drawButton(minecraft, i, i1);
+            if(super.mousePressed(minecraft, i, i1)) {
+                moddedGui.onButtonHover(this.option);
+            }
+        }
     }
+    public CustomGameSettings gameSettings;
     public CustomGuiButton(int var1, int var2, int var3, String var4) {
         this(var1, var2, var3, 200, 20, var4);
     }
     public CustomGuiButton(int var1, int var2, int var3, int var4, int var5, String var6) {
         super(var1, var2, var3, var4, var5, var6);
+        this.gameSettings = MMUtil.getCustomGameSettings();
     }
 }

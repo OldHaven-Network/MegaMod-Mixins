@@ -100,8 +100,7 @@ public abstract class MixinRenderBlocks {
 
     @Inject(method = "renderBlockByRenderType", at = @At("HEAD"), cancellable = true)
     public void renderBlockByRenderType(Block var1, int var2, int var3, int var4, CallbackInfoReturnable<Boolean> ci) {
-        //System.out.println(ModOptions.ENABLE_FANCY_TREES.getAsInt());
-        boolean fancyTress = (ModOptions.ENABLE_FANCY_TREES.getAsInt() > 0);
+        boolean fancyTress = (ModOptions.FANCY_TREES.getAsInt() > 0);
         if(fancyTress && var1.blockID == 18) {
             ci.setReturnValue(renderBlockLeaves(var1, var2, var3, var4));
         }
@@ -128,20 +127,22 @@ public abstract class MixinRenderBlocks {
         if(!ModOptions.RANDOM_TALLERGRASS.getAsBool())
             return;
         if(block == Block.tallGrass)
-            renderTallGrass(block, meta, x, y, z, true, 0.05F);
+            renderTallGrass(block, meta, x, y, z, true, 0.85F, 0.05F);
     }
 
-    public void renderTallGrass(Block block, int meta, double x, double y, double z, boolean up, double times) {
+    public void renderTallGrass(Block block, int meta, double x, double y, double z, boolean up, double times, double timesUp) {
         if(up) {
-            int id = blockAccess.getBlockId((int) x, (int) y + 1, (int) z);
-            if (id != 0)
+            TileEntity tileEntity = blockAccess.getBlockTileEntity((int) x, (int) y + 1, (int) z);
+            if (tileEntity != null)
                 return;
         }
-        Random ran = new Random((long)(x+y+z));
-        int i = (int)(ran.nextDouble()*15);
-        if(((int)x & i) == 1) {
-            x += (ran.nextDouble()*times) - (ran.nextDouble()*(times+times));
-            z += (ran.nextDouble()*times) - (ran.nextDouble()*(times+times));
+        Random ran = new Random((long)(x+z));
+        double i = ran.nextDouble()*times;
+        double a = ran.nextDouble()*times;
+        double b = ran.nextDouble()*times;
+        if(i < a && b < i) {
+            x += (ran.nextDouble()*timesUp) - (ran.nextDouble()*(timesUp+timesUp));
+            z += (ran.nextDouble()*timesUp) - (ran.nextDouble()*(timesUp+timesUp));
             if(up)
                 y += 0.75F;
             //ran.setSeed(ran.nextLong()*(long)times);
@@ -155,9 +156,7 @@ public abstract class MixinRenderBlocks {
         Tessellator tessellator = Tessellator.instance;
         int j = block.getBlockTextureFromSideAndMetadata(0, i);
         if(overrideBlockTexture >= 0)
-        {
             j = overrideBlockTexture;
-        }
 
         double x = 0;
         double y = 0;
@@ -265,12 +264,12 @@ public abstract class MixinRenderBlocks {
         double x = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
         double y = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
         double z = (generator.nextDouble()*0.35)*-(generator.nextDouble()*0.35+0.35);
-        int fancy = ModOptions.ENABLE_FANCY_TREES.getAsInt();
+        int fancy = ModOptions.FANCY_TREES.getAsInt();
         if(fancy == 2)
             func_1245_b(block, meta, i+x, j+y, k+z, true);
         else if(fancy == 1) {
             func_1245_b(block, meta, i+x, j+y, k+z);
-            renderTallGrass(block, i, x, y, z, false,0.15F);
+            renderTallGrass(block, i, x, y, z, false,0.15F, 1);
         }
         return true;
     }

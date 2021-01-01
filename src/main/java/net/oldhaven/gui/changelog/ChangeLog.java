@@ -29,7 +29,7 @@ public class ChangeLog {
             return;
         textFields = new LinkedList<>();
         try {
-            URL url = new URL("https://www.oldhaven.net/megamod.txt");
+            URL url = new URL("https://raw.githubusercontent.com/OldHaven-Network/MegaMod-Mixins/master/changelog.txt");
             URLConnection conn = url.openConnection();
             conn.addRequestProperty("User-Agent", "Mozilla");
             conn.setReadTimeout(5000);
@@ -44,9 +44,8 @@ public class ChangeLog {
                     if (sub.contains(".")) {
                         String ver = sub.replaceAll("[A-z ]", "");
                         if (ver.equals(sub)) {
-                            if(!hasCheckedVersion && !MegaMod.version.equals(sub)) {
+                            if(!hasCheckedVersion && !MegaMod.version.equals(sub))
                                 MegaMod.requiresUpdate = sub;
-                            }
                             hasCheckedVersion = true;
                             textFields.addLast(new TextField(str, green));
                             continue;

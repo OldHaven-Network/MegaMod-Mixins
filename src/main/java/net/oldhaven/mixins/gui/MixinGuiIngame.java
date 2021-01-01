@@ -2,10 +2,11 @@ package net.oldhaven.mixins.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
+import net.oldhaven.customs.ItemKeep;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.options.SavedLogins;
-import net.oldhaven.customs.packets.Packet_Runnable_MobHealth;
-import net.oldhaven.customs.packets.Packets;
+import net.oldhaven.customs.packets.all.CPacketMobHealth;
+import net.oldhaven.customs.packets.util.Packets;
 import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.customs.util.OnScreenText;
 import org.lwjgl.opengl.GL11;
@@ -26,14 +27,13 @@ public class MixinGuiIngame extends Gui {
     private int itemFade = 0;
     @Shadow private Minecraft mc;
     @Shadow private static RenderItem itemRenderer;
-    @Shadow private List chatMessageList;
+    @Shadow private List<String> chatMessageList;
 
     private void drawHealth(int x, int y, boolean half) {
-        if(!half) {
+        if(!half)
             drawTexturedModalRect(x, y, 52, 0, 9, 9);
-        } else {
+        else
             drawTexturedModalRect(x, y, 61, 0, 9, 9);
-        }
     }
     private void drawMissingHealth(int x, int y, int heartsLife) {
         boolean flag1 = (mc.thePlayer.heartsLife / 3) % 2 == 1;
@@ -54,8 +54,7 @@ public class MixinGuiIngame extends Gui {
             ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
             int k = scaledresolution.getScaledWidth();
             int l = scaledresolution.getScaledHeight();
-            int tooltip = ModOptions.MODERN_TOOLTIPS.getAsInt();
-            if(tooltip == 1) {
+            if(ModOptions.MODERN_TOOLTIPS.getAsBool()) {
                 ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
                 if (stack != null) {
                     String name = stack.getItem().getStatName();
@@ -74,14 +73,12 @@ public class MixinGuiIngame extends Gui {
                 } else if (!lastItem.equals(""))
                     lastItem = "";
             }
-            int showSpeed = ModOptions.SHOW_SPEED_IN_GAME.getAsInt();
-            int showMotion = ModOptions.SHOW_MOTION_IN_GAME.getAsInt();
-            if(showSpeed == 1) {
+            if(ModOptions.SHOW_SPEED_IN_GAME.getAsBool()) {
                 double speed = MMUtil.getPlayer().getPlayerSpeed();
                 OnScreenText.replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
             } else
                 OnScreenText.hideOnScreenText("speed");
-            if(showMotion == 1) {
+            if(ModOptions.SHOW_MOTION_IN_GAME.getAsBool()) {
                 double motion = MMUtil.getPlayer().getPlayerMotion();
                 OnScreenText.replaceOnScreenText("motion", "Motion: " + df.format(motion*(0.98F * 5)), 0xffffff);
             } else
@@ -94,13 +91,96 @@ public class MixinGuiIngame extends Gui {
                     down+=12;
                 }
             }
+            int right = 2;
+            int up = l - 50 - (chatMessageList.size() * 9);
+            if(chatMessageList.size() >= 21)
+                up = l - 50 - (21 * 9);
+            for(int i=0;i < MMUtil.playersTyping.size();i++) {
+                String name = MMUtil.playersTyping.get(i);
+                if(i+1 != MMUtil.playersTyping.size())
+                    name += ",";
+                mc.fontRenderer.drawStringWithShadow(name, right, up, 0xffffff);
+                right += mc.fontRenderer.getStringWidth(name) + 5;
+            }
+            if(MMUtil.playersTyping.size() > 0) {
+                this.drawString(mc.fontRenderer, "is typing...", right, up, 0xffffff);
+            }
             //if(gs.getOptionI("Toggle XP-Bar") == 1)
                 //guiEXPBar(scaledresolution);
-            if(ModOptions.TOGGLE_WAILA.getAsInt() == 1)
+            if(ModOptions.TOGGLE_WAILA.getAsBool())
                 guiWAILA(scaledresolution);
-            if(ModOptions.DISABLE_PLAYERLIST.getAsInt() != 1 && MMUtil.playerList)
+            if(!ModOptions.DISABLE_PLAYERLIST.getAsBool() && MMUtil.playerList)
                 guiPlayerList(scaledresolution);
         }
+    }
+
+    /*private int k, l, current, after;
+    @Inject(method = "renderGameOverlay", at = @At(value = "HEAD", target = "Lnet/minecraft/src/GuiIngame;drawTexturedModalRect(IIIIII)V"))
+    private void draw0(float v, boolean b, int i, int i1, CallbackInfo ci) {
+        if(mc == null || mc.gameSettings == null)
+            return;
+        ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+        k = scaledresolution.getScaledWidth();
+        l = scaledresolution.getScaledHeight();
+        if(mc.thePlayer == null)
+            return;
+        InventoryPlayer inventoryPlayer = mc.thePlayer.inventory;
+        current = (k / 2 - 91 - 1) + inventoryPlayer.currentItem * 20 + 20;
+        after = current-121;
+        if(after > 180)
+            after = 180;
+    }
+
+    @Redirect(method = "renderGameOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiIngame;drawTexturedModalRect(IIIIII)V", ordinal = 0))
+    private void draw1(GuiIngame guiIngame, int i, int i1, int i2, int i3, int i4, int i5) {
+        if(current == 0)
+            return;
+        float f = ModOptions.RAISE_SELECTED_HOTBAR.getAsFloat();
+        if(f > 0.0F) {
+            drawTexturedModalRect(current, l - 22, after, 0, 301-(current)+2, 22);
+            drawTexturedModalRect(k / 2 - 91, l - 22, 0, 0, current-141+2, 22);
+        } else
+            drawTexturedModalRect(i, i1, i2, i3, i4, i5);
+    }
+
+    @Redirect(method = "renderGameOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/GuiIngame;drawTexturedModalRect(IIIIII)V", ordinal = 1))
+    private void draw2(GuiIngame guiIngame, int i, int i1, int i2, int i3, int i4, int i5) {
+        if(current == 0)
+            return;
+        float f = ModOptions.RAISE_SELECTED_HOTBAR.getAsFloat()*5;
+        if(f > 0.0F) {
+            InventoryPlayer inventoryPlayer = mc.thePlayer.inventory;
+            drawTexturedModalRect((k / 2 - 91 - 1) + inventoryPlayer.currentItem * 20, l - 22 - (int)f, 0, 22, 24, 22);
+        } else
+            drawTexturedModalRect(i, i1, i2, i3, i4, i5);
+    }
+
+    @Redirect(method = "renderInventorySlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/RenderItem;renderItemIntoGUI(Lnet/minecraft/src/FontRenderer;Lnet/minecraft/src/RenderEngine;Lnet/minecraft/src/ItemStack;II)V", ordinal = 0))
+    private void draw3(RenderItem renderItem, FontRenderer fontRenderer, RenderEngine renderEngine, ItemStack itemStack, int j, int k) {
+        if(current == 0)
+            return;
+        float f = ModOptions.RAISE_SELECTED_HOTBAR.getAsFloat()*5;
+        if(f > 0.0F) {
+            EntityPlayerSP player = mc.thePlayer;
+            if(itemStack == player.getCurrentEquippedItem())
+                renderItem.renderItemIntoGUI(fontRenderer, renderEngine, itemStack, j, k - (int)f);
+            else
+                renderItem.renderItemIntoGUI(fontRenderer, renderEngine, itemStack, j, k);
+        } else
+            renderItem.renderItemIntoGUI(fontRenderer, renderEngine, itemStack, j, k);
+    }*/
+
+    @Redirect(method = "renderInventorySlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/RenderItem;renderItemOverlayIntoGUI(Lnet/minecraft/src/FontRenderer;Lnet/minecraft/src/RenderEngine;Lnet/minecraft/src/ItemStack;II)V", ordinal = 0))
+    private void draw4(RenderItem renderItem, FontRenderer fontRenderer, RenderEngine renderEngine, ItemStack itemStack, int j, int k) {
+        float f = ModOptions.RAISE_SELECTED_HOTBAR.getAsFloat()*5;
+        if(f > 0.0F) {
+            EntityPlayerSP player = mc.thePlayer;
+            if(itemStack == player.getCurrentEquippedItem())
+                renderItem.renderItemOverlayIntoGUI(fontRenderer, renderEngine, itemStack, j, k - (int)f);
+            else
+                renderItem.renderItemOverlayIntoGUI(fontRenderer, renderEngine, itemStack, j, k);
+        } else
+            renderItem.renderItemOverlayIntoGUI(fontRenderer, renderEngine, itemStack, j, k);
     }
 
     private boolean getListFromChat = false;
@@ -140,14 +220,6 @@ public class MixinGuiIngame extends Gui {
                 MMUtil.hasLoggedIn = true; /* ignore */
         }
         return chatLine.message;
-    }
-
-    @ModifyConstant(method = "renderGameOverlay", constant = @Constant(intValue = 32))
-    private int modify32(int test) {
-        //CustomGameSettings gs = MMUtil.getCustomGameSettings();
-        //if(gs.getOptionI("Toggle XP-Bar") == 1)
-        //    return 32+6;
-        return 32;
     }
 
     private int playersOnline = 0;
@@ -222,8 +294,8 @@ public class MixinGuiIngame extends Gui {
             int health = entityLiving.health;
 
             String connectedServer = MMUtil.getPlayer().getConnectedServer();
-            if(connectedServer != null && Packet_Runnable_MobHealth.mobIds.containsKey(entity.entityId))
-                health = Packet_Runnable_MobHealth.mobIds.get(entity.entityId);
+            if(connectedServer != null && CPacketMobHealth.mobIds.containsKey(entity.entityId))
+                health = CPacketMobHealth.mobIds.get(entity.entityId);
 
             for (int i = 0; i < 10; i++) {
                 int i6 = (width / 2 - 42) + i * 8;
@@ -243,6 +315,10 @@ public class MixinGuiIngame extends Gui {
                 drawCenteredString(mc.fontRenderer, getBlockName(block.translateBlockName()), width / 2 + 5, 6, 0xffffff);
                 drawCenteredString(mc.fontRenderer, "H: " + block.getHardness(), width / 2 + 5, 16, 0xffffff);
                 itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(block), width / 2 - 40, 8);
+                ItemKeep.ItemFulfill fulfill = ItemKeep.getByStr(block.getBlockName());
+                if(fulfill != null && fulfill.destroyWith != null) {
+                    itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, fulfill.destroyWith.stack, width / 2 + 40, 8);
+                }
                 RenderHelper.disableStandardItemLighting();
             }
         }

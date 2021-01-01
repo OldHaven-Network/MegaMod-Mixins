@@ -36,7 +36,7 @@ Bug Fixes by Kool_Kat.
 #define GODRAYS_SAMPLES 6
 #define GODRAYS_DECAY 0.99
 #define GODRAYS_DENSITY 0.15
-//#define GLARE
+//#define GLAR
 //#define GLARE_AMOUNT 0.25
 //#define GLARE_RANGE 3.0
 //#define BLOOM
@@ -55,12 +55,12 @@ Bug Fixes by Kool_Kat.
 #define VIGNETTE_STRENGTH 1.3
 #define CROSSPROCESS
 #define BRIGHTMULT 1.0                 	// 1.0 = default brightness. Higher values mean brighter. 0 would be black.
-#define DARKMULT 0.01						// 0.0 = normal image. Higher values will darken dark colors.
+#define DARKMULT 0.02						// 0.0 = normal image. Higher values will darken dark colors.
 #define COLOR_BOOST	0.1					// 0.0 = normal saturation. Higher values mean more saturated image.
 //#define MOTIONBLUR
 //#define MOTIONBLUR_AMOUNT 1.5
 #define HIGHDESATURATE
-#define GAMMA 0.45							//1.0 is default brightness. lower values will brighten image, higher values will darken image
+#define GAMMA 0.75							//1.0 is default brightness. lower values will brighten image, higher values will darken image
 
 
 

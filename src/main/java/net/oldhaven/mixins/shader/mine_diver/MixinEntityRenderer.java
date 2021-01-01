@@ -14,25 +14,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {
-
     @Shadow protected abstract void func_4135_b(float v, int i);
-
     @Shadow protected abstract void renderRainSnow(float v);
-
     @Shadow protected abstract void setupCameraTransform(float v, int i);
 
     @Inject(method = "renderWorld(FJ)V", at = @At("HEAD"))
     private void beginRender(float var1, long var2, CallbackInfo ci) {
+        if(!Shaders.isShaderEnabled())
+            return;
         Shaders.beginRender(mc, var1, var2);
     }
 
     @Inject(method = "renderWorld(FJ)V", at = @At("RETURN"))
     private void endRender(CallbackInfo ci) {
+        if(!Shaders.isShaderEnabled())
+            return;
         Shaders.endRender();
     }
 
     @Redirect(method = "renderWorld(FJ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityRenderer;setupCameraTransform(FI)V"))
     private void setClearColor(EntityRenderer entityRenderer, float var1, int var18) {
+        if(!Shaders.isShaderEnabled()) {
+            setupCameraTransform(var1, var18);
+            return;
+        }
         Shaders.setClearColor(fogColorRed, fogColorGreen, fogColorBlue);
         setupCameraTransform(var1, var18);
         Shaders.setCamera(var1);
@@ -40,6 +45,8 @@ public abstract class MixinEntityRenderer {
 
     @Redirect(method = "renderWorld(FJ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/RenderGlobal;sortAndRender(Lnet/minecraft/src/EntityLiving;ID)I"))
     private int beginTerrain(RenderGlobal renderGlobal, EntityLiving var4, int i, double var1) {
+        if(!Shaders.isShaderEnabled())
+            return renderGlobal.sortAndRender(var4, i, var1);;
         int ret;
         if (i == 0) {
             Shaders.beginTerrain();

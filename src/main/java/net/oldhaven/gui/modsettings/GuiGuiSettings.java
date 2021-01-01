@@ -25,14 +25,22 @@ public class GuiGuiSettings extends ModdedSettingsGui {
     public void initGui()
     {
         int i = super.initGui(0);
-        String buttonString = ModOptions.BUTTON_OUTLINE_HEX.getAsString();
-        int buttonColor;
-        if(buttonString.isEmpty())
-            buttonColor = 0xffffff;
-        else
-            buttonColor  = Integer.decode(buttonString);
-        controlList.add(new RGBButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Button Outline Color", buttonColor));
+        int buttonColor = getColorFor(ModOptions.BUTTON_OUTLINE_HEX.getAsString());
+        int buttonTextColor = getColorFor(ModOptions.BUTTON_TEXT_HEX.getAsString());
+        controlList.add(new RGBButton(201,
+                width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                "Button Outline Color...", buttonColor));
+        i++;
+        controlList.add(new RGBButton(202,
+                width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                "Button Text Color...", buttonTextColor));
         super.addDone();
+    }
+
+    private int getColorFor(String s) {
+        if(s.isEmpty())
+            return 0xffffff;
+        return Integer.decode(s);
     }
 
     protected void actionPerformed(GuiButton guibutton)
@@ -60,6 +68,20 @@ public class GuiGuiSettings extends ModdedSettingsGui {
                     MMUtil.getCustomGameSettings().saveSettings();
                     mc.displayGuiScreen(this);
                 }
+            ));
+        } else if(guibutton.id == 202) {
+            mc.displayGuiScreen(new GuiRGB(
+                    (int hex) -> {
+                        MMUtil.getCustomGameSettings().setOption("Button Text Color Hex", String.valueOf(hex));
+                        MMUtil.getCustomGameSettings().saveSettings();
+                        mc.displayGuiScreen(this);
+                    }, (int hex) -> {
+                mc.displayGuiScreen(this);
+            }, () -> {
+                MMUtil.getCustomGameSettings().setOption("Button Text Color Hex", "");
+                MMUtil.getCustomGameSettings().saveSettings();
+                mc.displayGuiScreen(this);
+            }
             ));
         }
     }

@@ -10,6 +10,7 @@ import net.oldhaven.customs.shaders.FakeShaderThread;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 
 public class MMUtil {
     public static int
@@ -32,6 +33,8 @@ public class MMUtil {
     private static SavedServers savedServers;
     private static SavedLogins autoLogins;
 
+    public static LinkedList<String> playersTyping;
+
     private static Minecraft mcInstance;
 
     /**
@@ -47,39 +50,34 @@ public class MMUtil {
         customKeybinds = new CustomKeybinds();
         autoLogins = new SavedLogins(megaMod);
         savedShaders = new SavedShaders();
+
+        playersTyping = new LinkedList<>();
+
+        try {
+            ThreadGroup group = Thread.currentThread().getThreadGroup();
+            int count = group.activeCount();
+            Thread[] threads = new Thread[count];
+            group.enumerate(threads);
+            for (Thread thread : threads) {
+                if (!thread.getName().equals("Minecraft main thread"))
+                    continue;
+                try {
+                    Field f = Thread.class.getDeclaredField("target");
+                    f.setAccessible(true);
+                    mcInstance = (Minecraft) f.get(thread);
+                } catch(IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+
+        } catch(SecurityException | NoSuchFieldException ex) {
+            System.out.println(ex);
+        }
     }
 
     public static Minecraft getMinecraftInstance() {
-        if(mcInstance == null) {
-            try {
-                ThreadGroup group = Thread.currentThread().getThreadGroup();
-                int count = group.activeCount();
-                Thread[] threads = new Thread[count];
-                group.enumerate(threads);
-                for (Thread thread : threads) {
-                    if (!thread.getName().equals("Minecraft main thread")) {
-                        continue;
-                    }
-                    mcInstance = (Minecraft) getPrivateValue(Thread.class, thread, "target");
-                    break;
-                }
-
-            } catch(SecurityException | NoSuchFieldException ex) {
-                System.out.println(ex);
-            }
-        }
         return mcInstance;
-    }
-    private static Object getPrivateValue(Class<?> instanceClass, Object instance, String field)
-            throws IllegalArgumentException, SecurityException, NoSuchFieldException {
-        try {
-            Field f = instanceClass.getDeclaredField(field);
-            f.setAccessible(true);
-            return f.get(instance);
-        } catch(IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public static FakeShaderThread getFakeShaderThread() {

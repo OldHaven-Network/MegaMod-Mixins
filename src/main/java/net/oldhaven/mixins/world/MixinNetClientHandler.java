@@ -5,10 +5,8 @@ import net.minecraft.src.NetClientHandler;
 import net.minecraft.src.NetworkManager;
 import net.minecraft.src.Packet18Animation;
 import net.minecraft.src.Packet3Chat;
-import net.oldhaven.customs.options.CustomGameSettings;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.customs.packets.Packets;
-import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.customs.packets.util.Packets;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,13 +32,12 @@ public class MixinNetClientHandler {
     @Inject(method = "handleArmAnimation", at=@At("HEAD"), cancellable = true)
     private void handleArmAnimation(Packet18Animation packet18Animation, CallbackInfo ci) {
         if(!Packets.canUsePackets())
-            if(Packets.tryInitalize(String.valueOf(packet18Animation.animate)))
+            if(Packets.initialize(String.valueOf(packet18Animation.animate)))
                 ci.cancel();
     }
 
     @Inject(method = "handleUpdateTime", at=@At("HEAD"), cancellable = true)
     private void handleUpdateTime(CallbackInfo ci) {
-        CustomGameSettings gs = MMUtil.getCustomGameSettings();
         float f = ModOptions.FORCE_TIME.getAsFloat();
         if(f != 0.0F) {
             this.mc.theWorld.setWorldTime((int) (f * 24000.0F));

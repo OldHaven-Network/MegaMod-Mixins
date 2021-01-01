@@ -19,13 +19,7 @@ public enum CustomPacketType {
     }
 
     public int getTypeInt() {
-        switch(this.name()) {
-            case "GUI": return 0;
-            case "Message": return 1;
-            case "Server": return 2;
-            case "Client": return 3;
-            default: return -1;
-        }
+        return this.number;
     }
 
     @Override

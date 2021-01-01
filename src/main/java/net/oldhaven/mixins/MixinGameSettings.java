@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.src.GameSettings;
 import net.oldhaven.customs.util.MMUtil;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -12,6 +13,8 @@ import java.io.File;
 
 @Mixin(GameSettings.class)
 public class MixinGameSettings {
+    @Shadow protected Minecraft mc;
+
     @Inject(method = "<init>(Lnet/minecraft/client/Minecraft;Ljava/io/File;)V", at = @At("RETURN"))
     private void onInit(Minecraft var1, File var2, CallbackInfo ci) {
         MMUtil.getAutoLogins().savedLoginsFile = new File(var2, "savedLogins.txt");

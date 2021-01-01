@@ -1,13 +1,18 @@
-package net.oldhaven.customs.packets;
+package net.oldhaven.customs.packets.all;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.GuiConnectFailed;
 import net.minecraft.src.NetworkManager;
+import net.oldhaven.customs.packets.PacketRunnable;
+import net.oldhaven.customs.packets.CustomPacketType;
+import net.oldhaven.customs.packets.util.Packets;
 import net.oldhaven.customs.util.MMUtil;
 
-public class Packet_Runnable_Disconnect extends PacketRunnable {
+import javax.annotation.Nonnull;
+
+public class CPacketDisconnect extends PacketRunnable {
     @Override
-    public void run(String[] args) {
+    public void onRun(String[] args) {
         Minecraft mc = MMUtil.getMinecraftInstance();
         NetworkManager handler = Packets.getNetworkClient();
         handler.networkShutdown("disconnect.kicked", new Object[0]);
@@ -19,6 +24,16 @@ public class Packet_Runnable_Disconnect extends PacketRunnable {
         mc.displayGuiScreen(new GuiConnectFailed("disconnect.disconnected", "disconnect.genericReason", (Object) new String[] {
                 builder.toString()
         }));
+    }
+
+    @Override
+    public void send(String... args) {
+    }
+
+    @Nonnull
+    @Override
+    public String getName() {
+        return "Disconnect";
     }
 
     @Override
