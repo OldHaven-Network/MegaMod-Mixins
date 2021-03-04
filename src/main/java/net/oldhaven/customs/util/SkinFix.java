@@ -73,7 +73,7 @@ public class SkinFix {
     }
 
     private static boolean codeIs404(int code) {
-        return code == 404 || code == 500;
+        return code == 404 || code == 500 || code == 522;
     }
     private static boolean tryConnect(String urlS) {
         try {
@@ -81,6 +81,7 @@ public class SkinFix {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.connect();
             int code = connection.getResponseCode();
+            System.out.println("TRY CONNECT CODE : " + code);
             if(!codeIs404(code)) {
                 return true;
             }

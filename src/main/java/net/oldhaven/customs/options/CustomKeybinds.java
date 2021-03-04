@@ -113,8 +113,8 @@ public class CustomKeybinds {
 
     public void setKey(String name, int key) {
         CustomGameSettings gs = MMUtil.getCustomGameSettings();
-        Integer i = gs.getOptionI("Disable "+name);
-        if(i == null || i != 1)
+        Boolean b = gs.getOptionB("Disable "+name);
+        if(b == null || !b)
             this.savedKeysMap.get(name).key = key;
         saveKeys();
     }
@@ -139,12 +139,14 @@ public class CustomKeybinds {
             keyActions.put("PlayerList", this::onKey_PlayerList);
         else
             keyActions.remove("PlayerList");
-        savedKeysMap.put("PlayerList", new SavedKey(1, Keyboard.KEY_TAB, "PlayerList"));
+        if(!savedKeysMap.containsKey("PlayerList"))
+            savedKeysMap.put("PlayerList", new SavedKey(1, Keyboard.KEY_TAB, "PlayerList"));
         if(!ModOptions.DISABLE_FLY.getAsBool())
             keyActions.put("Fly", this::onKey_Fly);
         else
             keyActions.remove("Fly");
-        savedKeysMap.put("Fly", new SavedKey(0, Keyboard.KEY_R, "Fly"));
+        if(!savedKeysMap.containsKey("Fly"))
+            savedKeysMap.put("Fly", new SavedKey(0, Keyboard.KEY_R, "Fly"));
         if(!ModOptions.DISABLE_SPRINT.getAsBool())
             keyActions.put("Sprint", this::onKey_Sprint);
         else
@@ -153,8 +155,10 @@ public class CustomKeybinds {
             keyActions.put("Zoom", this::onKey_Zoom);
         else
             keyActions.remove("Zoom");
-        savedKeysMap.put("Sprint", new SavedKey(1, Keyboard.KEY_LCONTROL, "Sprint"));
-        savedKeysMap.put("Zoom", new SavedKey(1, Keyboard.KEY_C, "Zoom"));
+        if(!savedKeysMap.containsKey("Sprint"))
+            savedKeysMap.put("Sprint", new SavedKey(1, Keyboard.KEY_LCONTROL, "Sprint"));
+        if(!savedKeysMap.containsKey("Zoom"))
+            savedKeysMap.put("Zoom", new SavedKey(1, Keyboard.KEY_C, "Zoom"));
         keyActions.put("Jump", this::onKey_Jump);
     }
     public void saveIntegers() {

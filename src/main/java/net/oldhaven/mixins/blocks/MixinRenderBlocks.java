@@ -148,6 +148,8 @@ public abstract class MixinRenderBlocks {
             //ran.setSeed(ran.nextLong()*(long)times);
             //y += ((ran.nextDouble() / 1.15F)*times) - (ran.nextDouble() / 2);
             renderCrossedSquares(block, meta, x, y, z);
+            renderCrossedSquares(block, meta, x, y+0.75f, z);
+            renderCrossedSquares(block, meta, x, y+0.75f+0.75f, z);
         }
     }
 

@@ -35,9 +35,8 @@ public class GuiControlsSlot extends GuiSlot {
         super(mc, i, i1, i2, i3, i4);
         keybinds = MMUtil.getCustomKeybinds();
         LinkedList<String> defaultStrings = new LinkedList<>();
-        for(int p=0;p < mc.gameSettings.keyBindings.length;p++) {
+        for(int p=0;p < mc.gameSettings.keyBindings.length;p++)
             defaultStrings.addLast(mc.gameSettings.getKeyBindingDescription(p));
-        }
         int o = 0;
         LinkedList<ButtonInfo> defaultButtons = new LinkedList<>();
         for(GuiButton button : list) {
@@ -47,10 +46,12 @@ public class GuiControlsSlot extends GuiSlot {
         newButtonsAt = o;
         keybinds.keyCheck();
         for(Map.Entry<String, CustomKeybinds.SavedKey> entry : keybinds.getSavedKeys().entrySet()) {
-            if(!keybinds.isKeyDisabled(entry.getKey())) {
-                defaultButtons.addLast(new ButtonInfo(new GuiSmallButton(o, 0, 0, 70, 20, Keyboard.getKeyName(entry.getValue().getKey())), entry.getKey()));
-                o++;
-            }
+            String key = Keyboard.getKeyName(entry.getValue().getKey());
+            GuiSmallButton button = new GuiSmallButton(o, 0, 0, 70, 20, key);
+            if(keybinds.isKeyDisabled(entry.getKey()))
+                button.enabled = false;
+            defaultButtons.addLast(new ButtonInfo(button, entry.getKey()));
+            o++;
         }
         buttons = defaultButtons;
         parGui = gui;

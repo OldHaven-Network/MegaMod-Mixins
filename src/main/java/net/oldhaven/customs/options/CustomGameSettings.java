@@ -48,6 +48,12 @@ public class CustomGameSettings {
             return String.valueOf(obj);
         return null;
     }
+    public Boolean getOptionB(String name) {
+        Object obj = getOption(name);
+        if(obj != null)
+            return Boolean.parseBoolean(name);
+        return null;
+    }
     public Float getOptionF(String name) {
         Object obj = getOption(name);
         if(obj != null)
@@ -56,6 +62,8 @@ public class CustomGameSettings {
     }
     public Integer getOptionI(String name) {
         Object obj = getOption(name);
+        if(obj instanceof Boolean)
+            return Boolean.parseBoolean(String.valueOf(obj)) ? 1 : 0;
         if(obj != null)
             return Integer.parseInt(String.valueOf(obj));
         return null;
