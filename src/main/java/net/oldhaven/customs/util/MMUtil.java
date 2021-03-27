@@ -1,5 +1,6 @@
 package net.oldhaven.customs.util;
 
+import com.google.gson.Gson;
 import net.minecraft.client.Minecraft;
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.IFontRenderer;
@@ -32,6 +33,8 @@ public class MMUtil {
     private static SavedShaders savedShaders;
     private static SavedServers savedServers;
     private static SavedLogins autoLogins;
+
+    public static final Gson gson = new Gson();
 
     public static LinkedList<String> playersTyping;
 

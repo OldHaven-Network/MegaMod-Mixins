@@ -7,6 +7,7 @@ import net.minecraft.src.Session;
 import net.minecraft.src.World;
 import net.oldhaven.MMDebug;
 import net.oldhaven.customs.util.SkinFix;
+import net.oldhaven.devpack.SkinImage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -37,7 +38,10 @@ public class MixinEntityPlayerSP extends EntityPlayer {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void EntityPlayerSP(Minecraft minecraft, World world, Session session, int i, CallbackInfo ci) {
         if(session != null && session.username != null && session.username.length() > 0) {
-            this.cloakUrl = SkinFix.getCapeUrl(session.username);
+            SkinImage skinImage = SkinFix.getCapeUrl(this.username);
+            if(skinImage == null || skinImage.hasFailed() || skinImage.imageUrl == null)
+                return;
+            this.cloakUrl = skinImage.imageUrl;
         }
     }
 }

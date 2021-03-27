@@ -7,6 +7,7 @@ import net.oldhaven.customs.SinglePlayerCommands;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.customs.util.SkinFix;
+import net.oldhaven.devpack.SkinImage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,7 +25,10 @@ public class MixinEntityPlayer extends EntityLiving {
 
     @Inject(method = "updateCloak", at = @At("RETURN"))
     private void updateCloak(CallbackInfo ci) {
-        this.playerCloakUrl = SkinFix.getCapeUrl(this.username);
+        SkinImage skinImage = SkinFix.getCapeUrl(this.username);
+        if(skinImage == null || skinImage.hasFailed() || skinImage.imageUrl == null)
+            return;
+        this.playerCloakUrl = skinImage.imageUrl;
         this.cloakUrl = this.playerCloakUrl;
     }
 

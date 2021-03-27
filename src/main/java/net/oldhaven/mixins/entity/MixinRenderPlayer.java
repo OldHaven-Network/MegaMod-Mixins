@@ -5,6 +5,7 @@ import net.oldhaven.customs.alexskins.CustomModelBiped;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.customs.util.SkinFix;
+import net.oldhaven.devpack.SkinImage;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -63,20 +64,48 @@ public class MixinRenderPlayer extends RenderLiving {
     }
 
     @Redirect(method = "renderSpecials", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/src/RenderPlayer;"+
-                        "loadDownloadableImageTexture(Ljava/lang/String;Ljava/lang/String;)Z",
-            opcode = Opcodes.INVOKEVIRTUAL,
-            ordinal = 0))
+                value = "INVOKE",
+                target = "Lnet/minecraft/src/RenderPlayer;loadDownloadableImageTexture(Ljava/lang/String;Ljava/lang/String;)Z",
+                opcode = Opcodes.INVOKEVIRTUAL,
+                ordinal = 0))
     private boolean loadEars(RenderPlayer renderPlayer, String s, String s1) {
         RenderEngine engine = MMUtil.getMinecraftInstance().renderEngine;
-        BufferedImage image = SkinFix.getEarsImage(entityPlayer.username);
-        if(image == null)
+        SkinImage skinImage = SkinFix.getEarsImage(entityPlayer.username);
+        if(skinImage == null)
             return false;
+        if(skinImage.failed == null || skinImage.hasFailed())
+            return false;
+        BufferedImage image = skinImage.image;
         int i = engine.allocateAndSetupTexture(image);
         engine.bindTexture(i);
         return true;
     }
+
+    @Redirect(method = "renderSpecials", at = @At(
+                value = "INVOKE",
+                target = "Lnet/minecraft/src/RenderPlayer;loadDownloadableImageTexture(Ljava/lang/String;Ljava/lang/String;)Z",
+                opcode = Opcodes.INVOKEVIRTUAL,
+                ordinal = 1))
+    private boolean loadCape(RenderPlayer render, String s, String s1) {
+        RenderEngine engine = MMUtil.getMinecraftInstance().renderEngine;
+        SkinImage skinImage = SkinFix.getCapeUrl(entityPlayer.username);
+        if(skinImage == null)
+            return false;
+        if(skinImage.failed == null || skinImage.hasFailed())
+            return false;
+        if(skinImage.image != null) {
+            BufferedImage image = skinImage.image;
+            int i = engine.allocateAndSetupTexture(image);
+            engine.bindTexture(i);
+        } else {
+            if(skinImage.imageUrl != null)
+                this.loadDownloadableImageTexture(skinImage.imageUrl, s1);
+            else
+                this.loadDownloadableImageTexture(s, s1);
+        }
+        return true;
+    }
+
 
     @Redirect(method = "renderSpecials", at = @At(value = "INVOKE", target = "Lnet/minecraft/src/ModelRenderer;postRender(F)V", ordinal = 0))
     private void postRenderHead(ModelRenderer modelRenderer, float v) {
