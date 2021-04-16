@@ -12,6 +12,8 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.oldhaven.customs.options.ModOptions.Style;
+
 public abstract class ModdedSettingsGui extends GuiScreen {
     boolean hasChanged = false;
     public List<GuiButton> controlList;
@@ -37,21 +39,27 @@ public abstract class ModdedSettingsGui extends GuiScreen {
             System.err.println("INVALID MOD SECTION " + getModSection());
             return i;
         }
-        for(ModOptions enumOption : section.getList()) {
-            if(enumOption.isDisabled)
+        for(ModOptions option : section.getList()) {
+            if(option.isDisabled)
                 continue;
-            String option = enumOption.getName();
-            if (enumOption.getStyle() == ModOptions.Style.FLOAT) {
-                Float value = MMUtil.getCustomGameSettings().getOptionF(enumOption.getName());
+            String name = option.getName();
+            Style style = option.getStyle();
+            if (style == Style.FLOAT) {
+                Float value = MMUtil.getCustomGameSettings().getOptionF(option.getName());
                 controlList.add(new CustomGuiButton.GuiSlider(
-                        enumOption.getOrdinal(),
+                        option.getOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumOption, option, value == null ? 0F : value).setModdedGui(this));
+                        option, name, value == null ? 0F : value).setModdedGui(this));
+            } else if(style == Style.INTEGER) {
+                controlList.add(new CustomGuiButton.GuiSmallButtonInt(
+                        option.getOrdinal(),
+                        (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
+                        option).setModdedGui(this));
             } else {
                 controlList.add(new CustomGuiButton.GuiSmallButton(
-                        enumOption.getOrdinal(),
+                        option.getOrdinal(),
                         (width / 2 - 155) + (i % 2) * 160, height / 6 + 24 * (i >> 1),
-                        enumOption, option).setModdedGui(this));
+                        option, name).setModdedGui(this));
             }
             i++;
         }

@@ -98,10 +98,10 @@ public abstract class MixinEntityRenderer {
     @ModifyConstant(method = "getFOVModifier", constant = @Constant(floatValue = 70.0F))
     private float getFovModifier(float var1) {
         if(MMUtil.isZooming) { /* zoom zoom */
-            OnScreenText.replaceOnScreenText("zoom", "Zoom (x" + (int) zoomFoV + ")", 0xffffff);
+            OnScreenText.showAndReplace("zoom", "Zoom (x" + (int) zoomFoV + ")", 0xffffff);
             return (getZoomFoV() + 70);
         }
-        OnScreenText.hideOnScreenText("zoom");
+        OnScreenText.hide("zoom");
         float f = ModOptions.FIELD_OF_VIEW.getAsFloat();
         return ((f * 70) + 70 + sprintFoV());
     }

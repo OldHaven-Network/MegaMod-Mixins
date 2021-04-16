@@ -6,6 +6,8 @@ import net.oldhaven.MegaMod;
 import java.io.*;
 import java.util.*;
 
+import static net.oldhaven.MMDebug.*;
+
 public class CustomGameSettings {
     public File optionsFile;
     private LinkedHashMap<String, Object> map;
@@ -136,7 +138,7 @@ public class CustomGameSettings {
         if(!map.containsKey("MM Version")) {
             MegaMod.hasUpdated = true;
         } else {
-            if(!String.valueOf(map.get("MM Version")).equals(MegaMod.version)) {
+            if(!String.valueOf(map.get("MM Version")).equals(MegaMod.getVersion())) {
                 MegaMod.hasUpdated = true;
                 map.replace("MM Version", ModOptions.getOptionByName("MM Version").getDefaultValue());
                 save = true;
@@ -153,22 +155,28 @@ public class CustomGameSettings {
         if(getOptionS("Button ADV Color").equalsIgnoreCase("(NOTWORKING)")) {
             setOption("Button ADV Color", "0xffffff");
             save = true;
-        } */
+        }
         if(getOptionI("Enable WAILA") != null) {
             setOption("Toggle WAILA", getOptionI("Enable WAILA"));
             removeOption("Enable WAILA");
             save = true;
-        }
+        } */
         /* end 0.4.0 fixes */
-        if(MMDebug.enabled)
-            System.out.println(" --- SETTINGS READ --- ");
+        /* 0.7.0 fixes */
+        if(getOptionB("Toggle WAILA") != null) {
+            setOption("WAILA Enabled", getOptionB("Toggle WAILA"));
+            removeOption("Toggle WAILA");
+            save = true;
+        }
+        /* end 0.7.0 fixes */
+        printe();
+        println(" --- SETTINGS READ --- ");
         for(Map.Entry<String, Object> entry : map.entrySet()) {
             String name = entry.getKey();
             ModOptions option = ModOptions.getOptionByName(name);
             if(option != null) {
                 String value = entry.getValue().toString();
-                if(MMDebug.enabled)
-                    System.out.println(option.getName() + " : " + value);
+                println(option.getName() + " : " + value);
                 switch (option.getStyle()) {
                     case BOOL:
                         try {
@@ -178,20 +186,22 @@ public class CustomGameSettings {
                             option.setCurrentValue(Boolean.valueOf(value));
                         }
                         break;
-                    case FLOAT:
-                        option.setCurrentValue(Float.valueOf(value));
-                        break;
                     case INTEGER:
-                        option.setCurrentValue(Integer.valueOf(value));
+                    case FLOAT:
+                        try {
+                            option.setCurrentValue(Float.valueOf(value));
+                        } catch(NumberFormatException e) {
+                            option.setCurrentValue(option.getDefaultValue());
+                        }
                         break;
                     default:
-                        option.setCurrentValue(entry.getValue());
+                        option.setCurrentValue(value);
                         break;
                 }
             }
         }
-        if(MMDebug.enabled)
-            System.out.println(" --- SETTINGS END --- ");
+        println(" --- SETTINGS END --- ");
+        printe();
         if(save)
             this.saveSettings();
     }

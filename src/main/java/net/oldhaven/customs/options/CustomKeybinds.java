@@ -2,6 +2,7 @@ package net.oldhaven.customs.options;
 
 import net.oldhaven.MegaMod;
 import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.devpack.SingleCallback;
 import org.lwjgl.input.Keyboard;
 
 import java.io.*;
@@ -29,10 +30,7 @@ public class CustomKeybinds {
         }
     }
     private Map<String, SavedKey> savedKeysMap;
-    private interface OneVarRunnable {
-        void run(boolean b);
-    }
-    private Map<String, OneVarRunnable> keyActions;
+    private Map<String, SingleCallback<Boolean>> keyActions;
     public Map<Integer, String> keyIntegers;
     public File savedKeysFile;
     public CustomKeybinds() {
@@ -57,6 +55,7 @@ public class CustomKeybinds {
             put("Fly", Keyboard.KEY_R);
             put("Sprint", Keyboard.KEY_LCONTROL);
             put("Zoom", Keyboard.KEY_C);
+            put("Open Map", Keyboard.KEY_M);
         }
     };
 
@@ -91,15 +90,16 @@ public class CustomKeybinds {
         if(MMUtil.getPlayer().getConnectedServer() != null && !MMUtil.getServerPacketInformation().canFly()) {
             return;
         }
-        boolean flying = MMUtil.isFlying;
-        MMUtil.isFlying = !flying;
+        MMUtil.isFlying = !MMUtil.isFlying;
     }
     private void onKey_Zoom(boolean b) {
         MMUtil.isZooming = b;
     }
-
     private void onKey_PlayerList(boolean b) {
         MMUtil.playerList = b;
+    }
+    private void onkey_OpenMap(boolean b) {
+        MMUtil.mapOpen = b;
     }
 
     public void onKey(String name, boolean b) {
@@ -159,6 +159,7 @@ public class CustomKeybinds {
             savedKeysMap.put("Sprint", new SavedKey(1, Keyboard.KEY_LCONTROL, "Sprint"));
         if(!savedKeysMap.containsKey("Zoom"))
             savedKeysMap.put("Zoom", new SavedKey(1, Keyboard.KEY_C, "Zoom"));
+        keyActions.put("Open Map", this::onkey_OpenMap);
         keyActions.put("Jump", this::onKey_Jump);
     }
     public void saveIntegers() {

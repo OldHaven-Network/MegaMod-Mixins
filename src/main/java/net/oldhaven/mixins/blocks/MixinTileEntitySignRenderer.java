@@ -20,11 +20,12 @@ public class MixinTileEntitySignRenderer {
 
     private void drawText(FontRenderer renderer, String s, int i, int i1, int i2) {
         if(ModOptions.SIGNS_TEXT_SHADOW.getAsBool()) {
-            /*if (i2 == 0x000000) {
-                renderer.drawString(s, i + 1, i1 + 1, 0x555555);
-                renderer.drawString(s, i, i1, i2);
-            } else*/
-            renderer.drawStringWithShadow(s, i, i1, i2);
+            //System.out.println(i + " " + i1 + " " + i2);
+            //if (i2 == 0x000000) {
+            //    renderer.drawString(s, i + 1, i1 + 1, 0x555555);
+            //    renderer.drawString(s, i, i1, i2);
+            //} else
+                renderer.drawStringWithShadow(s, i, i1, i2);
         } else
             renderer.drawString(s, i, i1, i2);
     }

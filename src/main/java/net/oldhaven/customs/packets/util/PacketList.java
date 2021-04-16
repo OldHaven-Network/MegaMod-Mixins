@@ -43,8 +43,7 @@ public enum PacketList implements IPacket {
     // -------------------------------------------
 
     public static boolean runPacket(Packet195Custom packetCustom) {
-        if(MMDebug.enabled)
-            System.out.println("Custom Packet: " + packetCustom.packetInfo);
+        MMDebug.println("Custom Packet: " + packetCustom.packetInfo);
         if(!Packets.canUsePackets)
             return false;
         String utf = packetCustom.packetInfo;

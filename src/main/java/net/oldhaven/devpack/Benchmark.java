@@ -1,11 +1,18 @@
 package net.oldhaven.devpack;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import net.oldhaven.MMDebug;
 
-@Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.TYPE)
-public @interface Benchmark {
+import java.util.HashMap;
+
+public class Benchmark {
+    public static final HashMap<String, Long> hashMap = new HashMap<>();
+    public static void begin(String name) {
+        hashMap.put(name, System.currentTimeMillis());
+    }
+    public static void end(String name) {
+        long cur = System.currentTimeMillis();
+        long old = hashMap.get(name);
+        MMDebug.println("Benchmark for " + name + " in " + (cur - old) + "ms");
+        hashMap.remove(name);
+    }
 }

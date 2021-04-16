@@ -27,7 +27,6 @@ public class GuiModSettings extends ModdedSettingsGui {
     }
 
     public void initGui() {
-        StringTranslate stringtranslate = StringTranslate.getInstance();
         int i = 0;
         controlList.add(new GuiSmallButton(201, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Sky Settings..."));
         i++;
@@ -44,6 +43,8 @@ public class GuiModSettings extends ModdedSettingsGui {
         controlList.add(new GuiSmallButton(205, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Shader Settings..."));
         i++;
         controlList.add(new GuiSmallButton(208, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "Discord Settings..."));
+        i++;
+        controlList.add(new GuiSmallButton(209, width / 2 - 155 + (i % 2) * 160, height / 6 + 24 * (i >> 1), "MiniMap Settings..."));
         i++;
         super.initGui(i);
         super.addDone();
@@ -77,6 +78,8 @@ public class GuiModSettings extends ModdedSettingsGui {
                     mc.displayGuiScreen(new GuiPlayerSettings(this, gameSettings));break;
                 case 208:
                     mc.displayGuiScreen(new GuiDiscordSettings(this, gameSettings));break;
+                case 209:
+                    mc.displayGuiScreen(new GuiMiniMapSettings(this, gameSettings));break;
             }
         }
     }

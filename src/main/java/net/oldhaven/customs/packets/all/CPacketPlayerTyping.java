@@ -1,5 +1,6 @@
 package net.oldhaven.customs.packets.all;
 
+import net.oldhaven.customs.OnlinePlayer;
 import net.oldhaven.customs.packets.PacketRunnable;
 import net.oldhaven.customs.packets.CustomPacketType;
 import net.oldhaven.customs.packets.util.Packets;
@@ -11,9 +12,9 @@ public class CPacketPlayerTyping extends PacketRunnable {
     @Override
     public void onRun(String[] args) {
         if(args[0].equals("true")) {
-            MMUtil.playersTyping.add(args[1]);
+            OnlinePlayer.get(args[1]).setTyping(true);
         } else {
-            MMUtil.playersTyping.remove(args[1]);
+            OnlinePlayer.get(args[1]).setTyping(false);
         }
     }
 

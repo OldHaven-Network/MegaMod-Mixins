@@ -17,7 +17,7 @@ public abstract class MixinWorld_ShaderDraw implements IWorld {
     @Shadow public abstract int getBlockId(int i, int i1, int i2);
     @Shadow public abstract boolean canBlockSeeTheSky(int x, int y, int z);
 
-    float tick = 2001;
+    /*float tick = 2001;
     float tick2 = 0;
     @Inject(method = "randomDisplayUpdates", at=@At("INVOKE"))
     private void tickInject(CallbackInfo ci) {
@@ -48,5 +48,5 @@ public abstract class MixinWorld_ShaderDraw implements IWorld {
             }
             tick += 0.01F;
         }
-    }
+    }*/
 }

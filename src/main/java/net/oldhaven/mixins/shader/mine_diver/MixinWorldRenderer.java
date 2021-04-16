@@ -6,6 +6,8 @@ import net.minecraft.src.Tessellator;
 import net.minecraft.src.WorldRenderer;
 import net.mine_diver.glsl.Shaders;
 import net.mine_diver.glsl.util.TessellatorShaders;
+import net.oldhaven.gui.onscreen.MiniMapUI;
+import net.oldhaven.gui.onscreen.OnScreenUI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

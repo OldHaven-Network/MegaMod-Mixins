@@ -15,7 +15,6 @@ public class SinglePlayerCommands {
     }
 
     public static boolean isGodded = false;
-
     private static void dupeCmd(String cmd, String... names) {
         if(runnableMap.containsKey(cmd)) {
             for(String name : names)
@@ -24,8 +23,7 @@ public class SinglePlayerCommands {
     }
 
     static void msgPlayer(EntityPlayerSP player, String s) {
-        if(MMDebug.enabled)
-            System.out.println(s);
+        MMDebug.println(s);
         player.addChatMessage(s);
     }
     public static Map<String, Runnable> runnableMap = new HashMap<String, Runnable>(){
@@ -93,8 +91,8 @@ public class SinglePlayerCommands {
                     ItemStack stack = new ItemStack(block, amount, 0);
                     player.inventory.addItemStackToInventory(new ItemStack(block, amount, 0));
                     msgPlayer(player, "Gave you "+amount+ " of "+stack.getItemName());
-                }
-                msgPlayer(player, "Invalid block ID or name");
+                } else
+                    msgPlayer(player, "Invalid block ID or name");
             });
             put("time", (args, player) -> {
                 if(args.length < 1 || args[0].toLowerCase().equals("help")) {
@@ -163,6 +161,6 @@ public class SinglePlayerCommands {
         dupeCmd("god", "godmode");
         dupeCmd("time", "settime");
         dupeCmd("help", "?");
-        System.out.println("Created " + runnableMap.size() + " SinglePlayer Cmds\n");
+        MMDebug.println("Created " + runnableMap.size() + " SinglePlayer Cmds\n");
     }
 }

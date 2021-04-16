@@ -52,7 +52,7 @@ public class JSEngine {
             //ScriptableObject.putProperty(scope, "Keyboard", Context.javaToJS(Keyboard.class, scope));
             //ScriptableObject.putProperty(scope,"print", (Consumer<Object>) console::print);
             ScriptableObject.putProperty(scope,"console", Context.javaToJS(console, scope));
-            ScriptableObject.putProperty(scope,"version", MegaMod.version);
+            ScriptableObject.putProperty(scope,"version", MegaMod.getVersion());
             ScriptableObject.putProperty(scope,"Minecraft", Context.javaToJS(MMUtil.getMinecraftInstance(), scope));
             //bindings.put("Keyboard", StaticClass.forClass(org.lwjgl.input.Keyboard.class));
             ScriptableObject.putProperty(scope,"Mixins", Context.javaToJS(new JSC_Mixins(), scope));

@@ -48,7 +48,7 @@ public class Shaders {
     public static String version;
     public static String extension;
     public static boolean isShaderEnabled() {
-        return (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes()) == 1;
+        return (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes()) == 0;
     }
     public static void init() {
         if(!isShaderEnabled())
@@ -265,7 +265,6 @@ public class Shaders {
         if (shadowPassInterval > 0 && --shadowPassCounter <= 0) {
             // do shadow pass
             preShadowPassThirdPersonView = mc.gameSettings.thirdPersonView;
-
             mc.gameSettings.thirdPersonView = true;
 
             isShadowPass = true;

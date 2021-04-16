@@ -23,9 +23,9 @@ import java.util.Map;
 public enum ModOptions {
     MM_VERSION(
             new ModOption("MM Version", "MegaMod", false),
-            MegaMod.version, 0, 5),
+            MegaMod.getVersion(), 0, 5),
 
-//region SETTINGS_MOD
+    //region SETTINGS_MOD
     FIELD_OF_VIEW(
             new ModOption("Field of View", "Mod", false),
             Style.FLOAT, "70", 70.0F, "", 70.0F, 0.1F),
@@ -41,17 +41,17 @@ public enum ModOptions {
 //region SETTINGS_SHADER
     SHADERS(
             new ModOption("Shaders", "Shader", false),
-            Style.FLOAT, "OFF", 4.0F, "", 0.0F, 0.0F,
-            new String[]{
-                    "OFF", "GLSL", "Checkerboard", "Faked-Real", "Outline"
+            Style.INTEGER, "OFF", 4.0F, "", 0.0F, 0,
+            new String[] {
+                    "GLSL", "Checkerboard", "Faked-Real", "Outline"
             }),
     SHADOW_DENSITY(
             new ModOption("Shadow Density", "ShaderNonGLSL", false)
-                .setDescription("How harsh shadows will be on blocks"),
+                    .setDescription("How harsh shadows will be on blocks"),
             Style.FLOAT, "DEFAULT", 20.0F, "", 1.0F, 0),
     DYNAMIC_LIGHTING(
             new ModOption("Dynamic Lighting", "ShaderNonGLSL", false)
-                .setDescription("Lights can move around (Unstable)"),
+                    .setDescription("Lights can move around (Unstable)"),
             Style.BOOL, false),
     WATER_COLOR(
             new ModOption("Water Color Hex", "Shader", null),
@@ -64,42 +64,46 @@ public enum ModOptions {
 //region SETTINGS_SKY
     CLOUD_HEIGHT(
             new ModOption("Cloud Height", "Sky", false)
-                .setDescription("How high the clouds should be on your client"),
+                    .setDescription("How high the clouds should be on your client"),
             Style.FLOAT, "OFF", 140.0F, "", 60.0F, 0.75F),
     FORCE_TIME(
             new ModOption("Force Time", "Sky", false)
-                .setDescription("Set time on your client to a tick"),
+                    .setDescription("Set time on your client to a tick"),
             Style.FLOAT, "OFF", 24000.0F, " Ticks", 0.0F, 0.0F),
     TOGGLE_RAINSNOW(
             new ModOption("Toggle Rain/Snow", "Sky", false)
-                .setDescription("Disable or enable rain/snow"),
+                    .setDescription("Disable or enable rain/snow"),
             Style.BOOL, true),
 //endregion
 
 //region SETTINGS_BLOCKS
     RANDOM_TALLERGRASS(
             new ModOption("Random Taller-Grass", "Blocks", false)
-                .setDescription("Grass will be taller in some areas"),
+                    .setDescription("Grass will be taller in some areas"),
             Style.BOOL, false),
     FANCY_TREES(
             new ModOption("Fancy Trees", "Blocks", false)
-                .setDescription("Randomized prettier trees"),
+                    .setDescription("Randomized prettier trees"),
             Style.FLOAT, "OFF", 1.0F, "", 0.0F, 0.0F,
             new String[]{
                     "Fast", "Fancy"
             }),
     WATER_ANIMATION(
             new ModOption("Water Animation", "Blocks", false)
-                .setDescription("Disable static water flow animation"),
+                    .setDescription("Disable static water flow animation"),
             Style.BOOL, true),
     LADDERS_CLIMBABLE(
             new ModOption("Ladders Climbable", "Blocks", false)
-                .setDescription("Make ladders climbable... or choose not to"),
+                    .setDescription("Make ladders climbable... or choose not to"),
             Style.BOOL, true),
     SIGNS_TEXT_SHADOW(
             new ModOption("Signs Text Shadow", "Blocks", false)
                     .setDescription("Have a shadow on text for all signs"),
             Style.BOOL, true),
+    SIGNS_CUTOFF_DISTANCE(
+            new ModOption("Signs Text Distance", "Blocks", false)
+                    .setDescription("Distance in percent before a sign's text gets disabled"),
+            Style.FLOAT, "5%", 95.0F, "%", 5.0F, 1.0F),
 //endregion
 
 //region SETTINGS_SKIN
@@ -108,11 +112,11 @@ public enum ModOptions {
             Style.BOOL, true),
     SKIN_HAT(
             new ModOption("Hat", "Skin", false)
-                .setDescription("Disable hat globally"),
+                    .setDescription("Disable hat globally"),
             Style.BOOL, true),
     SKIN_CAPE(
             new ModOption("Cape", "Skin", false)
-                .setDescription("Disable cape globally"),
+                    .setDescription("Disable cape globally"),
             Style.BOOL, true),
     SKIN_EARS(
             new ModOption("Ears", "Skin", false)
@@ -120,45 +124,118 @@ public enum ModOptions {
             Style.BOOL, true),
     SKIN_JACKET(
             new ModOption("Jacket", "Skin", false)
-                .setDescription("Disable jacket globally"),
+                    .setDescription("Disable jacket globally"),
             Style.BOOL, true),
     SKIN_LEFT_SLEEVE(
             new ModOption("Left Sleeve", "Skin", false)
-                .setDescription("Disable outer left sleeve globally"),
+                    .setDescription("Disable outer left sleeve globally"),
             Style.BOOL, true),
     SKIN_RIGHT_SLEEVE(
             new ModOption("Right Sleeve", "Skin", false)
-                .setDescription("Disable outer right sleeve globally"),
+                    .setDescription("Disable outer right sleeve globally"),
             Style.BOOL, true),
     SKIN_LEFT_PANTS_LEG(
             new ModOption("Left Pants Leg", "Skin", false)
-                .setDescription("Disable outer left pants globally"),
+                    .setDescription("Disable outer left pants globally"),
             Style.BOOL, true),
     SKIN_RIGHT_PANTS_LEG(
             new ModOption("Right Pants Leg", "Skin", false)
-                .setDescription("Disable outer right pants globally"),
+                    .setDescription("Disable outer right pants globally"),
             Style.BOOL, true),
     SKIN_DEFAULT_CAPE(
             new ModOption("Default Cape", "Skin", false)
-                .setDescription("Default cape you should see first on anyone"),
+                    .setDescription("Default cape you should see first on anyone"),
             Style.FLOAT, "Minecraft", 2.0F, "", 0.0F, 0.0F,
             new String[]{
                     "Minecraft", "Optifine", "MCCapes"
             }),
 //endregion
 
+//region SETTINGS_MINIMAP
+    MINIMAP_ENABLED(
+            new ModOption("MiniMap Enabled", "MiniMap", false)
+                    .setDescription("Enable or disable the MiniMap"),
+            Style.BOOL, true),
+    MINIMAP_COMPASS(
+            new ModOption("MiniMap Compass", "MiniMap", false)
+                    .setDescription("Enable or disable MiniMap directions"),
+            Style.BOOL, true),
+    MINIMAP_COMPASS_SHADOW(
+            new ModOption("Compass Shadows", "MiniMap", false)
+                    .setDescription("Enable or disable MiniMap text shadows"),
+            Style.BOOL, true),
+    MINIMAP_HIGLIGHT_DIR(
+            new ModOption("Highlight Direction", "MiniMap", false)
+                    .setDescription("Highlight the direction you're facing on the compass"),
+            Style.BOOL, true),
+    MINIMAP_SIZE(
+            new ModOption("MiniMap Size", "MiniMap", false)
+                    .setDescription("Change the size of your MiniMap"),
+            Style.FLOAT, "40", 60.0F, "", 40.0F, 0.4F),
+    MINIMAP_ROTATE(
+            new ModOption("Rotate MiniMap", "MiniMap", false)
+                    .setDescription("Allows you to enable/disable MiniMap rotation"),
+            Style.BOOL, false),
+    MINIMAP_SHOW_COORDS(
+            new ModOption("Coords Under MiniMap", "MiniMap", false)
+                    .setDescription("Show player coordinates under the MiniMap"),
+            Style.BOOL, false),
+    MINIMAP_RENDER_SELF_PLANE(
+            new ModOption("Render Only Self Plane", "MiniMap", false)
+                    .setDescription("Render your own X and Z only"),
+            Style.BOOL, false),
+    MINIMAP_STYLE(
+            new ModOption("MiniMap View", "MiniMap", false)
+                    .setDescription("Change the view of your MiniMap (BlockView Disables Some Rendering)"),
+            Style.FLOAT, "Block View", 0.0F, "", 0.0F, 1.0F,
+            new String[]{
+                    "Pixel View"
+            }),
+    MINIMAP_COMPASS_COLOR_HEX(
+            new ModOption("MiniMap Compass Color Hex", "MiniMap", null),
+            "", 0, 6),
+    MINIMAP_BORDER_COLOR_HEX(
+            new ModOption("MiniMap Border Color Hex", "MiniMap", null),
+            "", 0, 6),
+//endregion
+
+//region SETTINGS_WAILA
+    WAILA_ENABLED(
+            new ModOption("WAILA Enabled", "WAILA", false)
+                    .setDescription("Toggle for \"What Am I Looking At?\""),
+            Style.BOOL, true),
+    WAILA_BACKGROUND(
+            new ModOption("WAILA Background Type", "WAILA", false)
+                    .setDescription("Toggle the background for the WAILA UI"),
+            Style.INTEGER, "OFF", 4.0F, "", 0.0F, 0.0F,
+            new String[]{
+                    "Image", "Colored"
+            }),
+    WAILA_POSITION_X(
+            new ModOption("WAILA X Position", "WAILA", false)
+                    .setDescription("Change Local Position of Waila UI"),
+            Style.FLOAT, "0%", 100.0F, "%", 0.0F, 0.5F),
+    WAILA_POSITION_Y(
+            new ModOption("WAILA Y Position", "WAILA", false)
+                    .setDescription("Change Local Position of Waila UI"),
+            Style.FLOAT, "0%", 100.0F, "%", 0.0F, 0.01F),
+    WAILA_BACKGROUND_COLOR(
+            new ModOption("WAILA Background Color", "WAILA", null),
+            "", 0, 6),
+//endregion
+
 //region SETTINGS_GUISCREEN
     ANIMATE_MAIN_MENU(
             new ModOption("Animate Main Menu", "GuiScreen", false)
-                .setDescription("Animated png on Main Menu background"),
+                    .setDescription("Animated png on Main Menu background"),
             Style.BOOL, true),
     MAIN_MENU_QUIT_BUTTON(
             new ModOption("Main Menu Quit Btn", "GuiScreen", false)
-                .setDescription("Enable/Disable Main Menu quit button"),
+                    .setDescription("Enable/Disable Main Menu quit button"),
             Style.BOOL, true),
     NEW_MULTIPLAYER_GUI(
             new ModOption("New MultiPlayer GUI", "GuiScreen", false)
-                .setDescription("Enable/Disable the modernized MultiPlayer GUI"),
+                    .setDescription("Enable/Disable the modernized MultiPlayer GUI"),
             Style.BOOL, true),
 //endregion
 
@@ -166,28 +243,32 @@ public enum ModOptions {
     //SUBTITLES(new ModOption("Subtitles", "GUI", false), ModStyle.BOOL, 0),
     MODERN_TOOLTIPS(
             new ModOption("Modern Tooltips", "GUI", false)
-                .setDescription("Hover over a tool, or change weapons provides tooltips"),
+                    .setDescription("Hover over a tool, or change weapons provides tooltips"),
             Style.BOOL, true),
     CHAT_BG_OPACITY(
             new ModOption("Chat BG Opacity", "GUI", false)
-                .setDescription("Chat Background opaqueness (unstable)"),
+                    .setDescription("Chat Background opaqueness (unstable)"),
             Style.FLOAT, 1.0F),
     RAISE_SELECTED_HOTBAR(
             new ModOption("Raise HotBar Selected", "GUI", true)
                     .setDescription("Raises the hotbar a few pixels for the selected item"),
             Style.FLOAT, 0.0F),
     //SHOW_TOOLTIP(new ModOption("Show Tooltip", "GUI", false), ModStyle.BOOL, 1),
-    TOGGLE_WAILA(
-            new ModOption("Toggle WAILA", "GUI", false)
-                .setDescription("\"What Am I Looking At?\""),
-            Style.BOOL, true),
     SHOW_MOTION_IN_GAME(
             new ModOption("Show Motion In-Game", "GUI", false)
-                .setDescription("Shows your concurrent motion in-game"),
+                    .setDescription("Shows your concurrent motion in-game"),
             Style.BOOL, false),
     SHOW_SPEED_IN_GAME(
             new ModOption("Show Speed In-Game", "GUI", false)
-                .setDescription("Shows your concurrent speed in-game"),
+                    .setDescription("Shows your concurrent speed in-game"),
+            Style.BOOL, false),
+    SHOW_FPS_IN_GAME(
+            new ModOption("Show FPS In-Game", "GUI", false)
+                    .setDescription("Shows your current FPS"),
+            Style.BOOL, false),
+    SHOW_COORDS_IN_GAME(
+            new ModOption("Show Coords In-Game", "GUI", false)
+                    .setDescription("Shows your current X/Y/Z coordinates in-game"),
             Style.BOOL, false),
     BUTTON_TEXT_SHADOW(
             new ModOption("Button Text Shadow", "GUI", false)
@@ -204,7 +285,7 @@ public enum ModOptions {
 //region SETTINGS_PLAYER
     THIRDPERSON_DISTANCE(
             new ModOption("ThirdPerson Distance", "Player", false)
-                .setDescription("How far do you want the camera from your player?"),
+                    .setDescription("How far do you want the camera from your player?"),
             Style.FLOAT, "FAR", 29.0F, "", 1.0F, 0.0F),
 //endregion
 
@@ -230,19 +311,19 @@ public enum ModOptions {
 //region SETTINGS_DISCORD
     RICH_PRESENCE(
             new ModOption("Rich Presence", "Discord", false)
-                .setDescription("Disable Discord status completely"),
+                    .setDescription("Disable Discord status completely"),
             Style.BOOL, false),
 //endregion
 
 //region SETTINGS_SP
     SP_CHEATS(
             new ModOption("SP Cheats", "SP", false)
-                .setDescription("Enable or disable SinglePlayer cheats (/help)"),
+                    .setDescription("Enable or disable SinglePlayer cheats (/help)"),
             Style.BOOL, false);
 //endregion
 
 
-//region VARIABLES
+    //region VARIABLES
     private final Style style;
     public boolean isDisabled;
 
@@ -264,7 +345,7 @@ public enum ModOptions {
     private Section currentSection;
 //endregion
 
-//region GETTERS
+    //region GETTERS
     public Style getStyle() {
         return style;
     }
@@ -358,23 +439,26 @@ public enum ModOptions {
         this.name = modOption.getName();
         this.description = modOption.getDescription();
         this.style = style;
-        update(this.name);
-        String name = modOption.getSection();
-        if(ModOption.sectionMap.containsKey(name))
-            ModOption.sectionMap.get(name).list.add(this);
-        else
-            ModOption.sectionMap.put(name, new Section(name).add(this));
-        if(!ModOption.sectionList.contains(ModOption.sectionMap.get(name)))
-            ModOption.sectionList.add(ModOption.sectionMap.get(name));
-        this.ordinal = ModOption.sectionMap.get(name).list.size();
-        this.currentSection = ModOption.sectionMap.get(name);
+
+        String sectionName = modOption.getSection();
+        Section section = update(sectionName, modOption.getName());
+        this.ordinal = section.list.size();
+        this.currentSection = section;
         if(modOption.isDisabled()) {
             this.setDisabled();
         }
     }
-    private void update(String name) {
+    private Section update(String sectionName, String name) {
         ModOption.mapToList.put(name, this);
         ModOption.list.add(this);
+        Section section;
+        if(ModOption.sectionMap.containsKey(sectionName))
+            (section = ModOption.sectionMap.get(sectionName)).list.add(this);
+        else
+            ModOption.sectionMap.put(sectionName, (section = new Section(sectionName)).add(this));
+        if(!ModOption.sectionList.contains(ModOption.sectionMap.get(sectionName)))
+            ModOption.sectionList.add(section = ModOption.sectionMap.get(sectionName));
+        return section;
     }
     ModOptions(ModOption modOption, Style style, Object value) {
         this(modOption, style);
@@ -432,8 +516,12 @@ public enum ModOptions {
                     this.updatedObj = (int) ((f * times) + add) + 1;
             } else if(this.style == Style.BOOL) {
                 this.updatedObj = ((int)this.currentValue == 1 ? 1 : 0);
-            } else
-                this.updatedObj = (int) this.currentValue;
+            } else {
+                if(this.currentValue instanceof Float)
+                    this.updatedObj = (int) ((float)this.currentValue);
+                else
+                    this.updatedObj = (int) this.currentValue;
+            }
             this.hasUpdated = true;
         }
         return (int) this.updatedObj;
@@ -454,6 +542,22 @@ public enum ModOptions {
             this.hasUpdated = true;
         }
         return (float) this.updatedObj;
+    }
+    public <T> T get() {
+    // Likely never going to be used
+    // But I wanted to add it anyway just in-case.
+        Object ret;
+        switch(this.style) {
+            case FLOAT:
+                ret = getAsFloat();break;
+            case INTEGER:
+                ret = getAsInt();break;
+            case BOOL:
+                ret = getAsBool();break;
+            default:
+                ret = getAsString();break;
+        }
+        return (T) ret;
     }
 
     void setCurrentValue(Object currentValue) {
@@ -512,18 +616,25 @@ public enum ModOptions {
 
         private String description = "";
         private final String name;
+        private String trueName;
         private final String section;
         private final Boolean disabled;
         public ModOption(@Nonnull String s, @Nonnull String section, Boolean disabled) {
             if(disabled == null)
                 disabled = true;
             this.name = s;
+            this.trueName = s;
             this.section = section;
             this.disabled = disabled;
         }
 
         ModOption setDescription(String description) {
             this.description = description;
+            return this;
+        }
+
+        ModOption setTrueName(String name) {
+            this.trueName = name;
             return this;
         }
 

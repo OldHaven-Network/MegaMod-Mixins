@@ -41,8 +41,7 @@ public class MixinEntityLiving extends Entity {
     @Redirect(method = "moveEntityWithHeading",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityLiving;isInWater()Z", ordinal = 0, opcode = Opcodes.INVOKEVIRTUAL))
     public boolean isInWater(EntityLiving entity) {
-        Boolean flyB = isFlying(this);
-        if(flyB != null && flyB)
+        if(isFlying(this))
             return false;
         return entity.isInWater();
     }
@@ -50,7 +49,6 @@ public class MixinEntityLiving extends Entity {
     private double[] lastFly;
     private boolean wasLastFlying = false;
     private float flySpeed = 0;
-    private long lastFlyTime = 0;
     @Redirect(method = "moveEntityWithHeading",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/src/EntityLiving;moveEntity(DDD)V", ordinal = 2, opcode = Opcodes.INVOKEVIRTUAL))
     public void handleYValue(EntityLiving entity, double x, double y, double z) {
@@ -58,13 +56,12 @@ public class MixinEntityLiving extends Entity {
             this.moveEntity(x, y, z);
             return;
         }
-        CustomGameSettings cgs = MMUtil.getCustomGameSettings();
         GameSettings gs = MMUtil.getMinecraftInstance().gameSettings;
         float gsFlySpeed = (ModOptions.FLY_SPEED.getAsFloat() * 5) + 1;
-        Boolean flyB = isFlying(this);
-        Boolean sprintB = isSprinting(this);
+        boolean flyB = isFlying(this);
+        boolean sprintB = isSprinting(this);
         if(flyB) {
-            OnScreenText.showOnScreenText("flying", "Flying", 0xFFFFFF);
+            OnScreenText.show("flying", "Flying", 0xFFFFFF);
             Minecraft mc = MMUtil.getMinecraftInstance();
             if(mc.currentScreen == null) {
                 if(!wasLastFlying)
@@ -121,7 +118,7 @@ public class MixinEntityLiving extends Entity {
                 }
             }
             this.flySpeed = 0.0F;
-            OnScreenText.hideOnScreenText("flying");
+            OnScreenText.hide("flying");
         }
         this.moveEntity(x, y, z);
     }
@@ -183,8 +180,12 @@ public class MixinEntityLiving extends Entity {
                 } else {
                     if (isCollidedHorizontally)
                         MMUtil.isSprinting = false;
-                    if (!onGround)
+                    if (!onGround) {
+                            f += 0.015F;
+                            //if (f > 0.98F)
+                                //f = 0.98F;
                         sprintTimeout++;
+                    }
                     if (sprintTimeout > 20)
                         MMUtil.isSprinting = false;
                 }

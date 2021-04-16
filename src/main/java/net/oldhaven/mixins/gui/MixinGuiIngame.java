@@ -2,14 +2,15 @@ package net.oldhaven.mixins.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.src.*;
-import net.oldhaven.customs.ItemKeep;
+import net.oldhaven.customs.OnlinePlayer;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.options.SavedLogins;
-import net.oldhaven.customs.packets.all.CPacketMobHealth;
-import net.oldhaven.customs.packets.util.Packets;
 import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.customs.util.OnScreenText;
-import org.lwjgl.opengl.GL11;
+import net.oldhaven.gui.onscreen.MiniMapUI;
+import net.oldhaven.gui.onscreen.OnScreenUI;
+import net.oldhaven.gui.onscreen.PlayerListUI;
+import net.oldhaven.gui.onscreen.WailaUI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
@@ -27,91 +28,128 @@ public class MixinGuiIngame extends Gui {
     private int itemFade = 0;
     @Shadow private Minecraft mc;
     @Shadow private static RenderItem itemRenderer;
-    @Shadow private List<String> chatMessageList;
+    @Shadow private List<ChatLine> chatMessageList;
 
-    private void drawHealth(int x, int y, boolean half) {
-        if(!half)
-            drawTexturedModalRect(x, y, 52, 0, 9, 9);
-        else
-            drawTexturedModalRect(x, y, 61, 0, 9, 9);
-    }
-    private void drawMissingHealth(int x, int y, int heartsLife) {
-        boolean flag1 = (mc.thePlayer.heartsLife / 3) % 2 == 1;
-        if(mc.thePlayer.heartsLife < 10)
-            flag1 = false;
-        int k5 = 0;
-        if(flag1)
-            k5 = 1;
-        drawTexturedModalRect(x, y, 16 + k5 * 9, 0, 9, 9);
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(Minecraft minecraft, CallbackInfo ci) {
+        OnScreenUI.getUI(MiniMapUI.class).renderItem = itemRenderer;
     }
 
-    private DecimalFormat df = new DecimalFormat("#,###,##0.00");
+    private final DecimalFormat df = new DecimalFormat("#,###,##0.00");
     @Inject(method = "renderGameOverlay", at = @At(value = "FIELD", target = "Lnet/minecraft/src/GameSettings;showDebugInfo:Z", shift = At.Shift.BEFORE))
     private void renderGameOverlay_Text(CallbackInfo ci) {
-        if(!this.mc.gameSettings.showDebugInfo) {
-            if(mc.isGamePaused)
-                return;
-            ScaledResolution scaledresolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
-            int k = scaledresolution.getScaledWidth();
-            int l = scaledresolution.getScaledHeight();
-            if(ModOptions.MODERN_TOOLTIPS.getAsBool()) {
-                ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
-                if (stack != null) {
-                    String name = stack.getItem().getStatName();
-                    if (!lastItem.equals(name)) {
-                        lastItem = name;
-                        itemFade = 255;
-                        timeUp = 0;
-                    }
-                    if (itemFade > 0) {
-                        this.drawCenteredString(mc.fontRenderer, name, k / 2, l - 54, adjustAlpha(itemFade));
-                        if (timeUp > 50)
-                            itemFade -= 3F;
-                        else
-                            timeUp++;
-                    }
-                } else if (!lastItem.equals(""))
-                    lastItem = "";
+        if(this.mc.gameSettings.showDebugInfo)
+            return;
+        if(mc.isGamePaused)
+            return;
+        if(mc.currentScreen != null)
+            return;
+        ScaledResolution sc = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
+        int k = sc.getScaledWidth();
+        int l = sc.getScaledHeight();
+        if(ModOptions.MODERN_TOOLTIPS.getAsBool()) {
+            ItemStack stack = mc.thePlayer.getCurrentEquippedItem();
+            if (stack != null) {
+                String name = stack.getItem().getStatName();
+                if (!lastItem.equals(name)) {
+                    lastItem = name;
+                    itemFade = 255;
+                    timeUp = 0;
+                }
+                if (itemFade > 0) {
+                    this.drawCenteredString(mc.fontRenderer, name, k / 2, l - 54, adjustAlpha(itemFade));
+                    if (timeUp > 50)
+                        itemFade -= 3F;
+                    else
+                        timeUp++;
+                }
+            } else if (!lastItem.equals(""))
+                lastItem = "";
+        }
+        String fps = this.mc.debug.split(" ")[0];
+        OnScreenText.showIf(ModOptions.SHOW_FPS_IN_GAME.getAsBool(),
+                "fps", "FPS: " + fps, 0xffffff);
+        Vec3D pos = mc.thePlayer.getPosition(1.0F);
+        String coords = (int) pos.xCoord + " " + (int) pos.yCoord + " " + (int) pos.zCoord;
+        OnScreenText.showIf(ModOptions.SHOW_COORDS_IN_GAME.getAsBool(),
+                "coords", "Coords: " + coords, 0xffffff);
+        OnScreenText.showIf(ModOptions.SHOW_SPEED_IN_GAME.getAsBool(),
+                "speed",
+                "Speed: " + df.format(
+                        MMUtil.getPlayer().getPlayerSpeed() *
+                        (0.98F * 5)
+                ), 0xffffff);
+        OnScreenText.showIf(ModOptions.SHOW_MOTION_IN_GAME.getAsBool(),
+                "motion", "Motion: " + df.format(
+                        MMUtil.getPlayer().getPlayerMotion() *
+                        (0.98F * 5)
+                ), 0xffffff);
+        int down = 2;
+        for(Map.Entry<String, OnScreenText> entry : OnScreenText.getOnScreenText().entrySet()) {
+            if(!entry.getKey().isEmpty()) {
+                //mc.fontRenderer.renderString(entry.getValue().getText(), 2, down, new float[]{}, false);
+                this.drawString(mc.fontRenderer, entry.getValue().getText(), 2, down, adjustAlpha(entry.getValue().getColor(), 255));
+                down+=12;
             }
-            if(ModOptions.SHOW_SPEED_IN_GAME.getAsBool()) {
-                double speed = MMUtil.getPlayer().getPlayerSpeed();
-                OnScreenText.replaceOnScreenText("speed", "Speed: " + df.format(speed*(0.98F * 5)), 0xffffff);
-            } else
-                OnScreenText.hideOnScreenText("speed");
-            if(ModOptions.SHOW_MOTION_IN_GAME.getAsBool()) {
-                double motion = MMUtil.getPlayer().getPlayerMotion();
-                OnScreenText.replaceOnScreenText("motion", "Motion: " + df.format(motion*(0.98F * 5)), 0xffffff);
-            } else
-                OnScreenText.hideOnScreenText("motion");
-            int down = 2;
-            for(Map.Entry<String, OnScreenText> entry : OnScreenText.getOnScreenText().entrySet()) {
-                if(!entry.getKey().isEmpty()) {
-                    //mc.fontRenderer.renderString(entry.getValue().getText(), 2, down, new float[]{}, false);
-                    this.drawString(mc.fontRenderer, entry.getValue().getText(), 2, down, adjustAlpha(entry.getValue().getColor(), 255));
-                    down+=12;
+        }
+
+
+        int visibleStrings = 0;
+        byte var26 = 10;
+        boolean var31 = false;
+        if (this.mc.currentScreen instanceof GuiChat) {
+            var26 = 20;
+            var31 = true;
+        }
+        for(int var17 = 0; var17 < this.chatMessageList.size() && var17 < var26; ++var17) {
+            if (((ChatLine) this.chatMessageList.get(var17)).updateCounter < 200 || var31) {
+                double var32 = (double) ((ChatLine) this.chatMessageList.get(var17)).updateCounter / 200.0D;
+                var32 = 1.0D - var32;
+                var32 *= 10.0D;
+                if (var32 < 0.0D)
+                    var32 = 0.0D;
+                if (var32 > 1.0D)
+                    var32 = 1.0D;
+                var32 *= var32;
+                int var20 = (int) (255.0D * var32);
+                if (var31)
+                    var20 = 255;
+
+                if (var20 > 0) {
+                    visibleStrings++;
                 }
             }
-            int right = 2;
-            int up = l - 50 - (chatMessageList.size() * 9);
-            if(chatMessageList.size() >= 21)
-                up = l - 50 - (21 * 9);
-            for(int i=0;i < MMUtil.playersTyping.size();i++) {
-                String name = MMUtil.playersTyping.get(i);
-                if(i+1 != MMUtil.playersTyping.size())
-                    name += ",";
-                mc.fontRenderer.drawStringWithShadow(name, right, up, 0xffffff);
-                right += mc.fontRenderer.getStringWidth(name) + 5;
-            }
-            if(MMUtil.playersTyping.size() > 0) {
-                this.drawString(mc.fontRenderer, "is typing...", right, up, 0xffffff);
-            }
-            //if(gs.getOptionI("Toggle XP-Bar") == 1)
-                //guiEXPBar(scaledresolution);
-            if(ModOptions.TOGGLE_WAILA.getAsBool())
-                guiWAILA(scaledresolution);
-            if(!ModOptions.DISABLE_PLAYERLIST.getAsBool() && MMUtil.playerList)
-                guiPlayerList(scaledresolution);
         }
+
+        int right = 2;
+        int up = l - 50 - (visibleStrings * 9);
+        List<OnlinePlayer> typing = OnlinePlayer.getObjectiveList("typing");
+        int size = typing.size();
+        for(int i=0;i < typing.size();i++) {
+            OnlinePlayer onlinePlayer = typing.get(i);
+            if(!onlinePlayer.isTyping()) {
+                size -= 1;
+                continue;
+            }
+            String name = onlinePlayer.getUsername();
+            if(i+1 != typing.size())
+                name += ",";
+            mc.fontRenderer.drawStringWithShadow(name, right, up, 0xffffff);
+            right += mc.fontRenderer.getStringWidth(name) + 5;
+        }
+        if(size > 0)
+            this.drawString(mc.fontRenderer, "is typing...", right, up, 0xffffff);
+
+        //if(gs.getOptionI("Toggle XP-Bar") == 1)
+            //guiEXPBar(scaledresolution);
+        OnScreenUI.getUI(MiniMapUI.class).inGameTick(mc, (list) -> {
+            OnScreenUI.getUI(MiniMapUI.class).prepareDrawBlock(list);
+        });
+        OnScreenUI.getUI(MiniMapUI.class).draw(sc, itemRenderer);
+        if(ModOptions.WAILA_ENABLED.getAsBool())
+            OnScreenUI.getUI(WailaUI.class).draw(sc, itemRenderer);
+        if(!ModOptions.DISABLE_PLAYERLIST.getAsBool() && MMUtil.playerList)
+            OnScreenUI.getUI(PlayerListUI.class).draw(sc);
     }
 
     /*private int k, l, current, after;
@@ -191,14 +229,14 @@ public class MixinGuiIngame extends Gui {
             if(msg.startsWith("§9There are §c2")) {
                 String rep = msg.replace("§9There are §c", "");
                 rep = rep.replaceAll("§9", "");
-                playersOnline = Integer.parseInt(rep.split(" ")[0]);
-                rep = rep.replace(playersOnline + " out of a maximum §c", "");
-                maxPlayers = Integer.parseInt(rep.split(" ")[0]);
+                PlayerListUI.playersOnline = Integer.parseInt(rep.split(" ")[0]);
+                rep = rep.replace(PlayerListUI.playersOnline + " out of a maximum §c", "");
+                PlayerListUI.maxPlayers = Integer.parseInt(rep.split(" ")[0]);
                 chatMessageList.remove(chatLine);
             }
-            for(int i=0;i < chatMessageList.size();i++) {
+            //for(int i=0;i < chatMessageList.size();i++) {
 
-            }
+            //}
             getListFromChat = false;
             return msg;
         }
@@ -220,127 +258,6 @@ public class MixinGuiIngame extends Gui {
                 MMUtil.hasLoggedIn = true; /* ignore */
         }
         return chatLine.message;
-    }
-
-    private int playersOnline = 0;
-    private int maxPlayers = 100;
-    private void guiPlayerList(ScaledResolution sc) {
-        int width = sc.getScaledWidth();
-        int centerW = sc.getScaledWidth()/2;
-        if(Packets.canUsePackets()) {
-            List<String> names = MMUtil.getPlayer().getJoinedNames();
-            int height = sc.getScaledHeight()/2 - (12 * names.size());
-            int graidentOH = height - 12;
-            int gradientH = height + (12 * names.size()) + 12;
-            drawGradientRect(width / 2 - 45, graidentOH,  width / 2 + 45, gradientH, 0xc0101010, 0xd0101010);
-            this.drawCenteredString(mc.fontRenderer, "PLAYERLIST", centerW, graidentOH, 0x4fedff);
-            for(String name : names) {
-                this.drawCenteredString(mc.fontRenderer, name, centerW, height, 0xffffff);
-                height += 12;
-            }
-            playersOnline = names.size();
-            this.drawCenteredString(mc.fontRenderer, playersOnline + " players online", centerW, height, 0x4fedff);
-        } else {
-            this.drawCenteredString(mc.fontRenderer, playersOnline+"/"+maxPlayers, centerW, width/2, 0x4fedff);
-        }
-    }
-
-    private void guiEXPBar(ScaledResolution sc) {
-        int width = sc.getScaledWidth();
-        int height = sc.getScaledHeight();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        int o = mc.renderEngine.getTexture("/gui/alphabg.png");
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        mc.renderEngine.bindTexture(o);
-
-        int i = 10;
-        int h = height-29;
-        drawTexturedModalRect(width/2-(182/2), h, 0, 26, 1, 5);
-        drawTexturedModalRect(width/2-(182/2)+1+i, h, 1, 26, 179-i, 5);
-        drawTexturedModalRect(width/2-(182/2)+180, h, 180, 26, 1, 5);
-        GL11.glBlendFunc(770, 771);
-        GL11.glDisable(GL11.GL_BLEND);
-    }
-
-    private void guiWAILA(ScaledResolution sc) {
-        Entity entity = MMUtil.getPlayer().pointingEntity;
-        int blockId = MMUtil.pointingBlock;
-        int width = sc.getScaledWidth();
-
-        if(entity instanceof EntityLiving || blockId != 0) {
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            int o = mc.renderEngine.getTexture("/gui/alphabg.png");
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.renderEngine.bindTexture(o);
-            drawTexturedModalRect(width/2-45, 3, 0, 0, 87, 26);
-            GL11.glBlendFunc(770, 771);
-            GL11.glDisable(GL11.GL_BLEND);
-        }
-
-        if (entity instanceof EntityLiving) {
-            EntityLiving entityLiving = (EntityLiving) entity;
-            String name;
-            if (entityLiving instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) entityLiving;
-                name = player.username;
-            } else
-                name = getEntityName(entityLiving);
-
-
-            drawCenteredString(mc.fontRenderer, name, width / 2, 6, 0xffffff);
-            GL11.glBindTexture(3553 /*GL_TEXTURE_2D*/, mc.renderEngine.getTexture("/gui/icons.png"));
-            int health = entityLiving.health;
-
-            String connectedServer = MMUtil.getPlayer().getConnectedServer();
-            if(connectedServer != null && CPacketMobHealth.mobIds.containsKey(entity.entityId))
-                health = CPacketMobHealth.mobIds.get(entity.entityId);
-
-            for (int i = 0; i < 10; i++) {
-                int i6 = (width / 2 - 42) + i * 8;
-                drawMissingHealth(i6, 15, entity.heartsLife);
-            }
-            for (int i = 0; i < health; i++) {
-                int i6 = (width / 2 - 42) + i * 8;
-                if (i * 2 + 1 < health) {
-                    drawHealth(i6, 15, false);
-                } else if (i * 2 + 1 == health) {
-                    drawHealth(i6, 15, true);
-                }
-            }
-        } else if(blockId != 0) {
-            Block block = Block.blocksList[blockId];
-            if(block != null) {
-                drawCenteredString(mc.fontRenderer, getBlockName(block.translateBlockName()), width / 2 + 5, 6, 0xffffff);
-                drawCenteredString(mc.fontRenderer, "H: " + block.getHardness(), width / 2 + 5, 16, 0xffffff);
-                itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, new ItemStack(block), width / 2 - 40, 8);
-                ItemKeep.ItemFulfill fulfill = ItemKeep.getByStr(block.getBlockName());
-                if(fulfill != null && fulfill.destroyWith != null) {
-                    itemRenderer.renderItemIntoGUI(mc.fontRenderer, mc.renderEngine, fulfill.destroyWith.stack, width / 2 + 40, 8);
-                }
-                RenderHelper.disableStandardItemLighting();
-            }
-        }
-    }
-
-    private String getBlockName(String name) {
-        if(name.startsWith("tile")) {
-            name = name.replace("tile.", "");
-            name = name.replace(".name", "");
-            name = name.substring(0, 1).toUpperCase() + name.substring(1);
-        }
-        return name;
-    }
-
-    private String getEntityName(EntityLiving entityLiving) {
-        String name = entityLiving.getEntityTexture();
-        name = name.replace("/mob/", "");
-        name = name.replace(".png", "");
-        name = name.replace(".png", "");
-        name = name.replace(".jpg", "");
-        name = name.substring(0, 1).toUpperCase() + name.substring(1);
-        return name;
     }
 
     public int adjustAlpha(int rgb, int alpha) {

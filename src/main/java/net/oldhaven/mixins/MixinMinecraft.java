@@ -10,8 +10,7 @@ import net.oldhaven.customs.util.MMUtil;
 import net.oldhaven.customs.util.SkinFix;
 import net.oldhaven.gui.changelog.ChangeLog;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.PixelFormat;
+import org.lwjgl.opengl.*;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,15 +20,22 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.util.Map;
 
+import static net.oldhaven.MMDebug.println;
+import static net.oldhaven.MMDebug.printe;
+
 @Mixin(Minecraft.class)
-public class MixinMinecraft {
+public abstract class MixinMinecraft {
 	@Shadow public FontRenderer fontRenderer;
 	@Shadow public GameSettings gameSettings;
 	@Shadow public EntityPlayerSP thePlayer;
 	@Shadow private static Minecraft theMinecraft;
 	@Shadow public RenderGlobal renderGlobal;
+
+	@Shadow public abstract void run();
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void init(Component component, Canvas canvas, MinecraftApplet minecraftApplet, int i, int i1, boolean b, CallbackInfo ci) {
@@ -38,19 +44,16 @@ public class MixinMinecraft {
 			if(!env.isEmpty()) {
 				MMDebug.enabled = true;
 				MMDebug.debugUserName = env;
-				System.out.println("Debug mode is " + MMDebug.enabled);
+				System.out.println("Debug mode is ENABLED");
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
 			MMDebug.enabled = false;
 		}
-		if(MMDebug.enabled) {
-			System.out.println("-----------------");
-			System.out.println("!!MegaMod IS IN DEBUG MODE!!");
-			System.out.println("THIS MODE IS ONLY FOR EDITING AND RESOLVING MegaMod ISSUES!");
-			System.out.println("-----------------");
-		}
 	}
+
+	@Redirect(method = "startGame", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Controllers;create()V"))
+	private void createController() {}
 
 	/**
 	 * Before MC starts, initiate MegaMod
@@ -69,6 +72,27 @@ public class MixinMinecraft {
 	 */
 	@Inject(method = "startGame", at = @At("RETURN"))
 	private void onStarted(CallbackInfo ci) {
+		if(MMDebug.enabled) {
+			System.out.println("-----------------");
+			System.out.println("!!MegaMod IS IN DEBUG MODE!!");
+			System.out.println("THIS MODE IS ONLY FOR EDITING AND RESOLVING MegaMod ISSUES!");
+
+			OperatingSystemMXBean op = ManagementFactory.getOperatingSystemMXBean();
+			Runtime runtime = Runtime.getRuntime();
+			printe();
+			println("SYS Info (In-case of Faults): ");
+			println(" - OS: " + op.getName() + ", " + op.getArch());
+			println(" - Free Mem (Bytes): " + runtime.freeMemory());
+			long maxMem = runtime.maxMemory();
+			println(" - Max Mem (bytes): " + ((maxMem == Long.MAX_VALUE) ? "INFINITE" : maxMem));
+			println(" - Mem For JVM (bytes): " + runtime.totalMemory());
+			println(" - Available Cores: " + runtime.availableProcessors());
+			println(" - GL Renderer: " + GL11.glGetString(GL11.GL_RENDERER));
+			println(" - GL Vendor: " + GL11.glGetString(GL11.GL_VENDOR));
+			println(" - GL Version: " + GL11.glGetString(GL11.GL_VERSION));
+			//println(" - GL EXT: " + GL11.glGetString(GL11.GL_EXTENSIONS));
+			System.out.println("-----------------");
+		}
 		MegaMod.getInstance().onMinecraftStarted();
 	}
 

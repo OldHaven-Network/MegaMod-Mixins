@@ -1,4 +1,5 @@
 buildscript {
+    ext.kotlin_version = '1.4.32'
     repositories {
         jcenter()
         maven {
@@ -13,10 +14,12 @@ buildscript {
             name = "Jitpack"
             url = "https://jitpack.io/"
         }
+        maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     }
     dependencies {
         //Sin² Edition Loom
         classpath 'com.github.js6pak:fabric-loom:beta_mcp-SNAPSHOT'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -24,11 +27,13 @@ plugins {
     id 'maven-publish'
 }
 apply plugin: 'fabric-loom'
+apply plugin: 'kotlin'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
+def developmentMode = mod_development_mode
 version = project.mod_version
 group = project.maven_group
 
@@ -41,6 +46,7 @@ repositories {
         name = 'Jitpack'
         url = 'https://jitpack.io/'
     }
+    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
 }
 
 dependencies {
@@ -49,8 +55,11 @@ dependencies {
     mappings loom.mcp(loom.BETA, "${project.minecraft_version}.1", loom.mediafire("http://www.mediafire.com/file/03d94f13c9ulj5a/mcp43.zip/file"))
     modImplementation "com.github.modmuss50:fabric-loader:${project.loader_version}"
 
+    modCompile group: 'net.java.dev.jna', name: 'jna', version: '5.5.0'
+    include group: 'net.java.dev.jna', name: 'jna', version: '5.5.0'
     modCompile 'club.minnced:java-discord-rpc:2.0.2'
     include 'club.minnced:java-discord-rpc:2.0.2'
+
     compile 'com.google.code.gson:gson:2.8.6'
     compile 'com.google.guava:guava:28.2-jre'
     compile 'commons-io:commons-io:2.5'
@@ -59,6 +68,7 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-core:2.13.0'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.12'
     compile group: 'org.mozilla', name: 'rhino', version: '1.7.12'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 }
 
 processResources {
@@ -96,24 +106,14 @@ jar {
 remapJar {
     toMappings = 'official'
 }
-
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-        }
-    }
-
-    // select the repositories you want to publish to
-    repositories {
-        // uncomment to publish to the local maven
-        // mavenLocal()
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+

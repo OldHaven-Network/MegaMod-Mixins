@@ -3,6 +3,8 @@ package net.oldhaven.mixins.blocks;
 import net.minecraft.src.*;
 import net.oldhaven.customs.options.ModOptions;
 import net.oldhaven.customs.util.MMUtil;
+import net.oldhaven.gui.onscreen.MiniMapUI;
+import net.oldhaven.gui.onscreen.OnScreenUI;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Mixin(RenderBlocks.class)
 public abstract class MixinRenderBlocks {
@@ -130,26 +133,26 @@ public abstract class MixinRenderBlocks {
             renderTallGrass(block, meta, x, y, z, true, 0.85F, 0.05F);
     }
 
+    private int rand(int seed, int x, int y) {
+        int h = seed + x*374761393 + y*668265263; //all constants are prime
+        h = (h^(h >> 13))*1274126177;
+        return h^(h >> 16);
+    }
+
     public void renderTallGrass(Block block, int meta, double x, double y, double z, boolean up, double times, double timesUp) {
         if(up) {
             TileEntity tileEntity = blockAccess.getBlockTileEntity((int) x, (int) y + 1, (int) z);
             if (tileEntity != null)
                 return;
         }
-        Random ran = new Random((long)(x+z));
-        double i = ran.nextDouble()*times;
-        double a = ran.nextDouble()*times;
-        double b = ran.nextDouble()*times;
-        if(i < a && b < i) {
-            x += (ran.nextDouble()*timesUp) - (ran.nextDouble()*(timesUp+timesUp));
+        boolean b = rand(128568126, (int)x, (int)z)/100000 < 1500;
+        if(b) {
+            ThreadLocalRandom ran = ThreadLocalRandom.current();
+            x += (ran.nextDouble()*timesUp) + (ran.nextDouble()*(timesUp+timesUp));
             z += (ran.nextDouble()*timesUp) - (ran.nextDouble()*(timesUp+timesUp));
             if(up)
                 y += 0.75F;
-            //ran.setSeed(ran.nextLong()*(long)times);
-            //y += ((ran.nextDouble() / 1.15F)*times) - (ran.nextDouble() / 2);
             renderCrossedSquares(block, meta, x, y, z);
-            renderCrossedSquares(block, meta, x, y+0.75f, z);
-            renderCrossedSquares(block, meta, x, y+0.75f+0.75f, z);
         }
     }
 
@@ -165,7 +168,7 @@ public abstract class MixinRenderBlocks {
         double z = 0;
         if(random) {
             double times = 0.15F;
-            Random ran = new Random((long) (d + d1 + d2));
+            ThreadLocalRandom ran = ThreadLocalRandom.current();
             x = (ran.nextDouble()*times)-(ran.nextDouble()*(times+times));
             y = (ran.nextDouble()*times)-(ran.nextDouble()*(times+times));
             z = (ran.nextDouble()*times)-(ran.nextDouble()*(times+times));

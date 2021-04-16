@@ -3,27 +3,27 @@ package net.oldhaven.customs.util;
 import com.google.gson.*;
 import net.minecraft.src.EntityPlayerSP;
 import net.oldhaven.customs.options.ModOptions;
-import net.oldhaven.devpack.GenericSuccess;
+import net.oldhaven.devpack.SingleCallback;
 import net.oldhaven.devpack.SkinImage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SkinFix {
     private static final Map<String, String> uuids = new HashMap<>();
     private static final Map<String, UserSkin> savedSkins = new HashMap<>();
-    private static final Map<String, JsonObject> mcCapesProfile = new HashMap<>();
+    private static final Map<String, JsonObject> mcCapesProfile = new ConcurrentHashMap<>();
     private static final JsonObject dummyJsonObj = new JsonObject();
 
     public static class UserSkin {
@@ -91,69 +91,84 @@ public class SkinFix {
     private static boolean codeIs404(int code) {
         return code == 404 || code == 500 || code == 522;
     }
-    private static boolean tryConnect(String urlS) {
-        try {
-            URL url = new URL(urlS);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
-            int code = connection.getResponseCode();
-            if(!codeIs404(code)) {
-                return true;
-            } else {
-                System.out.println("TRY CONNECT CODE : " + code);
-            }
-        } catch(IOException ignore) {}
-        return false;
+    private static void tryConnect(String urlStr, SingleCallback<URL> success, Runnable fail) {
+        SkinUtil.executor.execute(() -> {
+            try {
+                URL url = new URL(urlStr);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                int code = connection.getResponseCode();
+                if(!codeIs404(code)) {
+                    success.run(url);
+                    return;
+                }
+            } catch(IOException ignore) {}
+            if(fail != null)
+                fail.run();
+        });
+    }
+    private static void tryConnect(String urlStr, SingleCallback<URL> success) {
+        tryConnect(urlStr, success, null);
     }
 
-
-    public static JsonObject getMinecraftCapesProfile(String uuid) {
-        if(SkinFix.mcCapesProfile.containsKey(uuid))
-            return SkinFix.mcCapesProfile.get(uuid);
-        String urlBase = "https://minecraftcapes.net/profile/"+uuid+"/";
-        if(tryConnect(urlBase)) {
-            JsonObject jsonObject = SkinUtil.readJsonFromURL(urlBase);
-            SkinFix.mcCapesProfile.put(uuid, jsonObject);
-            return jsonObject;
+    public static void getMinecraftCapesProfile(final String uuid, final SingleCallback<JsonObject> success) {
+        if(SkinFix.mcCapesProfile.containsKey(uuid)) {
+            success.run(SkinFix.mcCapesProfile.get(uuid));
+            return;
         }
-        SkinFix.mcCapesProfile.put(uuid, SkinFix.dummyJsonObj);
-        return null;
+        String urlBase = "https://minecraftcapes.net/profile/"+uuid+"/";
+        tryConnect(urlBase, (url) -> {
+            JsonObject jsonObject = JsonUtil.readJsonFromURL(url, JsonObject.class);
+            SkinFix.mcCapesProfile.put(uuid, jsonObject);
+            success.run(jsonObject);
+        }, () -> SkinFix.mcCapesProfile.put(uuid, SkinFix.dummyJsonObj));
+    }
+
+    private static final Map<String, SkinImage> skinImageMap = new HashMap<>();
+    public static SkinImage getSkinUrl(String url) {
+        if(skinImageMap.containsKey(url))
+            return skinImageMap.get(url);
+        SkinImage image = new SkinImage();
+        SkinUtil.getSkinFromUrl(url, (img) -> {
+            image.setImage(img);
+            image.setFailed(img == null);
+        });
+        skinImageMap.put(url, image);
+        return image;
     }
 
     public static SkinImage getCapeUrl(String playerName) {
         if(!connected || !ModOptions.SKIN_CAPE.getAsBool())
             return null;
         UserSkin userSkin = getUserSkin(playerName);
-        SkinImage skinImage = userSkin.skinCape;
+        final SkinImage skinImage = userSkin.skinCape;
         if(skinImage.failed != null)
             return skinImage;
-        System.out.println("2");
-        String urlBase = "http://s.optifine.net/capes/"+playerName+".png";
-        if(tryConnect(urlBase)) {
+        final String urlBase = "http://s.optifine.net/capes/"+playerName+".png";
+        tryConnect(urlBase, (url) -> {
             skinImage.setImageUrl(urlBase);
             skinImage.setFailed(false);
-            return skinImage;
-        }
-        System.out.println("3");
-        String uuid = getUuidStringFromName(playerName);
-        try {
-            JsonObject jsonObject = getMinecraftCapesProfile(uuid);
-            if (jsonObject != null) {
-                getElement(jsonObject, "textures").<JsonObject>success((textures) -> {
-                    String base64 = textures.get("cape").getAsString();
+        }, () -> {
+            String uuid = getUuidStringFromName(playerName);
+            try {
+                getMinecraftCapesProfile(uuid, (jsonObject) -> {
+                    JsonUtil.getElement(jsonObject, "textures").<JsonObject>success((textures) -> {
+                        JsonUtil.getElement(textures, "cape").<JsonElement>success((element) -> {
+                            String base64 = element.getAsString();
 
-                    byte[] imageByte = Base64.getDecoder().decode(base64);
-                    skinImage.setImage(getBufferFrom(imageByte));
-                    skinImage.setFailed(false);
-                }).failure((JsonElement element) -> {
-                    skinImage.setFailed(true);
+                            byte[] imageByte = Base64.getDecoder().decode(base64);
+                            skinImage.setImage(getBufferFrom(imageByte));
+                            skinImage.setFailed(false);
+                        });
+                    }).failure((JsonElement element) -> {
+                        skinImage.setFailed(true);
+                    });
                 });
-                System.out.println(skinImage.image);
+            } catch(Exception e) {
+                e.printStackTrace();
             }
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        if(skinImage.failed != null)
+        });
+        if(skinImage.failed == null)
             skinImage.setFailed(true);
         return skinImage;
     }
@@ -167,36 +182,24 @@ public class SkinFix {
             return skinImage;
         String uuid = getUuidStringFromName(playerName);
         try {
-            JsonObject jsonObject = getMinecraftCapesProfile(uuid);
-            if (jsonObject != null) {
-                getElement(jsonObject, "textures").<JsonObject>success((textures) -> {
-                    String base64 = textures.get("ears").getAsString();
-
-                    byte[] imageByte = Base64.getDecoder().decode(base64);
-                    skinImage.setImage(getBufferFrom(imageByte));
-                    skinImage.setFailed(false);
+            getMinecraftCapesProfile(uuid, (jsonObject) -> {
+                JsonUtil.getElement(jsonObject, "textures").<JsonObject>success((textures) -> {
+                    JsonUtil.getElement(textures, "ears").<JsonElement>success((element) -> {
+                        String base64 = element.getAsString();
+                        byte[] imageByte = Base64.getDecoder().decode(base64);
+                        skinImage.setImage(getBufferFrom(imageByte));
+                        skinImage.setFailed(false);
+                    });
                 }).failure((JsonElement element) -> {
                     skinImage.setFailed(true);
                 });
-            }
+            });
         } catch(Exception e) {
             e.printStackTrace();
         }
-        if(skinImage.failed != null)
+        if(skinImage.failed == null)
             skinImage.setFailed(true);
         return skinImage;
-    }
-
-    private static GenericSuccess<JsonElement> getElement(JsonObject from, String... toList) {
-        JsonElement getter = null;
-        for(String to : toList) {
-            getter = from.get(to);
-            if(getter == null)
-                return GenericSuccess._RSC(null, false);
-            if(getter.isJsonObject())
-                from = getter.getAsJsonObject();
-        }
-        return GenericSuccess._RSC(getter, getter != null && !getter.isJsonNull());
     }
 
     private static BufferedImage getBufferFrom(byte[] imgBytes) {
@@ -225,33 +228,38 @@ public class SkinFix {
 
     private static UserSkin getSkinFromUrl(String ur) {
         UserSkin userSkin = new UserSkin();
-        JsonObject json = SkinUtil.readJsonFromURL(ur);
+        JsonObject json = null;
+        try {
+            json = JsonUtil.readJsonFromURL(new URL(ur), JsonObject.class);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         if(json == null)
             return userSkin;
         if(json.get("properties") != null) {
             JsonObject properties =
-                    getElement(json, "properties")
+                    JsonUtil.getElement(json, "properties")
                     .<JsonArray>retreive().get(0).getAsJsonObject();
             if(properties.get("signature") == null)
                 return userSkin;
             if(SkinUtil.verifySig(properties)) { /*verified*/
-                JsonObject user = MMUtil.gson.fromJson(
+                JsonObject user = JsonUtil.gson.fromJson(
                     new String(
                         Base64.getDecoder().decode(
-                            getElement(properties, "value")
+                            JsonUtil.getElement(properties, "value")
                                 .<JsonPrimitive>retreive().getAsString()
                                 .getBytes(StandardCharsets.UTF_8)
                         )
                     ), JsonObject.class
                 );
-                getElement(user, "textures").<JsonObject>success((textures) -> {
-                    JsonObject skin = getElement(textures, "SKIN").retreive();
-                    getElement(textures, "EARS")
+                JsonUtil.getElement(user, "textures").<JsonObject>success((textures) -> {
+                    JsonObject skin = JsonUtil.getElement(textures, "SKIN").retreive();
+                    JsonUtil.getElement(textures, "EARS")
                             .<String>success((ears) -> userSkin.skinEars.setImageUrl(ears));
-                    getElement(textures, "CAPE")
+                    JsonUtil.getElement(textures, "CAPE")
                             .<String>success((cape) -> userSkin.skinCape.setImageUrl(cape));
-                    userSkin.skinUrl = getElement(skin, "url").<JsonPrimitive>retreive().getAsString();
-                    getElement(skin, "metadata", "model").<JsonPrimitive>success((prim) -> {
+                    userSkin.skinUrl = JsonUtil.getElement(skin, "url").<JsonPrimitive>retreive().getAsString();
+                    JsonUtil.getElement(skin, "metadata", "model").<JsonPrimitive>success((prim) -> {
                         String alex = prim.getAsString();
                         userSkin.slim = alex.equalsIgnoreCase("slim");
                     });
@@ -261,6 +269,7 @@ public class SkinFix {
         return userSkin;
     }
     private static String getUuidFromMojang(String playerName) {
+        long time = System.currentTimeMillis();
         try {
             URL url = new URL("https://api.mojang.com/users/profiles/minecraft/" + playerName);
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));

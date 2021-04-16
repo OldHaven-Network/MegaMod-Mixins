@@ -28,17 +28,24 @@ public class OnScreenText {
     public static Map<String, OnScreenText> getOnScreenText() {
         return onScreenTextMap;
     }
-    public static void replaceOnScreenText(String name, String text, int color) {
+    public static void showAndReplace(String name, String text, int color) {
         if(onScreenTextMap.containsKey(name))
             onScreenTextMap.get(name).setText(text);
         else
-            showOnScreenText(name, text, color);
+            OnScreenText.show(name, text, color);
     }
-    public static void showOnScreenText(String name, String text, int color) {
+    public static void show(String name, String text, int color) {
         if(!onScreenTextMap.containsKey(name))
             onScreenTextMap.put(name, new OnScreenText(text, color));
     }
-    public static void hideOnScreenText(String name) {
+    public static void hide(String name) {
         onScreenTextMap.remove(name);
+    }
+
+    public static void showIf(boolean b, String name, String text, int color) {
+        if(b) {
+            OnScreenText.showAndReplace(name, text, color);
+        } else
+            OnScreenText.hide(name);
     }
 }

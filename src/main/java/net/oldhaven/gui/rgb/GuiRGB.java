@@ -14,8 +14,14 @@ public class GuiRGB extends GuiScreen {
     private final RunnableWithHex yesAction;
     private final RunnableWithHex noAction;
     private final Runnable toDefault;
-    public GuiRGB(RunnableWithHex yesAction, RunnableWithHex noAction, Runnable toDefault) {
+    private final int originalRgb;
+
+    public GuiRGB(String rgbString, RunnableWithHex yesAction, RunnableWithHex noAction, Runnable toDefault) {
         super();
+        if(rgbString.isEmpty())
+            this.originalRgb = 0xffffffff;
+        else
+            this.originalRgb = Integer.decode(rgbString);
         this.yesAction = yesAction;
         this.noAction = noAction;
         this.toDefault = toDefault;
@@ -33,6 +39,12 @@ public class GuiRGB extends GuiScreen {
         this.controlList.add(new GuiSmallButton(0, this.width / 2 - (155/2), this.height / 3 + 55, "Reset to Default / Remove"));
         this.controlList.add(new GuiSmallButton(1, this.width / 2 - 155 + 0, this.height / 3 + 96, "Yes"));
         this.controlList.add(new GuiSmallButton(2, this.width / 2 - 155 + 160, this.height / 3 + 96, "No"));
+        float r = (originalRgb>>16) &0xff;
+        float g = (originalRgb>>8) &0xff;
+        float b = (originalRgb>>0) &0xff;
+        this.r.displayString = String.valueOf((this.r.sliderValue = r / 255) * 255);
+        this.g.displayString = String.valueOf((this.g.sliderValue = g / 255) * 255);
+        this.b.displayString = String.valueOf((this.b.sliderValue = b / 255) * 255);
     }
 
     @Override

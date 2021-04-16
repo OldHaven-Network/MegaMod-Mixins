@@ -1,7 +1,5 @@
 package net.oldhaven.devpack;
 
-import com.google.gson.JsonPrimitive;
-
 public class GenericSuccess<T> {
     private T generic;
     private boolean success = false;

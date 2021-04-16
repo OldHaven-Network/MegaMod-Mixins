@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "id": "megamod",
   "version": "${version}",
+  "developmentMode": "",
 
   "name": "MegaMod",
   "description": "MegaMod",

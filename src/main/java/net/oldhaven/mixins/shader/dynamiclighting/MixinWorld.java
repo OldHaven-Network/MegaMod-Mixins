@@ -25,7 +25,7 @@ public abstract class MixinWorld {
     @Inject(method = "getLightBrightness", at = @At("INVOKE"), cancellable = true)
     private void getLightBrightness(int x, int y, int z, CallbackInfoReturnable<Float> cir) {
         int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
-        if(shaders <= 1 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
+        if(shaders <= 0 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
             return;
         Object i = MMUtil.getFakeShaderThread().calculateLightRender(x, y, z, this.worldProvider.lightBrightnessTable[this.getBlockLightValue(x, y, z)]);
         if((float)i != 0.0F)
@@ -35,7 +35,7 @@ public abstract class MixinWorld {
     @Inject(method = "getBlockLightValue", at = @At("INVOKE"), cancellable = true)
     private void getLightValue(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
         int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
-        if(shaders <= 1 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
+        if(shaders <= 0 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
             return;
         Object i = MMUtil.getFakeShaderThread().calculateLightRender(x, y, z, this.getBlockLightValue_do(x, y, z, true));
         if((int)i != 0)
@@ -45,7 +45,7 @@ public abstract class MixinWorld {
     @Inject(method = "getFullBlockLightValue", at=@At("INVOKE"), cancellable = true)
     private void getFullBlockLightValue(int x, int y, int z, CallbackInfoReturnable<Integer> cir) {
         int shaders = (int)(ModOptions.SHADERS.getAsFloat()*ModOptions.SHADERS.getTimes());
-        if(shaders <= 1 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
+        if(shaders <= 0 || !ModOptions.DYNAMIC_LIGHTING.getAsBool())
             return;
         Object i = MMUtil.getFakeShaderThread().calculateLightRender(x, y, z, this.getBlockLightValue_do(x, y, z, true));
         if((int)i != 0)

@@ -12,17 +12,19 @@ import net.oldhaven.customs.shaders.FakeShaderThread;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 public class MMUtil {
     public static int
             thirdPersonView, signCursorLoc,
             chatCursorLoc, chatScrollUp,
-            pointingBlock =                     0;
+            pointingBlock                     = 0;
     public static boolean
             hasLoggedIn, isZooming,
             isSprinting, isFlying,
             flyStill, modLoaderEnabled,
-            failedToDrawBG, playerList =        false;
+            failedToDrawBG, playerList,
+            mapOpen                       = false;
 
     private static ServerPacketInformation serverPacketInformation;
     private static CustomGameSettings customGameSettings;
@@ -33,10 +35,6 @@ public class MMUtil {
     private static SavedShaders savedShaders;
     private static SavedServers savedServers;
     private static SavedLogins autoLogins;
-
-    public static final Gson gson = new Gson();
-
-    public static LinkedList<String> playersTyping;
 
     private static Minecraft mcInstance;
 
@@ -53,8 +51,6 @@ public class MMUtil {
         customKeybinds = new CustomKeybinds();
         autoLogins = new SavedLogins(megaMod);
         savedShaders = new SavedShaders();
-
-        playersTyping = new LinkedList<>();
 
         try {
             ThreadGroup group = Thread.currentThread().getThreadGroup();

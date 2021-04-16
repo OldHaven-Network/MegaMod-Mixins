@@ -218,13 +218,13 @@ public class MixinGuiMainMenu extends GuiScreen {
             else
                 this.drawCenteredString(this.fontRenderer, "MegaMod ChangeLog", MM_CL.xPosition-15, MM_CL.yPosition + 22+2, 0xffffff);
         }
-        if(MegaMod.requiresUpdate != null && !MegaMod.devVersion) {
-            this.drawString(fontRenderer, "UPDATE FROM " + MegaMod.version + " TO " + MegaMod.requiresUpdate, 2, height - 10, 0xff7575);
-            this.drawString(fontRenderer, "MegaMod v"+ MegaMod.version + "-Mixins", 2, height - 20, 0xFFFFFF);
+        if(MegaMod.requiresUpdate != null && !MegaMod.isDevBuild()) {
+            this.drawString(fontRenderer, "UPDATE FROM " + MegaMod.getVersion() + " TO " + MegaMod.requiresUpdate, 2, height - 10, 0xff7575);
+            this.drawString(fontRenderer, "MegaMod v"+ MegaMod.getVersion() + "-Mixins", 2, height - 20, 0xFFFFFF);
         } else {
-            if(MegaMod.devVersion)
+            if(MegaMod.isDevBuild())
                 this.drawString(fontRenderer, "! DEVELOPER VERSION !", 2, height - 20, 0xff7575);
-            this.drawString(fontRenderer, "MegaMod v" + MegaMod.version + "-Mixins", 2, height - 10, 0xFFFFFF);
+            this.drawString(fontRenderer, "MegaMod v" + MegaMod.getVersion() + "-Mixins", 2, height - 10, 0xFFFFFF);
         }
     }
 

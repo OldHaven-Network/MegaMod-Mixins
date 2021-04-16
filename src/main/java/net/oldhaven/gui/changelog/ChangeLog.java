@@ -27,6 +27,8 @@ public class ChangeLog {
     public ChangeLog() {
         if(!MegaMod.isOnline())
             return;
+        if(MegaMod.isDevBuild())
+            return;
         textFields = new LinkedList<>();
         try {
             URL url = new URL("https://raw.githubusercontent.com/OldHaven-Network/MegaMod-Mixins/master/changelog.txt");
@@ -44,7 +46,7 @@ public class ChangeLog {
                     if (sub.contains(".")) {
                         String ver = sub.replaceAll("[A-z ]", "");
                         if (ver.equals(sub)) {
-                            if(!hasCheckedVersion && !MegaMod.version.equals(sub))
+                            if(!hasCheckedVersion && !MegaMod.getVersion().equals(sub))
                                 MegaMod.requiresUpdate = sub;
                             hasCheckedVersion = true;
                             textFields.addLast(new TextField(str, green));

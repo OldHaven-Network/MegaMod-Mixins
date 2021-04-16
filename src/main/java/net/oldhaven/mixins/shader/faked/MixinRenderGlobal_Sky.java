@@ -23,7 +23,7 @@ public abstract class MixinRenderGlobal_Sky {
 
     @Inject(method = "renderSky", at=@At(value = "INVOKE", target = "Lnet/minecraft/src/World;getStarBrightness(F)F", shift = At.Shift.BEFORE))
     private void renderShaderSky(float v, CallbackInfo ci) {
-        if (((int) ModOptions.SHADERS.getAsFloat() * 4) > 1)
+        if (((int) ModOptions.SHADERS.getAsFloat() * 4) > 0)
             return;
     }
 

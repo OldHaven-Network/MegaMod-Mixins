@@ -68,16 +68,14 @@ public class GuiShaderSettings extends ModdedSettingsGui
             else
                 mc.displayGuiScreen(new GuiShaderNonGLSLSettings(this, gameSettings));
         } else if(guibutton.id == 201) {
-            mc.displayGuiScreen(new GuiRGB(
+            mc.displayGuiScreen(new GuiRGB(ModOptions.WATER_COLOR.getAsString(),
                 (int hex) -> {
                     MMUtil.getCustomGameSettings().setOption("Water Color Hex", String.valueOf(hex));
                     MMUtil.getCustomGameSettings().saveSettings();
                     if(MMUtil.getMinecraftInstance().renderGlobal != null)
                         MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
-                }, (int hex) -> {
-                    mc.displayGuiScreen(this);
-                }, () -> {
+                }, (int hex) -> mc.displayGuiScreen(this), () -> {
                     MMUtil.getCustomGameSettings().setOption("Water Color Hex", "");
                     MMUtil.getCustomGameSettings().saveSettings();
                     if(MMUtil.getMinecraftInstance().renderGlobal != null)
@@ -86,16 +84,14 @@ public class GuiShaderSettings extends ModdedSettingsGui
                 }
             ));
         } else if(guibutton.id == 202) {
-            mc.displayGuiScreen(new GuiRGB(
+            mc.displayGuiScreen(new GuiRGB(ModOptions.LAVA_COLOR.getAsString(),
                 (int hex) -> {
                     MMUtil.getCustomGameSettings().setOption("Lava Color Hex", String.valueOf(hex));
                     MMUtil.getCustomGameSettings().saveSettings();
                     if(MMUtil.getMinecraftInstance().renderGlobal != null)
                         MMUtil.getMinecraftInstance().renderGlobal.loadRenderers();
                     mc.displayGuiScreen(this);
-                }, (int hex) -> {
-                    mc.displayGuiScreen(this);
-                }, () -> {
+                }, (int hex) -> mc.displayGuiScreen(this), () -> {
                     MMUtil.getCustomGameSettings().setOption("Lava Color Hex", "");
                     MMUtil.getCustomGameSettings().saveSettings();
                     if(MMUtil.getMinecraftInstance().renderGlobal != null)
@@ -107,9 +103,10 @@ public class GuiShaderSettings extends ModdedSettingsGui
     }
 
     private int glslCheck() {
-        String value = ModOptions.SHADERS.getStringValue();
-        optionButton.enabled = !value.equals("OFF");
-        if(value.equals("GLSL")) {
+        ModOptions shaders = ModOptions.SHADERS;
+        float value = shaders.getAsFloat();
+        optionButton.enabled = shaders.getAsFloat() != -1;
+        if(value == 0) {
             optionButton.displayString = "GLSL Settings";
             return 1;
         } else {

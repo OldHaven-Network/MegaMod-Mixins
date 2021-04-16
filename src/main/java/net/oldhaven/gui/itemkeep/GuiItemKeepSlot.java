@@ -17,9 +17,8 @@ import java.util.TreeSet;
 //            GuiSlot, GuiAutoLogins, TexturePackList, TexturePackBase, 
 //            RenderEngine, Tessellator
 
-class GuiItemKeepSlot extends GuiSlot
-{
-    private static RenderItem itemRenderer = new RenderItem();
+class GuiItemKeepSlot extends GuiSlot {
+    private static final RenderItem itemRenderer = new RenderItem();
     private final SortedSet<String> keys;
     private final HashMap<String, ItemKeep.ItemFulfill> hashMap;
     public GuiItemKeepSlot(GuiItemKeep gui) {

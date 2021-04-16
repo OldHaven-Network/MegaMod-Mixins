@@ -1,15 +1,23 @@
 package net.oldhaven.customs.util;
 
 import com.google.gson.JsonObject;
+import net.oldhaven.devpack.SingleCallback;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class SkinUtil {
+    static Executor executor = Executors.newCachedThreadPool();
+
     /**
      * Some code from here to help with doing signature stuff:
      * https://github.com/Steveice10/MCAuthLib/blob/master/src/main/java/com/github/steveice10/mc/auth/data/GameProfile.java
@@ -51,23 +59,21 @@ public class SkinUtil {
         return false;
     }
 
-    static JsonObject readJsonFromURL(String ur) {
-        try {
-            URL url = new URL(ur);
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-            StringBuilder lines = new StringBuilder();
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    lines.append(line);
-                }
-            }
-            in.close();
-            return MMUtil.gson.fromJson(lines.toString(), JsonObject.class);
-        } catch(IOException e) {
-            e.printStackTrace();
+    static void getSkinFromUrl(String pngUrl, SingleCallback<BufferedImage> callback) {
+        if(pngUrl == null || pngUrl.isEmpty()) {
+            callback.run(null);
+            return;
         }
-        return null;
+        executor.execute(() -> {
+            BufferedImage image = null;
+            try {
+                URL url = new URL(pngUrl);
+                image = ImageIO.read(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                callback.run(image);
+            }
+        });
     }
 }

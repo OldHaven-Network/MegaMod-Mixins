@@ -20,8 +20,7 @@ public class Packets {
     public static void sendPacket(String packetName, String bytes) {
         if(!canUsePackets())
             return;
-        if(MMDebug.enabled)
-            System.out.println("Send Packet " + packetName + ": " + bytes);
+        MMDebug.println("Send Packet " + packetName + ": " + bytes);
 
         EntityPlayerSP thePlayer = MMUtil.getMinecraftInstance().thePlayer;
         EntityClientPlayerMP playerMP = (EntityClientPlayerMP) thePlayer;

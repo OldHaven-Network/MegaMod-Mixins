@@ -57,20 +57,28 @@ public class MegaModDiscord {
         setSmallImage(images.smallID, images.smallText);
     }
     public static void setSmallImage(final String id, final String text) {
+        if(richPresence == null)
+            return;
         richPresence.smallImageKey = id;
         richPresence.smallImageText = text;
     }
     public static void setLargeImage(final String id, final String text) {
+        if(richPresence == null)
+            return;
         richPresence.largeImageKey = id;
         richPresence.largeImageText = text;
     }
     public static void setDetails(final String details) {
+        if(richPresence == null)
+            return;
         if(ip(details))
             richPresence.details = "IP Address";
         else
             richPresence.details = details;
     }
     public static void setState(final String state) {
+        if(richPresence == null)
+            return;
         if(ip(state))
             richPresence.state = "IP Address";
         else
@@ -79,12 +87,16 @@ public class MegaModDiscord {
         richPresence.partyMax = 0;
     }
     public static void setParty(final String state, final int size, final int max) {
+        if(richPresence == null)
+            return;
         setState(state);
         richPresence.partySize = size;
         richPresence.partyMax = max;
     }
     public static void updatePresence() {
         if(isDisabled)
+            return;
+        if(richPresence == null)
             return;
         DiscordRPC.INSTANCE.Discord_UpdatePresence(richPresence);
     }

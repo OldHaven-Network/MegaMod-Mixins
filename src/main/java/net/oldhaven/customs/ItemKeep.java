@@ -28,8 +28,8 @@ public class ItemKeep {
             this.damage = damage;
         }
     }
-    private static HashMap<String, ItemFulfill> listID = new HashMap<>();
-    private static HashMap<String, ItemFulfill> mapByStr = new HashMap<>();
+    private static final HashMap<String, ItemFulfill> listID = new HashMap<>();
+    private static final HashMap<String, ItemFulfill> mapByStr = new HashMap<>();
     public static HashMap<String, ItemFulfill> getFullMap() {
         return mapByStr;
     }
